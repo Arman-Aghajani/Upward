@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upward — Learn. Rank up. Rise.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="../rankup.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --bg-light: #0a0a4a;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: var(--bg-dark);
+            overflow-x: hidden;
+        }
+
+        /* STARS */
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        /* NAVBAR */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 60px;
+            background: rgba(2, 2, 35, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-logo {
+            font-family: 'Press Start 2P';
+            font-size: 16px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color .2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: Arial;
+        }
+
+        .nav-link:hover {
+            color: white;
+        }
+
+        .nav-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 40px 80px;
+            position: relative;
+            z-index: 1;
+            background: radial-gradient(ellipse at 50% 40%, rgba(255, 215, 0, 0.06) 0%, transparent 70%);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 32px;
+            animation: fadeUp .6s ease both;
+        }
+
+        .hero-title {
+            font-family: 'Press Start 2P';
+            font-size: clamp(28px, 5vw, 52px);
+            color: var(--accent);
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            margin-bottom: 16px;
+            line-height: 1.4;
+            animation: fadeUp .6s ease .1s both;
+        }
+
+        .hero-tagline {
+            font-family: 'Press Start 2P';
+            font-size: clamp(10px, 2vw, 14px);
+            opacity: 0.5;
+            margin-bottom: 28px;
+            letter-spacing: 2px;
+            animation: fadeUp .6s ease .2s both;
+        }
+
+        .hero-desc {
+            max-width: 600px;
+            font-size: 16px;
+            line-height: 1.8;
+            opacity: 0.7;
+            margin-bottom: 48px;
+            animation: fadeUp .6s ease .3s both;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeUp .6s ease .4s both;
+        }
+
+        .btn-primary {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            padding: 16px 32px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            filter: brightness(1.15);
+
+        }
+
+        .btn-secondary {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            padding: 16px 32px;
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            overflow: hidden;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* RANKS PREVIEW */
+        .ranks-preview {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 64px;
+            animation: fadeUp .6s ease .5s both;
+        }
+
+        .rank-pill {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            transition: all .3s;
+        }
+
+        .rank-pill:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .rank-pill.highlight {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* SCROLL INDICATOR */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.3;
+            animation: bounce2 2s infinite;
+        }
+
+        .scroll-indicator span {
+            font-size: 11px;
+        }
+
+        .scroll-arrow {
+            font-size: 20px;
+        }
+
+        @keyframes bounce2 {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(6px);
+            }
+        }
+
+        /* FEATURES SECTION */
+        .section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 60px;
+        }
+
+        .section-label {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--accent);
+            opacity: 0.6;
+            text-align: center;
+            margin-bottom: 16px;
+            letter-spacing: 3px;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P';
+            font-size: clamp(14px, 2.5vw, 22px);
+            text-align: center;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 15px;
+            opacity: 0.5;
+            max-width: 500px;
+            margin: 0 auto 60px;
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: transform .25s, box-shadow .25s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-title {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            opacity: 0.6;
+            line-height: 1.8;
+        }
+
+        /* LANGUAGES SECTION */
+        .languages-section {
+            position: relative;
+            z-index: 1;
+            padding: 80px 60px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: var(--border);
+            border-bottom: var(--border);
+        }
+
+        .lang-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .lang-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 32px 40px;
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 16px;
+            transition: transform .25s, box-shadow .25s;
+            min-width: 180px;
+        }
+
+        .lang-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .lang-icon {
+            font-size: 48px;
+        }
+
+        .lang-name {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+        }
+
+        .lang-desc {
+            font-size: 12px;
+            opacity: 0.5;
+            text-align: center;
+        }
+
+        /* RANK SYSTEM SECTION */
+        .ranks-section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 60px;
+        }
+
+        .ranks-showcase {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .rank-showcase-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rank-circle-landing {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            transition: all .3s;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .rank-showcase-item:hover .rank-circle-landing {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .rank-showcase-item span {
+            font-size: 10px;
+            opacity: 0.3;
+        }
+
+        /* CTA SECTION */
+        .cta-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 60px;
+            text-align: center;
+            background: radial-gradient(ellipse at 50% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+        }
+
+        .cta-title {
+            font-family: 'Press Start 2P';
+            font-size: clamp(16px, 3vw, 28px);
+            color: var(--accent);
+            margin-bottom: 20px;
+            line-height: 1.6;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .cta-desc {
+            font-size: 15px;
+            opacity: 0.5;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        /* FOOTER */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: var(--border);
+            padding: 30px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0.4;
+            font-size: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-logo {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity .6s ease, transform .6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 24px;
+            }
+
+            .section {
+                padding: 60px 24px;
+            }
+
+            .languages-section {
+                padding: 60px 24px;
+            }
+
+            .ranks-section {
+                padding: 60px 24px;
+            }
+
+            .cta-section {
+                padding: 80px 24px;
+            }
+
+            footer {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="nav-logo">Upward</div>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#languages" class="nav-link">Languages</a>
+            <a href="#ranks" class="nav-link">Ranks</a>
+            <a href="../AccountManagement/Login.html" class="nav-link">Log In</a>
+            <a href="../AccountManagement/Signup.html" class="nav-btn">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">⭐ Gamified Programming Learning</div>
+        <h1 class="hero-title">Upward</h1>
+        <p class="hero-tagline">Learn. Rank up. Rise.</p>
+        <p class="hero-desc">
+            Stop watching tutorials and start doing. Upward turns programming into a game — earn XP, climb ranks from E
+            to National, and get real-time AI feedback on your code.
+        </p>
+        <div class="hero-btns">
+            <a href="../AccountManagement/Signup.html" class="btn-primary">Start For Free</a>
+            <a href="#features" class="btn-secondary">See How It Works</a>
+        </div>
+
+        <div class="ranks-preview">
+            <div class="rank-pill">Rank E</div>
+            <div class="rank-pill">Rank D</div>
+            <div class="rank-pill">Rank C</div>
+            <div class="rank-pill ">Rank B</div>
+            <div class="rank-pill">Rank A</div>
+            <div class="rank-pill">Rank S</div>
+            <div class="rank-pill highlight">National</div>
+        </div>
+
+        <div class="scroll-indicator">
+            <span>scroll</span>
+            <div class="scroll-arrow">↓</div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+        <p class="section-label">Features</p>
+        <h2 class="section-title fade-in">Everything you need to actually learn</h2>
+        <p class="section-subtitle fade-in">Not another passive course. Upward makes you write real code and rewards you
+            for it.</p>
+
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <span class="feature-icon">🏆</span>
+                <h3 class="feature-title">Rank System</h3>
+                <p class="feature-desc">Start at Rank E and climb all the way to National. Each rank unlocks harder
+                    problems and proves your growing skill.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <span class="feature-icon">🤖</span>
+                <h3 class="feature-title">AI Feedback</h3>
+                <p class="feature-desc">Submit your code and get instant AI-powered feedback. Not just right or wrong —
+                    real explanations of what to improve.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <span class="feature-icon">⚡</span>
+                <h3 class="feature-title">XP & Progression</h3>
+                <p class="feature-desc">Every lesson completed and problem solved earns XP. Watch your progress bar fill
+                    and your rank climb in real time.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <span class="feature-icon">🗺️</span>
+                <h3 class="feature-title">Interactive Map</h3>
+                <p class="feature-desc">Navigate your learning journey through a visual world map. Each territory
+                    unlocks new skills and challenges.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <span class="feature-icon">💬</span>
+                <h3 class="feature-title">AI Tutor Chat</h3>
+                <p class="feature-desc">Stuck on a concept? Your AI tutor knows exactly which lesson you're on and gives
+                    context-aware help instantly.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <span class="feature-icon">⚔️</span>
+                <h3 class="feature-title">Duel Mode</h3>
+                <p class="feature-desc">Challenge another student to a coding duel. Same problem, same timer — whoever
+                    solves it first and most efficiently wins.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LANGUAGES -->
+    <section class="languages-section" id="languages">
+        <p class="section-label">Languages</p>
+        <h2 class="section-title fade-in">Three languages. One platform.</h2>
+        <p class="section-subtitle fade-in">Master the building blocks of the web and beyond.</p>
+
+        <div class="lang-grid">
+            <div class="lang-card fade-in">
+                <div class="lang-icon">🌐</div>
+                <div class="lang-name">HTML</div>
+                <div class="lang-desc">Structure the web from the ground up</div>
+            </div>
+            <div class="lang-card fade-in">
+                <div class="lang-icon">🎨</div>
+                <div class="lang-name">CSS</div>
+                <div class="lang-desc">Style and design beautiful interfaces</div>
+            </div>
+            <div class="lang-card fade-in">
+                <div class="lang-icon">🐍</div>
+                <div class="lang-name">Python</div>
+                <div class="lang-desc">Write real programs and logic</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RANKS -->
+    <section class="ranks-section" id="ranks">
+        <p class="section-label">Rank System</p>
+        <h2 class="section-title fade-in">Seven ranks stand between you and the top</h2>
+        <p class="section-subtitle fade-in">Every rank is harder than the last. Every rank proves you've grown.</p>
+
+        <div class="ranks-showcase fade-in">
+            <div class="rank-showcase-item">
+                <div class="rank-circle-landing">E</div>
+                <span>Beginner</span>
+            </div>
+            <div class="rank-showcase-item">
+                <div class="rank-circle-landing">D</div>
+                <span>Easy</span>
+            </div>
+            <div class="rank-showcase-item">
+                <div class="rank-circle-landing">C</div>
+                <span>Intermediate</span>
+            </div>
+            <div class="rank-showcase-item">
+                <div class="rank-circle-landing">B</div>
+                <span>Advanced</span>
+            </div>
+            <div class="rank-showcase-item">
+                <div class="rank-circle-landing">A</div>
+                <span>Expert</span>
+            </div>
+            <div class="rank-showcase-item">
+                <div class="rank-circle-landing">S</div>
+                <span>Master</span>
+            </div>
+            <div class="rank-showcase-item">
+                <div class="rank-circle-landing" style="font-size:9px;">NAT</div>
+                <span>National</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2 class="cta-title fade-in">Ready to start climbing?</h2>
+        <p class="cta-desc fade-in">Join Upward for free. No credit card. No tutorials. Just you, your code, and the
+            next rank waiting.</p>
+        <a href="../AccountManagement/Signup.html" class="btn-primary">Create Free Account</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-logo">Upward</div>
+        <div>Learn. Rank up. Rise.</div>
+        <div>© 2026 Upward. All rights reserved.</div>
+    </footer>
+
+    <script>
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // If already logged in skip landing page
+        if (localStorage.getItem('current_user')) {
+            window.location.href = '../Courses/CourseMap.html';
+        }
+    </script>
+    <!-- GDPR COOKIE BANNER -->
+    
+
+    <style>
+        .gdpr-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: rgba(6, 6, 61, 0.97);
+            border-top: 2px solid rgba(255, 255, 255, 0.15);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            transform: translateY(100%);
+            transition: transform .4s ease;
+        }
+
+        .gdpr-banner.visible {
+            transform: translateY(0);
+        }
+
+        .gdpr-text {
+            flex: 1;
+            min-width: 260px;
+            font-size: 13px;
+            line-height: 1.7;
+            opacity: 0.8;
+        }
+
+        .gdpr-text strong {
+            color: #FFD700;
+        }
+
+        .gdpr-text a {
+            color: #FFD700;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .gdpr-buttons {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .gdpr-accept {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            padding: 12px 20px;
+            background: #FFD700;
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            white-space: nowrap;
+        }
+
+        .gdpr-accept:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .gdpr-decline {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            padding: 12px 20px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .gdpr-decline:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+        }
+    </style>
+
+    <div class="gdpr-banner" id="gdprBanner">
+        <div class="gdpr-text">
+            <strong>🍪 We use localStorage</strong> to save your learning progress, rank and account info on your
+            device. No tracking, no ads, no data sent to third parties. By continuing you agree to our <a
+                href="Privacy.html">Privacy Policy</a>.
+        </div>
+        <div class="gdpr-buttons">
+            <button class="gdpr-decline" onclick="declineGDPR()">Decline</button>
+            <button class="gdpr-accept" onclick="acceptGDPR()">Accept & Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Show banner if consent not yet given
+        if (!localStorage.getItem('gdpr_consent')) {
+            setTimeout(() => {
+                document.getElementById('gdprBanner').classList.add('visible');
+            }, 800);
+        }
+
+        function acceptGDPR() {
+            localStorage.setItem('gdpr_consent', 'accepted');
+            document.getElementById('gdprBanner').style.transform = 'translateY(100%)';
+        }
+
+        function declineGDPR() {
+            localStorage.setItem('gdpr_consent', 'declined');
+            document.getElementById('gdprBanner').style.transform = 'translateY(100%)';
+            // Clear any existing data if they decline
+            localStorage.clear();
+            localStorage.setItem('gdpr_consent', 'declined');
+        }
+    </script>
+</body>
+
+</html>

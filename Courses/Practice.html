@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --bg-light: #0a0a4a;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        /* TOOLBAR */
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: var(--bg-mid);
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        /* PAGE */
+        .page-content {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 40px 80px;
+        }
+
+        .page-title {
+            font-family: 'Press Start 2P';
+            font-size: 20px;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        }
+
+        .page-subtitle {
+            text-align: center;
+            opacity: 0.6;
+            margin-bottom: 60px;
+            font-size: 14px;
+        }
+
+        /* GRID */
+        .ranks-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        /* CARD */
+        .rank-card {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform .25s, box-shadow .25s;
+            position: relative;
+            overflow: hidden;
+            width: 200px;
+            flex: 0 0 200px;
+        }   
+
+
+        .rank-card:hover:not(.locked) {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .rank-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: .4s;
+        }
+
+        .rank-card:hover:not(.locked)::after {
+            left: 100%;
+        }
+
+        /* CIRCLE */
+        .rank-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+            transition: box-shadow .3s;
+        }
+
+        .rank-card:hover:not(.locked) .rank-circle {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.35);
+        }
+
+        .rank-letter {
+            font-family: 'Press Start 2P';
+            font-size: 28px;
+            color: var(--accent);
+        }
+
+        /* national is longer text so smaller font */
+        .rank-letter.national {
+            font-size: 11px;
+        }
+
+        .rank-label {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .rank-info {
+            font-size: 12px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        /* BUTTON */
+        .rank-btn {
+            display: inline-block;
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: black;
+            border-radius: 8px;
+            border: 1px solid gray;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rank-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        /* LOCKED STATE */
+        .locked {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .locked .rank-circle {
+            border-color: #555;
+            box-shadow: none;
+        }
+
+        .locked .rank-letter {
+            color: #666;
+        }
+
+        .locked .rank-btn {
+            background: #222;
+            color: #555;
+            border-color: #444;
+            cursor: not-allowed;
+        }
+
+        .locked .rank-btn:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* YOUR RANK BADGE */
+        .your-rank-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: black;
+            font-family: 'Press Start 2P';
+            font-size: 6px;
+            padding: 5px 8px;
+            border-radius: 6px;
+        }
+
+        /* LOCK SYMBOL inside circle when locked */
+        .lock-symbol {
+            font-size: 28px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <div class="ToolButtons">Practice</div>
+    </div>
+
+    <div class="page-content">
+        <h1 class="page-title">Choose Your Rank</h1>
+        <p class="page-subtitle">Select a difficulty tier. Higher ranks unlock as you level up.</p>
+
+        <div class="ranks-grid" id="ranksGrid"></div>
+    </div>
+
+    <script>
+        const ranks = [
+            { letter: "E", label: "Rank E", desc: "3 problems · Beginner", page: "../E-Rank/Practice-E.html" },
+            { letter: "D", label: "Rank D", desc: "3 problems · Easy", page: "../D-Rank/Practice-D.html" },
+            { letter: "C", label: "Rank C", desc: "3 problems · Intermediate", page: "../C-Rank/Practice-C.html" },
+            { letter: "B", label: "Rank B", desc: "3 problems · Advanced", page: "../B-Rank/Practice-B.html" },
+            { letter: "A", label: "Rank A", desc: "3 problems · Expert", page: "../A-Rank/Practice-A.html" },
+            { letter: "S", label: "Rank S", desc: "3 problems · Master", page: "../S-Rank/Practice-S.html" },
+            { letter: "National", label: "National", desc: "3 problems · Elite", page: "../National-Rank/Practice-National.html" },
+        ];
+
+        const rankOrder = ["E", "D", "C", "B", "A", "S", "National"];
+        const currentRankIndex = Number(localStorage.getItem("rankIndex")) || 0;
+
+        const grid = document.getElementById("ranksGrid");
+
+        ranks.forEach((r, i) => {
+            const isLocked = i > currentRankIndex;
+            const isCurrent = i === currentRankIndex;
+
+            const card = document.createElement("div");
+            card.className = "rank-card" + (isLocked ? " locked" : "");
+
+            const isNational = r.letter === "National";
+
+            card.innerHTML = `
+                ${isCurrent ? '<span class="your-rank-badge">YOUR RANK</span>' : ""}
+                <div class="rank-circle">
+                    ${isLocked
+                    ? '<span class="lock-symbol">🔒</span>'
+                    : `<span class="rank-letter ${isNational ? 'national' : ''}">${r.letter}</span>`
+                }
+                </div>
+                <span class="rank-label">${r.label}</span>
+                <p class="rank-info">${r.desc}</p>
+                <span class="rank-btn">${isLocked ? "LOCKED" : "START"}</span>
+            `;
+
+            if (!isLocked) {
+                card.addEventListener("click", () => {
+                    window.location.href = r.page;
+                });
+            }
+
+            grid.appendChild(card);
+        });
+    </script>
+
+</body>
+
+</html>

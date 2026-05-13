@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --bg-light: #0a0a4a;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255,255,255,0.15);
+            --shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%; height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes move { from { transform: translate(0,0); } to { transform: translate(-200px,-200px); } }
+
+        .ToolBar {
+            position: sticky; top: 0; z-index: 5;
+            background: var(--bg-mid);
+            border-bottom: var(--border);
+            display: flex; align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+        }
+        .material-symbols-outlined { color: var(--accent); margin-left: 20px; font-size: 40px; cursor: pointer; }
+        .toolbar-title {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 13px;
+            color: var(--accent);
+        }
+
+        .chat-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 270px 1fr;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .chat-sidebar {
+            border-right: var(--border);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,0.02);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+        .chat-sidebar::-webkit-scrollbar { width: 3px; }
+        .chat-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+        .sidebar-section-title {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            opacity: 0.6;
+            padding: 4px 0;
+        }
+
+        .new-chat-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 12px;
+            background: var(--accent);
+            color: black;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            width: 100%;
+        }
+        .new-chat-btn:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(255,215,0,0.4); }
+
+        /* TOPIC BUTTONS */
+        .topic-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: white;
+            font-size: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all .2s;
+            line-height: 1.5;
+            width: 100%;
+        }
+        .topic-btn:hover { background: rgba(255,215,0,0.08); border-color: rgba(255,215,0,0.3); transform: translateX(4px); }
+        .topic-btn.active { background: rgba(255,215,0,0.1); border-color: var(--accent); }
+        .topic-btn .topic-tag { font-family: 'Press Start 2P'; font-size: 7px; color: var(--accent); opacity: 0.7; display: block; margin-bottom: 4px; }
+
+        /* SAVED CHATS */
+        .saved-chat-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+            width: 100%;
+            text-align: left;
+        }
+        .saved-chat-item:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+        .saved-chat-item.active { border-color: var(--accent); background: rgba(255,215,0,0.06); }
+        .saved-chat-title {
+            font-size: 12px;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+        .saved-chat-meta {
+            font-size: 10px;
+            opacity: 0.4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-chat-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            line-height: 1;
+            transition: color .2s;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+        .delete-chat-btn:hover { color: #ff4d4d; }
+        .no-chats-msg { font-size: 11px; opacity: 0.3; text-align: center; padding: 10px 0; }
+
+        /* MAIN CHAT */
+        .chat-main { display: flex; flex-direction: column; overflow: hidden; }
+
+        .context-bar {
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 12px;
+            opacity: 0.5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .context-bar span { color: var(--accent); opacity: 1; font-family: 'Press Start 2P'; font-size: 8px; }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+        .messages-area::-webkit-scrollbar { width: 4px; }
+        .messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        .msg-row { display: flex; flex-direction: column; max-width: 70%; gap: 6px; }
+        .msg-row.user { align-self: flex-end; align-items: flex-end; }
+        .msg-row.ai { align-self: flex-start; align-items: flex-start; }
+        .msg-label { font-family: 'Press Start 2P'; font-size: 8px; opacity: 0.4; }
+        .msg-bubble { padding: 14px 18px; border-radius: 14px; font-size: 14px; line-height: 1.7; }
+        .msg-row.user .msg-bubble { background: var(--accent); color: #020223; border-bottom-right-radius: 4px; font-weight: 500; }
+        .msg-row.ai .msg-bubble { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+
+        .typing-dots { display: flex; gap: 5px; padding: 14px 18px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; border-bottom-left-radius: 4px; width: fit-content; }
+        .typing-dots span { width: 7px; height: 7px; background: rgba(255,255,255,0.4); border-radius: 50%; animation: bounce 1.2s infinite; }
+        .typing-dots span:nth-child(2) { animation-delay: .2s; }
+        .typing-dots span:nth-child(3) { animation-delay: .4s; }
+        @keyframes bounce { 0%,60%,100% { transform: translateY(0); opacity:.4; } 30% { transform: translateY(-5px); opacity:1; } }
+
+        .suggestions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 30px 16px; flex-shrink: 0; }
+        .suggestion-chip { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all .2s; }
+        .suggestion-chip:hover { background: rgba(255,215,0,0.15); border-color: var(--accent); color: white; }
+
+        .input-area { border-top: var(--border); padding: 16px 20px; display: flex; gap: 12px; background: var(--bg-mid); flex-shrink: 0; }
+        .input-area textarea { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; color: white; font-family: Arial, sans-serif; font-size: 14px; padding: 12px 16px; resize: none; outline: none; height: 48px; line-height: 1.5; transition: border-color .2s; pointer-events: all; }
+        .input-area textarea:focus { border-color: var(--accent); }
+        .input-area textarea::placeholder { color: rgba(255,255,255,0.3); }
+        .send-btn { width: 48px; height: 48px; background: var(--accent); border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .2s, box-shadow .2s; }
+        .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .send-btn svg { width: 20px; height: 20px; fill: #020223; }
+    </style>
+</head>
+<body>
+
+<div class="ToolBar">
+    <a href="../Courses/CourseMap.html">
+        <span class="material-symbols-outlined">home</span>
+    </a>
+    <div class="toolbar-title">AI Tutor</div>
+</div>
+
+<div class="chat-layout">
+
+    <div class="chat-sidebar">
+        <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
+
+        <p class="sidebar-section-title">Topics</p>
+        <button class="topic-btn active" id="topic-general" onclick="setTopic(this, 'General', null)">
+            <span class="topic-tag">General</span>
+            Ask anything about HTML, CSS or Python
+        </button>
+        <button class="topic-btn" id="topic-html" onclick="setTopic(this, 'HTML', 'HTML — structure of web pages, tags, elements, attributes, semantic HTML')">
+            <span class="topic-tag">HTML</span>
+            Help with HTML structure and tags
+        </button>
+        <button class="topic-btn" id="topic-css" onclick="setTopic(this, 'CSS', 'CSS — styling web pages, selectors, flexbox, grid, colors, fonts, spacing')">
+            <span class="topic-tag">CSS</span>
+            Help with CSS styling and layouts
+        </button>
+        <button class="topic-btn" id="topic-python" onclick="setTopic(this, 'Python', 'Python — variables, conditions, loops, functions, lists, dictionaries, recursion')">
+            <span class="topic-tag">Python</span>
+            Help with Python programming
+        </button>
+        <button class="topic-btn" id="topic-practice" onclick="setTopic(this, 'Practice', 'Coding practice problems — give hints and guidance without giving away full solutions')">
+            <span class="topic-tag">Practice</span>
+            Get hints for practice problems
+        </button>
+
+        <p class="sidebar-section-title" style="margin-top:8px;">Saved Chats</p>
+        <div id="savedChatsList"></div>
+    </div>
+
+    <div class="chat-main">
+        <div class="context-bar">
+            <span id="contextLabel">General</span>
+            Tutor mode active
+        </div>
+
+        <div class="messages-area" id="messagesArea"></div>
+
+        <div class="suggestions" id="suggestions">
+            <button class="suggestion-chip" onclick="useSuggestion(this)">What is a CSS selector?</button>
+            <button class="suggestion-chip" onclick="useSuggestion(this)">How do functions work in Python?</button>
+            <button class="suggestion-chip" onclick="useSuggestion(this)">Difference between margin and padding?</button>
+            <button class="suggestion-chip" onclick="useSuggestion(this)">How does a for loop work?</button>
+        </div>
+
+        <div class="input-area">
+            <textarea id="mainChatInput" placeholder="Ask your tutor anything..."></textarea>
+            <button class="send-btn" id="mainSendBtn" onclick="sendMessage()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ===== STATE =====
+    let isLoading = false;
+    let conversationHistory = [];
+    let currentContext = null;
+    let currentTopicName = 'General';
+    let currentChatId = null;
+
+    // ===== LOCALSTORAGE HELPERS =====
+    function getAllChats() {
+        try { return JSON.parse(localStorage.getItem('saved_chats') || '{}'); }
+        catch(e) { return {}; }
+    }
+
+    function saveCurrentChat() {
+        if (conversationHistory.length === 0) return;
+        const chats = getAllChats();
+        const id = currentChatId || ('chat_' + Date.now());
+        currentChatId = id;
+
+        // Title = first user message truncated
+        const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+        const title = firstUserMsg ? firstUserMsg.content.slice(0, 40) + (firstUserMsg.content.length > 40 ? '...' : '') : 'New Chat';
+
+        chats[id] = {
+            id,
+            title,
+            topic: currentTopicName,
+            context: currentContext,
+            history: conversationHistory,
+            updatedAt: Date.now()
+        };
+
+        localStorage.setItem('saved_chats', JSON.stringify(chats));
+        renderSavedChats();
+    }
+
+    function deleteChat(id, e) {
+        e.stopPropagation();
+        const chats = getAllChats();
+        delete chats[id];
+        localStorage.setItem('saved_chats', JSON.stringify(chats));
+        if (currentChatId === id) startNewChat();
+        else renderSavedChats();
+    }
+
+    function loadChat(id) {
+        const chats = getAllChats();
+        const chat = chats[id];
+        if (!chat) return;
+
+        currentChatId = id;
+        currentContext = chat.context;
+        currentTopicName = chat.topic;
+        conversationHistory = chat.history;
+
+        document.getElementById('contextLabel').innerText = chat.topic;
+        document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+
+        renderMessages();
+        renderSavedChats();
+        document.getElementById('suggestions').style.display = 'none';
+    }
+
+    function renderSavedChats() {
+        const chats = getAllChats();
+        const list = document.getElementById('savedChatsList');
+        const sorted = Object.values(chats).sort((a, b) => b.updatedAt - a.updatedAt);
+
+        if (sorted.length === 0) {
+            list.innerHTML = '<p class="no-chats-msg">No saved chats yet</p>';
+            return;
+        }
+
+        list.innerHTML = sorted.map(chat => {
+            const date = new Date(chat.updatedAt);
+            const dateStr = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+            const isActive = chat.id === currentChatId ? 'active' : '';
+            return `
+                <div class="saved-chat-item ${isActive}" onclick="loadChat('${chat.id}')">
+                    <button class="delete-chat-btn" onclick="deleteChat('${chat.id}', event)">✕</button>
+                    <div class="saved-chat-title">${chat.title}</div>
+                    <div class="saved-chat-meta">
+                        <span>${chat.topic}</span>
+                        <span>${dateStr}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderMessages() {
+        const area = document.getElementById('messagesArea');
+        area.innerHTML = '';
+        conversationHistory.forEach(msg => {
+            addMessageToUI(msg.role === 'user' ? 'user' : 'ai', msg.content);
+        });
+    }
+
+    // ===== CHAT FUNCTIONS =====
+    function startNewChat() {
+        currentChatId = null;
+        conversationHistory = [];
+        currentContext = null;
+        currentTopicName = 'General';
+        document.getElementById('contextLabel').innerText = 'General';
+        document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('topic-general').classList.add('active');
+
+        const area = document.getElementById('messagesArea');
+        area.innerHTML = '';
+        addMessageToUI('ai', "Hey! I'm your AI tutor. Ask me anything about HTML, CSS or Python!");
+        document.getElementById('suggestions').style.display = 'flex';
+        renderSavedChats();
+    }
+
+    function setTopic(btn, name, context) {
+        document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentContext = context;
+        currentTopicName = name;
+        document.getElementById('contextLabel').innerText = name;
+
+        // Start fresh chat with this topic
+        currentChatId = null;
+        conversationHistory = [];
+        const area = document.getElementById('messagesArea');
+        area.innerHTML = '';
+        addMessageToUI('ai', `Switched to <strong>${name}</strong> mode. ${context ? `Ask me anything about ${name}!` : 'Ask me anything about HTML, CSS or Python!'}`);
+        document.getElementById('suggestions').style.display = 'none';
+    }
+
+    function useSuggestion(btn) {
+        document.getElementById('mainChatInput').value = btn.innerText;
+        document.getElementById('suggestions').style.display = 'none';
+        sendMessage();
+    }
+
+    function getSystemPrompt() {
+        return currentContext
+            ? `You are a friendly encouraging AI tutor on a gamified programming learning platform. The student selected the topic: ${currentContext}. Focus your help on this area. Keep answers concise and beginner-friendly. Never give full solutions to coding problems — give hints and guidance. Use simple language. The student is a teenager learning to code.`
+            : `You are a friendly encouraging AI tutor on a gamified programming learning platform teaching HTML, CSS and Python. Help students with programming questions. Keep answers concise and beginner-friendly. Never give full solutions — give hints and guidance. Use simple language. The student is a teenager learning to code.`;
+    }
+
+    async function sendMessage() {
+        if (isLoading) return;
+        const input = document.getElementById('mainChatInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        document.getElementById('suggestions').style.display = 'none';
+        input.value = '';
+        input.style.height = '48px';
+
+        addMessageToUI('user', text);
+        conversationHistory.push({ role: 'user', content: text });
+
+        isLoading = true;
+        document.getElementById('mainSendBtn').disabled = true;
+        const typingEl = addTyping();
+
+        try {
+            const response = await fetch('https://us-central1-upward-44313.cloudfunctions.net/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 1000,
+                    system: getSystemPrompt(),
+                    messages: conversationHistory
+                })
+            });
+
+            const data = await response.json();
+            const reply = data.content[0].text;
+
+            typingEl.remove();
+            addMessageToUI('ai', reply);
+            conversationHistory.push({ role: 'assistant', content: reply });
+
+            // Auto-save after every AI response
+            saveCurrentChat();
+
+        } catch(err) {
+            typingEl.remove();
+            addMessageToUI('ai', 'Sorry, I could not connect right now. Check your internet and try again.');
+        }
+
+        isLoading = false;
+        document.getElementById('mainSendBtn').disabled = false;
+    }
+
+    function addMessageToUI(role, text) {
+        const area = document.getElementById('messagesArea');
+        const row = document.createElement('div');
+        row.className = `msg-row ${role}`;
+        row.innerHTML = `
+            <span class="msg-label">${role === 'user' ? 'You' : 'AI Tutor'}</span>
+            <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
+        `;
+        area.appendChild(row);
+        area.scrollTop = area.scrollHeight;
+        return row;
+    }
+
+    function addTyping() {
+        const area = document.getElementById('messagesArea');
+        const row = document.createElement('div');
+        row.className = 'msg-row ai';
+        row.innerHTML = `<span class="msg-label">AI Tutor</span><div class="typing-dots"><span></span><span></span><span></span></div>`;
+        area.appendChild(row);
+        area.scrollTop = area.scrollHeight;
+        return row;
+    }
+
+    // ===== INPUT EVENTS =====
+    document.getElementById('mainSendBtn').addEventListener('click', sendMessage);
+    document.getElementById('mainChatInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+    document.getElementById('mainChatInput').addEventListener('input', function() {
+        this.style.height = '48px';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // ===== INIT =====
+    startNewChat();
+    renderSavedChats();
+</script>
+
+</body>
+</html>

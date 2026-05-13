@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rank E — Problems</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_back" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255,255,255,0.15);
+            --shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%; height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+        }
+        @keyframes move { from { transform: translate(0,0); } to { transform: translate(-200px,-200px); } }
+        .ToolBar {
+            position: sticky; top: 0; z-index: 5;
+            background: var(--bg-mid);
+            border-bottom: var(--border);
+            display: flex; align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+        .ToolButtons {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 13px;
+            color: var(--accent);
+        }
+        .page-content {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 40px 80px;
+        }
+        .rank-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .rank-circle-big {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px auto;
+            background: rgba(255,215,0,0.05);
+            box-shadow: 0 0 25px rgba(255,215,0,0.2);
+        }
+        .rank-circle-big span {
+            font-family: 'Press Start 2P';
+            font-size: 32px;
+            color: var(--accent);
+        }
+        .rank-title {
+            font-family: 'Press Start 2P';
+            font-size: 16px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        .rank-subtitle {
+            opacity: 0.5;
+            font-size: 13px;
+        }
+        .problems-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .problem-card {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform .25s, box-shadow .25s;
+            position: relative;
+            overflow: hidden;
+            gap: 20px;
+        }
+        .problem-card:hover {
+            transform: translateX(8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+        .problem-card::after {
+            content: "";
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.04), transparent);
+            transition: .4s;
+        }
+        .problem-card:hover::after { left: 100%; }
+        .problem-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+        }
+        .problem-number {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: var(--accent);
+            opacity: 0.6;
+            min-width: 30px;
+        }
+        .problem-info h3 {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            margin-bottom: 8px;
+            color: white;
+        }
+        .problem-info p {
+            font-size: 13px;
+            opacity: 0.6;
+            line-height: 1.5;
+        }
+        .problem-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        .type-tag {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            opacity: 0.7;
+        }
+        .type-tag.coding { border-color: #00ff90; color: #00ff90; }
+        .type-tag.multiple { border-color: #66aaff; color: #66aaff; }
+        .done-badge {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            background: rgba(0,255,144,0.1);
+            border: 1px solid #00ff90;
+            color: #00ff90;
+        }
+        .arrow {
+            font-size: 20px;
+            opacity: 0.4;
+            transition: opacity .2s;
+        }
+        .problem-card:hover .arrow { opacity: 1; }
+        .xp-tag {
+            font-size: 11px;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ToolBar">
+    <a href="../Courses/Practice.html">
+        <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <div class="ToolButtons">Rank E Problems</div>
+</div>
+
+<div class="page-content">
+
+    <div class="rank-header">
+        <div class="rank-circle-big"><span>E</span></div>
+        <h1 class="rank-title">Rank E</h1>
+        <p class="rank-subtitle">3 problems · Beginner · 10 XP each</p>
+    </div>
+
+    <div class="problems-list" id="problemsList"></div>
+
+</div>
+
+<script>
+    const problems = [
+        {
+            id: "practice_e_1",
+            number: "01",
+            title: "Variables & Print",
+            desc: "Store your name in a variable and print a greeting message.",
+            type: "coding",
+            page: "Practice-E-P1.html"
+        },
+        {
+            id: "practice_e_2",
+            number: "02",
+            title: "If / Else",
+            desc: "Write a condition that checks if someone is old enough to enter.",
+            type: "coding",
+            page: "Practice-E-P2.html"
+        },
+        {
+            id: "practice_e_3",
+            number: "03",
+            title: "What Does This Print?",
+            desc: "Read a short code snippet and choose the correct output.",
+            type: "multiple",
+            page: "Practice-E-P3.html"
+        }
+    ];
+
+    const list = document.getElementById("problemsList");
+
+    problems.forEach(p => {
+        const done = localStorage.getItem(p.id);
+        const card = document.createElement("div");
+        card.className = "problem-card";
+        card.innerHTML = `
+            <div class="problem-left">
+                <span class="problem-number">${p.number}</span>
+                <div class="problem-info">
+                    <h3>${p.title}</h3>
+                    <p>${p.desc}</p>
+                </div>
+            </div>
+            <div class="problem-meta">
+                <span class="type-tag ${p.type}">${p.type === "coding" ? "Coding" : "Multiple Choice"}</span>
+                ${done ? '<span class="done-badge">✓ Done</span>' : '<span class="xp-tag">+10 XP</span>'}
+            </div>
+            <span class="arrow">→</span>
+        `;
+        card.addEventListener("click", () => { window.location.href = p.page; });
+        list.appendChild(card);
+    });
+</script>
+
+</body>
+</html>

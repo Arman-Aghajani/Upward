@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Quiz — Chapter 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.06;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            height: 70px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .practice,
+        .submit-btn {
+            border: 1px solid gray;
+            border-radius: 10px;
+            height: 40px;
+            padding: 0 16px;
+            background: var(--accent);
+            font-family: 'Press Start 2P';
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+            cursor: pointer;
+            color: #020223;
+            font-size: 9px;
+        }
+
+        .submit-btn {
+            display: block;
+            margin: 40px auto 0 auto;
+        }
+
+        .practice:hover,
+        .submit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .quiz-wrapper {
+            max-width: 900px;
+            margin: 60px auto;
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-title {
+            font-family: 'Press Start 2P';
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-size: 16px;
+        }
+
+        .quiz-subtitle {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.5;
+            margin-bottom: 40px;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question p {
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .answers button {
+            width: 100%;
+            margin: 8px 0;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: linear-gradient(145deg, #111, #1a1a2e);
+            color: white;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all .2s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .answers button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+            border-color: var(--accent);
+        }
+
+        .answers button::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            opacity: 0;
+            transition: .2s;
+        }
+
+        .answers button:hover::before,
+        .answers button.selected::before {
+            opacity: 1;
+        }
+
+        .selected {
+            background: linear-gradient(145deg, #222, #2a2a4a) !important;
+            border: 2px solid var(--accent) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3) !important;
+        }
+
+        .correct {
+            background: linear-gradient(145deg, #0f8f3c, #146b30) !important;
+            border: 2px solid #00ff90 !important;
+            box-shadow: 0 0 15px rgba(0, 255, 144, 0.4) !important;
+        }
+
+        .wrong {
+            background: linear-gradient(145deg, #a11, #700) !important;
+            border: 2px solid #ff4d4d !important;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4) !important;
+        }
+
+        .hint-box {
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            display: none;
+        }
+
+        .hint-box.loading {
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+            display: block;
+        }
+
+        .hint-box.show {
+            display: block;
+        }
+
+        .result {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .result-pass {
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: #00ff90;
+            margin-bottom: 16px;
+        }
+
+        .result-fail {
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: #ff8080;
+            margin-bottom: 8px;
+        }
+
+        .result-sub {
+            font-size: 13px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
+        <div class="ToolButtons">
+            <a href="../Courses/Practice.html"><button class="practice">Practice</button></a>
+        </div>
+        <a href="../Courses/Css.html" style="
+    margin-left: auto;
+    margin-right: 20px;
+    text-decoration: none;
+    font-family: 'Press Start 2P';
+    font-size: 9px;
+    padding: 0 18px;
+    height: 38px;
+    line-height: 38px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: white;
+    display: inline-block;
+    transition: border-color .2s, color .2s;
+">Back to Course</a>
+    </div>
+
+
+    <div class="quiz-wrapper">
+        <h1 class="quiz-title">CSS Quiz</h1>
+        <p class="quiz-subtitle">Chapter 2 — You must answer all questions correctly to pass</p>
+
+        <!-- SELECTORS -->
+        <div class="question" data-answer="b"
+            data-hint="The dot prefix targets a class. The hash prefix targets an ID. No prefix means a tag selector.">
+            <p>1. Which selector targets all elements with class="btn"?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; #btn</button>
+                <button data-option="b">B. &nbsp; .btn</button>
+                <button data-option="c">C. &nbsp; *btn</button>
+                <button data-option="d">D. &nbsp; btn</button>
+            </div>
+            <div class="hint-box" id="hint0"></div>
+        </div>
+
+        <div class="question" data-answer="d"
+            data-hint="IDs are unique and use the # symbol. They have higher specificity than classes.">
+            <p>2. Which selector targets the element with id="header"?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; .header</button>
+                <button data-option="b">B. &nbsp; header</button>
+                <button data-option="c">C. &nbsp; *header</button>
+                <button data-option="d">D. &nbsp; #header</button>
+            </div>
+            <div class="hint-box" id="hint1"></div>
+        </div>
+
+        <!-- BOX MODEL -->
+        <div class="question" data-answer="a"
+            data-hint="The box model from inside out: content, padding, border, margin. Padding is the space inside the border, around the content.">
+            <p>3. Which box model property is the space INSIDE the border, between border and content?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; padding</button>
+                <button data-option="b">B. &nbsp; margin</button>
+                <button data-option="c">C. &nbsp; spacing</button>
+                <button data-option="d">D. &nbsp; gap</button>
+            </div>
+            <div class="hint-box" id="hint2"></div>
+        </div>
+
+        <div class="question" data-answer="c"
+            data-hint="By default, width sets the content width and padding/border are added on top. box-sizing: border-box makes width include padding and border.">
+            <p>4. Which value of box-sizing makes width include padding and border?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; content-box</button>
+                <button data-option="b">B. &nbsp; full-box</button>
+                <button data-option="c">C. &nbsp; border-box</button>
+                <button data-option="d">D. &nbsp; padding-box</button>
+            </div>
+            <div class="hint-box" id="hint3"></div>
+        </div>
+
+        <!-- POSITIONING -->
+        <div class="question" data-answer="b"
+            data-hint="position: absolute removes the element from normal flow and positions it relative to its nearest positioned ancestor (or the viewport).">
+            <p>5. Which position value removes an element from the normal document flow?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; static</button>
+                <button data-option="b">B. &nbsp; absolute</button>
+                <button data-option="c">C. &nbsp; relative</button>
+                <button data-option="d">D. &nbsp; default</button>
+            </div>
+            <div class="hint-box" id="hint4"></div>
+        </div>
+
+        <div class="question" data-answer="c"
+            data-hint="position: fixed keeps an element in the same spot on the screen even when scrolling — useful for navbars and floating buttons.">
+            <p>6. Which position value keeps an element in place during page scroll?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; static</button>
+                <button data-option="b">B. &nbsp; relative</button>
+                <button data-option="c">C. &nbsp; fixed</button>
+                <button data-option="d">D. &nbsp; absolute</button>
+            </div>
+            <div class="hint-box" id="hint5"></div>
+        </div>
+
+        <button class="submit-btn" onclick="checkQuiz()">Submit Quiz</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const QUIZ_KEY = 'css_quiz2_done';
+        let questionResults = [false, false, false, false, false, false];
+
+        document.querySelectorAll('.question').forEach((q, qi) => {
+            q.querySelectorAll('.answers button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (questionResults[qi]) return;
+                    q.querySelectorAll('.answers button').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                });
+            });
+        });
+
+        async function checkQuiz() {
+            const questions = document.querySelectorAll('.question');
+            let allCorrect = true;
+
+            questions.forEach((q, qi) => {
+                if (questionResults[qi]) return;
+                const correct = q.dataset.answer;
+                const selected = q.querySelector('.selected');
+                const hintBox = document.getElementById('hint' + qi);
+                if (!selected) { allCorrect = false; return; }
+                const isCorrect = selected.dataset.option === correct;
+                q.querySelectorAll('.answers button').forEach(btn => {
+                    if (btn.dataset.option === correct) btn.classList.add('correct');
+                });
+                if (isCorrect) {
+                    questionResults[qi] = true;
+                    selected.classList.remove('selected');
+                    hintBox.style.display = 'none';
+                    q.querySelectorAll('.answers button').forEach(btn => btn.style.pointerEvents = 'none');
+                } else {
+                    allCorrect = false;
+                    selected.classList.add('wrong');
+                    selected.classList.remove('selected');
+                    showHint(qi, q.dataset.hint, hintBox);
+                }
+            });
+
+            if (questionResults.every(r => r)) { showPass(); }
+            else if (!allCorrect) { showRetry(); }
+        }
+
+        function showHint(qi, fallbackHint, hintBox) {
+            hintBox.className = 'hint-box show';
+            hintBox.innerText = '💡 Hint: ' + fallbackHint;
+        }
+
+        function showPass() {
+            document.getElementById('result').innerHTML = `
+            <div class="result-pass">🎉 Perfect Score! Chapter 2 Complete!</div>
+            <div class="result-sub">+25 XP awarded.</div>
+            <a href="../Courses/Css.html" class="back-btn">Back to Course</a>
+        `;
+            if (!localStorage.getItem(QUIZ_KEY)) {
+                localStorage.setItem('xp', Number(localStorage.getItem('xp') || 0) + 25);
+                localStorage.setItem(QUIZ_KEY, 'true');
+                checkRankUp();
+            }
+            document.querySelector('.submit-btn').style.display = 'none';
+        }
+
+        function showRetry() {
+            document.getElementById('result').innerHTML = `
+            <div class="result-fail">Some answers are incorrect.</div>
+            <div class="result-sub">Fix the highlighted questions and try again.</div>
+        `;
+        }
+    </script>
+</body>
+
+</html>

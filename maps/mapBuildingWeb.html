@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=home" />
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+        }
+
+        /* viewportul care rămâne full screen */
+        .map-viewport {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background: #020223;
+            cursor: grab;
+            justify-items: center;
+            align-items: center;
+
+        }
+
+        /* elementul care se scalează */
+        .map {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform-origin: 0 0;
+            user-select: none;
+        }
+
+        /* imaginea hărții */
+        .map img {
+            display: block;
+            width: 2000px;
+            /* dimensiunea hărții tale */
+            height: auto;
+            pointer-events: none;
+
+        }
+
+        .lesson {
+            position: absolute;
+            background-color: #FFD700;
+            border: 2px solid gray;
+            border-radius: 8px;
+            padding: 12px 16px;
+            height: 60px;
+            color: black;
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+            transition: transform 0.15s, opacity .2s;
+            flex: 0 0 auto;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .lesson:hover {
+            transform: scale(1.1);
+        }
+
+
+        /* poziții pe hartă (procentele sunt relative la dimensiunea hărții) */
+        .l1 {
+            top: 60%;
+            left: 40%;
+        }
+
+        .l2 {
+            top: 40%;
+            left: 35%;
+        }
+
+        .l3 {
+            top: 40%;
+            left: 60%;
+        }
+
+        .material-symbols-outlined {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            font-size: 40px;
+            background: #FFD700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button {
+            border: 1px solid gray;
+            border-radius: 10px;
+            height: 40px;
+            padding: 0 16px;
+            background-color: var(--accent);
+            font-family: 'Press Start 2P';
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            cursor: pointer;
+        }
+
+        button::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transition: 0.4s;
+        }
+
+        button:hover::after {
+            left: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="map-viewport" id="viewport">
+        <a href="../Courses/CourseMap.html">
+            <button class="material-symbols-outlined">home</button>
+        </a>
+
+        <div class="map" id="map">
+            <img src="../logos/Map4-Repair.png" alt="map">
+            <a href="../Courses/Html.html">
+                <button class="lesson l1">Start Html</button>
+            </a>
+            <a href="../Courses/CSS.html">
+                <button class="lesson l2">Start CSS</button>
+            </a>
+            <a href="../Courses/Python.html">
+                <button class="lesson l3">Start Python</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const viewport = document.getElementById("viewport")
+        const map = document.getElementById("map")
+        const mapImg = map.querySelector("img")
+
+        let scale = 1
+        let posX = 0
+        let posY = 0
+        let isDragging = false
+        let startX
+        let startY
+        const mapWidth = 2000
+        let mapHeight = 1200  // valoare temporară până se încarcă imaginea
+
+        function getMinScale() {
+            const scaleX = viewport.clientWidth / mapWidth
+            const scaleY = viewport.clientHeight / mapHeight
+            return Math.max(scaleX, scaleY)
+        }
+
+        function updateTransform() {
+            const viewportWidth = viewport.clientWidth
+            const viewportHeight = viewport.clientHeight
+
+            const scaledWidth = mapWidth * scale
+            const scaledHeight = mapHeight * scale
+
+            let minX = viewportWidth - scaledWidth
+            let minY = viewportHeight - scaledHeight
+
+            posX = Math.min(0, Math.max(minX, posX))
+            posY = Math.min(0, Math.max(minY, posY))
+
+            map.style.transform =
+                `translate(${posX}px, ${posY}px) scale(${scale})`
+        }
+
+        /* citește dimensiunea reală a imaginii când se încarcă */
+        function initMap() {
+            mapHeight = mapImg.naturalHeight * (mapWidth / mapImg.naturalWidth)
+            scale = getMinScale()
+            updateTransform()
+        }
+
+        if (mapImg.complete) {
+            initMap()
+        } else {
+            mapImg.addEventListener("load", initMap)
+        }
+
+        viewport.addEventListener("wheel", e => {
+            e.preventDefault()
+            const zoomSpeed = 0.001
+            const minScale = getMinScale()
+            scale += -e.deltaY * zoomSpeed
+            scale = Math.min(Math.max(minScale, scale), 3)
+            updateTransform()
+        })
+
+        viewport.addEventListener("mousedown", e => {
+            isDragging = true
+            startX = e.clientX - posX
+            startY = e.clientY - posY
+            viewport.style.cursor = "grabbing"
+        })
+
+        window.addEventListener("mousemove", e => {
+            if (!isDragging) return
+            posX = e.clientX - startX
+            posY = e.clientY - startY
+            updateTransform()
+        })
+
+        window.addEventListener("mouseup", () => {
+            isDragging = false
+            viewport.style.cursor = "grab"
+        })
+
+        window.addEventListener("resize", () => {
+            const minScale = getMinScale()
+            if (scale < minScale) scale = minScale
+            updateTransform()
+        })
+    </script>
+
+</body>
+
+</html>

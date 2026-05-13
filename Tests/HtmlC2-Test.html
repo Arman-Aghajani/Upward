@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Quiz — Chapter 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.06;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            height: 70px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .practice,
+        .submit-btn {
+            border: 1px solid gray;
+            border-radius: 10px;
+            height: 40px;
+            padding: 0 16px;
+            background: var(--accent);
+            font-family: 'Press Start 2P';
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+            cursor: pointer;
+            color: #020223;
+            font-size: 9px;
+        }
+
+        .submit-btn {
+            display: block;
+            margin: 40px auto 0 auto;
+        }
+
+        .practice:hover,
+        .submit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .quiz-wrapper {
+            max-width: 900px;
+            margin: 60px auto;
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-title {
+            font-family: 'Press Start 2P';
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-size: 16px;
+        }
+
+        .quiz-subtitle {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.5;
+            margin-bottom: 40px;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question p {
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .answers button {
+            width: 100%;
+            margin: 8px 0;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: linear-gradient(145deg, #111, #1a1a2e);
+            color: white;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all .2s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .answers button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+            border-color: var(--accent);
+        }
+
+        .answers button::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            opacity: 0;
+            transition: .2s;
+        }
+
+        .answers button:hover::before,
+        .answers button.selected::before {
+            opacity: 1;
+        }
+
+        .selected {
+            background: linear-gradient(145deg, #222, #2a2a4a) !important;
+            border: 2px solid var(--accent) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3) !important;
+        }
+
+        .correct {
+            background: linear-gradient(145deg, #0f8f3c, #146b30) !important;
+            border: 2px solid #00ff90 !important;
+            box-shadow: 0 0 15px rgba(0, 255, 144, 0.4) !important;
+        }
+
+        .wrong {
+            background: linear-gradient(145deg, #a11, #700) !important;
+            border: 2px solid #ff4d4d !important;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4) !important;
+        }
+
+        .hint-box {
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            display: none;
+        }
+
+        .hint-box.loading {
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+            display: block;
+        }
+
+        .hint-box.show {
+            display: block;
+        }
+
+        .result {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .result-pass {
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: #00ff90;
+            margin-bottom: 16px;
+        }
+
+        .result-fail {
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: #ff8080;
+            margin-bottom: 8px;
+        }
+
+        .result-sub {
+            font-size: 13px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
+        <div class="ToolButtons">
+            <a href="../Courses/Practice.html"><button class="practice">Practice</button></a>
+        </div>
+        <a href="../Courses/Html.html" style="
+    margin-left: auto;
+    margin-right: 20px;
+    text-decoration: none;
+    font-family: 'Press Start 2P';
+    font-size: 9px;
+    padding: 0 18px;
+    height: 38px;
+    line-height: 38px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: white;
+    display: inline-block;
+    transition: border-color .2s, color .2s;
+">Back to Course</a>
+    </div>
+
+
+    <div class="quiz-wrapper">
+        <h1 class="quiz-title">HTML Quiz</h1>
+        <p class="quiz-subtitle">Chapter 2 — You must answer all questions correctly to pass</p>
+
+        <!-- LISTS & TABLES -->
+        <div class="question" data-answer="b"
+            data-hint="ul stands for unordered list (bullet points). ol stands for ordered list (numbered). li is each item.">
+            <p>1. Which element creates a bulleted (unordered) list?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; &lt;ol&gt;</button>
+                <button data-option="b">B. &nbsp; &lt;ul&gt;</button>
+                <button data-option="c">C. &nbsp; &lt;li&gt;</button>
+                <button data-option="d">D. &nbsp; &lt;list&gt;</button>
+            </div>
+            <div class="hint-box" id="hint0"></div>
+        </div>
+
+        <div class="question" data-answer="c"
+            data-hint="A table row uses tr. Inside it, th is for header cells (bold by default) and td is for normal data cells.">
+            <p>2. Inside a &lt;tr&gt;, which element represents a regular data cell?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; &lt;th&gt;</button>
+                <button data-option="b">B. &nbsp; &lt;cell&gt;</button>
+                <button data-option="c">C. &nbsp; &lt;td&gt;</button>
+                <button data-option="d">D. &nbsp; &lt;tc&gt;</button>
+            </div>
+            <div class="hint-box" id="hint1"></div>
+        </div>
+
+        <!-- FORMS & INPUTS -->
+        <div class="question" data-answer="a"
+            data-hint="The type attribute changes what kind of input is shown. type='password' hides the characters as the user types.">
+            <p>3. Which attribute on an &lt;input&gt; hides the typed text with dots?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; type="password"</button>
+                <button data-option="b">B. &nbsp; hidden="true"</button>
+                <button data-option="c">C. &nbsp; type="hidden"</button>
+                <button data-option="d">D. &nbsp; secure="yes"</button>
+            </div>
+            <div class="hint-box" id="hint2"></div>
+        </div>
+
+        <div class="question" data-answer="d"
+            data-hint="A submit button sends the form data. Inside a form, button defaults to type='submit', or you can use input type='submit'.">
+            <p>4. Which element submits a form when clicked?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; &lt;input type="text"&gt;</button>
+                <button data-option="b">B. &nbsp; &lt;send&gt;</button>
+                <button data-option="c">C. &nbsp; &lt;form-submit&gt;</button>
+                <button data-option="d">D. &nbsp; &lt;button type="submit"&gt;</button>
+            </div>
+            <div class="hint-box" id="hint3"></div>
+        </div>
+
+        <!-- SEMANTIC HTML -->
+        <div class="question" data-answer="b"
+            data-hint="Semantic tags describe meaning, not appearance. nav is specifically for navigation links like menus.">
+            <p>5. Which semantic element is meant for a navigation menu?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; &lt;menu&gt;</button>
+                <button data-option="b">B. &nbsp; &lt;nav&gt;</button>
+                <button data-option="c">C. &nbsp; &lt;div class="nav"&gt;</button>
+                <button data-option="d">D. &nbsp; &lt;links&gt;</button>
+            </div>
+            <div class="hint-box" id="hint4"></div>
+        </div>
+
+        <div class="question" data-answer="c"
+            data-hint="div is a generic non-semantic container. article, section, and aside all carry meaning about the content inside.">
+            <p>6. Which of these is NOT a semantic HTML element?</p>
+            <div class="answers">
+                <button data-option="a">A. &nbsp; &lt;article&gt;</button>
+                <button data-option="b">B. &nbsp; &lt;section&gt;</button>
+                <button data-option="c">C. &nbsp; &lt;div&gt;</button>
+                <button data-option="d">D. &nbsp; &lt;aside&gt;</button>
+            </div>
+            <div class="hint-box" id="hint5"></div>
+        </div>
+
+        <button class="submit-btn" onclick="checkQuiz()">Submit Quiz</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const QUIZ_KEY = 'html_quiz2_done';
+        let questionResults = [false, false, false, false, false, false];
+
+        document.querySelectorAll('.question').forEach((q, qi) => {
+            q.querySelectorAll('.answers button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (questionResults[qi]) return;
+                    q.querySelectorAll('.answers button').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                });
+            });
+        });
+
+        async function checkQuiz() {
+            const questions = document.querySelectorAll('.question');
+            let allCorrect = true;
+
+            questions.forEach((q, qi) => {
+                if (questionResults[qi]) return;
+                const correct = q.dataset.answer;
+                const selected = q.querySelector('.selected');
+                const hintBox = document.getElementById('hint' + qi);
+                if (!selected) { allCorrect = false; return; }
+                const isCorrect = selected.dataset.option === correct;
+                q.querySelectorAll('.answers button').forEach(btn => {
+                    if (btn.dataset.option === correct) btn.classList.add('correct');
+                });
+                if (isCorrect) {
+                    questionResults[qi] = true;
+                    selected.classList.remove('selected');
+                    hintBox.style.display = 'none';
+                    q.querySelectorAll('.answers button').forEach(btn => btn.style.pointerEvents = 'none');
+                } else {
+                    allCorrect = false;
+                    selected.classList.add('wrong');
+                    selected.classList.remove('selected');
+                    showHint(qi, q.dataset.hint, hintBox);
+                }
+            });
+
+            if (questionResults.every(r => r)) { showPass(); }
+            else if (!allCorrect) { showRetry(); }
+        }
+
+        function showHint(qi, fallbackHint, hintBox) {
+            hintBox.className = 'hint-box show';
+            hintBox.innerText = '💡 Hint: ' + fallbackHint;
+        }
+
+        function showPass() {
+            document.getElementById('result').innerHTML = `
+            <div class="result-pass">🎉 Perfect Score! Chapter 2 Complete!</div>
+            <div class="result-sub">+25 XP awarded.</div>
+            <a href="../Courses/Html.html" class="back-btn">Back to Course</a>
+        `;
+            if (!localStorage.getItem(QUIZ_KEY)) {
+                localStorage.setItem('xp', Number(localStorage.getItem('xp') || 0) + 25);
+                localStorage.setItem(QUIZ_KEY, 'true');
+                checkRankUp();
+            }
+            document.querySelector('.submit-btn').style.display = 'none';
+        }
+
+        function showRetry() {
+            document.getElementById('result').innerHTML = `
+            <div class="result-fail">Some answers are incorrect.</div>
+            <div class="result-sub">Fix the highlighted questions and try again.</div>
+        `;
+        }
+    </script>
+</body>
+
+</html>

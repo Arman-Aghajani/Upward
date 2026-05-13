@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rank B — Problem 3</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: var(--bg-mid);
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+        }
+
+        .page-content {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 0 40px 80px;
+        }
+
+        .quiz-card {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .panel-title {
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        .problem-desc {
+            font-size: 14px;
+            opacity: 0.85;
+            line-height: 1.7;
+        }
+
+        .code-snippet {
+            background: #111;
+            border-left: 3px solid var(--accent);
+            border-radius: 6px;
+            padding: 18px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #00ff90;
+            line-height: 1.8;
+        }
+
+        .question-text {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .answer-btn {
+            background: linear-gradient(145deg, #111, #1a1a2e);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 16px 20px;
+            color: white;
+            font-size: 14px;
+            text-align: left;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-btn::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            opacity: 0;
+            transition: .2s;
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+            border-color: var(--accent);
+        }
+
+        .answer-btn:hover::before,
+        .answer-btn.selected::before {
+            opacity: 1;
+        }
+
+        .answer-btn.selected {
+            background: linear-gradient(145deg, #222, #2a2a4a);
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(145deg, #0f8f3c, #146b30) !important;
+            border: 2px solid #00ff90;
+        }
+
+        .answer-btn.wrong {
+            background: linear-gradient(145deg, #a11, #700) !important;
+            border: 2px solid #ff4d4d;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 12px 20px;
+            background: var(--accent);
+            color: black;
+            border: 1px solid gray;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            align-self: flex-start;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-box {
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.7;
+            display: none;
+        }
+
+        .result-box.success {
+            background: rgba(0, 255, 144, 0.1);
+            border: 1px solid #00ff90;
+            color: #00ff90;
+        }
+
+        .result-box.error {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid #ff4d4d;
+            color: #ff8080;
+        }
+
+        .done-banner {
+            background: rgba(0, 255, 144, 0.1);
+            border: 1px solid #00ff90;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: #00ff90;
+            text-align: center;
+            display: none;
+        }
+
+        .xp-info {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ToolBar">
+        <a href="Practice-B.html"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div class="ToolButtons">Problem 3 — Multiple Choice</div>
+    </div>
+    <div class="page-content">
+        <div class="quiz-card">
+            <h2 class="panel-title">What Does This Print?</h2>
+            <p class="problem-desc">Trace through the code carefully — this one involves list slicing and negative
+                indexing.</p>
+            <div class="code-snippet">nums = [10, 20, 30, 40, 50]<br>a = nums[1:4]<br>b = a[-1]<br>print(b + nums[0])
+            </div>
+            <p class="question-text">What will this code print?</p>
+            <div class="done-banner" id="doneBanner">✓ Already completed — XP awarded</div>
+            <div class="answers">
+                <button class="answer-btn" data-option="a">A. &nbsp; 50</button>
+                <button class="answer-btn" data-option="b">B. &nbsp; 40</button>
+                <button class="answer-btn" data-option="c">C. &nbsp; 60</button>
+                <button class="answer-btn" data-option="d">D. &nbsp; 30</button>
+            </div>
+            <div class="result-box" id="resultBox"></div>
+            <button class="submit-btn" id="submitBtn" onclick="checkAnswer()">Submit Answer</button>
+            <p class="xp-info">Reward: +10 XP (first solve only)</p>
+        </div>
+    </div>
+    <script>
+        const PROBLEM_KEY = "practice_b_3";
+        const CORRECT = "a";
+        let selected = null;
+        let submitted = false;
+        if (localStorage.getItem(PROBLEM_KEY)) document.getElementById("doneBanner").style.display = "block";
+        document.querySelectorAll(".answer-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (submitted) return;
+                document.querySelectorAll(".answer-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                selected = btn.dataset.option;
+            });
+        });
+        function checkAnswer() {
+            if (!selected || submitted) return;
+            submitted = true;
+            document.querySelectorAll(".answer-btn").forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove("selected");
+                if (btn.dataset.option === CORRECT) btn.classList.add("correct");
+                if (btn.dataset.option === selected && selected !== CORRECT) btn.classList.add("wrong");
+            });
+            const result = document.getElementById("resultBox");
+            result.style.display = "block";
+            document.getElementById("submitBtn").disabled = true;
+            if (selected === CORRECT) {
+                result.className = "result-box success";
+                result.innerText = "Correct! nums[1:4] slices to [20, 30, 40]. Then a[-1] gets the last element which is 40. Finally 40 + nums[0] = 40 + 10 = 50.";
+                if (!localStorage.getItem(PROBLEM_KEY)) {
+                    localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
+                    localStorage.setItem(PROBLEM_KEY, "true");
+checkRankUp();
+                    document.getElementById("doneBanner").style.display = "block";
+                }
+            } else {
+                result.className = "result-box error";
+                result.innerText = "Not quite. Work through it step by step: nums[1:4] = [20, 30, 40]. Then a[-1] is the last item of that slice = 40. Then 40 + nums[0] = 40 + 10 = 50. Answer is A.";
+            }
+        }
+    </script>
+</body>
+
+</html>

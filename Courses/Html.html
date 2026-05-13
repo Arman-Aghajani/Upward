@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Course — Upward</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .Page-Wrapper {
+            display: grid;
+            row-gap: 50px;
+            padding-bottom: 80px;
+        }
+
+        .ToolBar {
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: var(--shadow);
+            height: 70px;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 38px;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .material-symbols-outlined:hover {
+            transform: scale(1.1);
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            height: 38px;
+            padding: 0 16px;
+            background: var(--accent);
+            color: #020223;
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .First-Section,
+        .Second-Section,
+        .Third-Section,
+        .Fourth-Section {
+            max-width: 860px;
+            margin: 0 auto;
+            width: calc(100% - 40px);
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            transition: transform .25s, box-shadow .25s, border-color .25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .First-Section::before,
+        .Second-Section::before,
+        .Third-Section::before,
+        .Fourth-Section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .First-Section:hover,
+        .Second-Section:hover,
+        .Third-Section:hover,
+        .Fourth-Section:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .course-icon-big {
+            font-size: 56px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .course-title {
+            font-family: 'Press Start 2P';
+            font-size: 18px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .course-desc {
+            font-size: 14px;
+            opacity: 0.6;
+            line-height: 1.8;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+
+        .course-meta {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 11px;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P';
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 28px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .learn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            text-align: left;
+        }
+
+        .learn-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            opacity: 0.8;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .learn-item::before {
+            content: "→";
+            color: var(--accent);
+            opacity: 0.6;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .usage-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .usage-tag {
+            background: rgba(255, 255, 255, 0.04);
+            border: var(--border);
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .course-timeline {
+            position: relative;
+            max-width: 620px;
+            margin: 36px auto 0;
+            padding-left: 56px;
+        }
+
+        .course-timeline::before {
+            content: "";
+            position: absolute;
+            left: 28px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+        }
+
+        .chapter {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .chapter-number {
+            position: absolute;
+            left: -44px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            background: #06063d;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+        }
+
+        .chapter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .locked-label {
+            color: #ff66ff;
+            font-size: 8px;
+        }
+
+        .unlocked-label {
+            color: #00ff90;
+            font-size: 8px;
+        }
+
+        .lesson-list {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .lesson {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 8px;
+            border-radius: 8px;
+            gap: 20px;
+            transition: background .2s, transform .2s;
+        }
+
+        .lesson:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        .lesson span {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .lesson button {
+            height: 32px;
+            font-size: 8px;
+            padding: 0 14px;
+            flex-shrink: 0;
+        }
+
+        .locked-btn {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: rgba(255, 255, 255, 0.25) !important;
+            cursor: not-allowed;
+        }
+
+        .locked-btn:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .quiz-row {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .quiz-row span {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .quiz-btn {
+            height: 32px;
+            font-size: 8px;
+            padding: 0 14px;
+            background: linear-gradient(135deg, #9b59b6, #6c3483) !important;
+            color: white !important;
+        }
+
+        .quiz-done-badge {
+            font-size: 10px;
+            color: #00ff90;
+            font-family: 'Press Start 2P';
+        }
+
+        .chapter-locked-overlay {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chapter-locked-overlay p {
+            font-size: 12px;
+            opacity: 0.5;
+            margin-bottom: 12px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+        .logo-image{
+            width:200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Page-Wrapper">
+
+        <div class="ToolBar">
+            <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
+            <div class="ToolButtons">
+                <a href="../Courses/Practice.html"><button>Practice</button></a>
+                <a href="../AI-Tutor/Chat.html"><button
+                        style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:white;">Chat</button></a>
+            </div>
+        </div>
+
+        <div class="First-Section">
+            <img class="logo-image" src="../logos/HTML-Logo.png">
+            <h1 class="course-title">HTML Course</h1>
+            <p class="course-desc">Learn how to build the structure of websites using HTML — the foundation of
+                everything on the web.</p>
+            <div class="course-meta">
+                <span class="meta-tag">⭐ Beginner</span>
+                <span class="meta-tag">📚 6 Lessons</span>
+                <span class="meta-tag">⚡ 2 Chapters</span>
+            </div>
+            <a href="#roadmap"><button>Start Course</button></a>
+        </div>
+
+        <div class="Second-Section">
+            <h2 class="section-title">What You Will Learn</h2>
+            <div class="learn-grid">
+                <div class="learn-item">HTML structure and document anatomy</div>
+                <div class="learn-item">Text elements and formatting</div>
+                <div class="learn-item">Links and images</div>
+                <div class="learn-item">Lists, tables and forms</div>
+                <div class="learn-item">Semantic HTML</div>
+                <div class="learn-item">Accessibility basics</div>
+            </div>
+        </div>
+
+        <div class="Third-Section">
+            <h2 class="section-title">Real World Usage</h2>
+            <div class="usage-row">
+                <div class="usage-tag">Every website starts with HTML</div>
+                <div class="usage-tag">Defines page structure</div>
+                <div class="usage-tag">Works with CSS & JavaScript</div>
+            </div>
+        </div>
+
+        <div id="roadmap" class="Fourth-Section">
+            <h2 class="section-title">Course Roadmap</h2>
+            <div class="course-timeline">
+
+                <div class="chapter">
+                    <div class="chapter-number">1</div>
+                    <div class="chapter-header"><span>Introduction</span><span class="unlocked-label"
+                            id="ch1Status"></span></div>
+                    <div class="lesson-list">
+                        <div class="lesson"><span>Lesson 1 — Structure</span><a
+                                href="../Html-Lessons/Html-Structure.html"><button id="l1btn">Start</button></a></div>
+                        <div class="lesson"><span>Lesson 2 — Text</span><a href="../Html-Lessons/Html-Text.html"><button
+                                    id="l2btn">Start</button></a></div>
+                        <div class="lesson"><span>Lesson 3 — Links & Images</span><a
+                                href="../Html-Lessons/Html-Lings&Img.html"><button id="l3btn">Start</button></a></div>
+                        <div class="quiz-row">
+                            <span>📝 Chapter 1 Quiz</span>
+                            <span id="ch1QuizDone" class="quiz-done-badge" style="display:none;">✓ Passed</span>
+                            <a href="../Tests/HtmlC1-Test.html" id="ch1QuizLink"><button class="quiz-btn">Take
+                                    Quiz</button></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chapter">
+                    <div class="chapter-number">2</div>
+                    <div class="chapter-header"><span>Core Structure</span><span id="ch2Label"
+                            class="locked-label">LOCKED</span></div>
+                    <div id="ch2Content"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const l1 = localStorage.getItem('lesson_html_structure');
+        const l2 = localStorage.getItem('lesson_html_text');
+        const l3 = localStorage.getItem('lesson_html_links');
+        const quizDone = localStorage.getItem('html_quiz_done');
+
+        if (l1) document.getElementById('l1btn').innerText = '✓ Done';
+        if (l2) document.getElementById('l2btn').innerText = '✓ Done';
+        if (l3) document.getElementById('l3btn').innerText = '✓ Done';
+        if (l1 && l2 && l3) document.getElementById('ch1Status').innerText = '✓ Complete';
+
+        if (quizDone) {
+            document.getElementById('ch1QuizDone').style.display = 'inline';
+            document.getElementById('ch1QuizLink').style.display = 'none';
+        }
+
+        const ch2 = document.getElementById('ch2Content');
+        const ch2Label = document.getElementById('ch2Label');
+
+        if (quizDone) {
+            ch2Label.className = 'unlocked-label';
+            ch2Label.innerText = 'Unlocked';
+            ch2.innerHTML = `
+            <div class="lesson-list">
+                <div class="lesson"><span>Lesson 4 — Lists & Tables</span><a href="../Html-Lessons/Html-Lists&Tables.html"><button>${localStorage.getItem('lesson_html_lists') ? '✓ Done' : 'Start'}</button></a></div>
+                <div class="lesson"><span>Lesson 5 — Forms & Inputs</span><a href="../Html-Lessons/Html-Forms.html"><button>${localStorage.getItem('lesson_html_forms') ? '✓ Done' : 'Start'}</button></a></div>
+                <div class="lesson"><span>Lesson 6 — Semantic HTML</span><a href="../Html-Lessons/Html-Semantic.html"><button>${localStorage.getItem('lesson_html_semantic') ? '✓ Done' : 'Start'}</button></a></div>
+                <div class="quiz-row">
+                    <span>📝 Chapter 2 Quiz</span>
+                    ${localStorage.getItem('html_quiz2_done')
+                    ? '<span class="quiz-done-badge">✓ Passed</span>'
+                    : '<a href="../Tests/HtmlC2-Test.html"><button class="quiz-btn">Take Quiz</button></a>'}
+                </div>
+            </div>
+        `;
+        } else {
+            ch2.innerHTML = `
+            <div class="chapter-locked-overlay">
+                <p>Complete all Chapter 1 lessons and pass the quiz to unlock.</p>
+                <button class="locked-btn" style="height:32px;font-size:8px;">🔒 Locked</button>
+            </div>
+        `;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 6 — Strings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.06;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            border-bottom: var(--border);
+            background-color: var(--bg-mid);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .practice,
+        .next-btn,
+        .run-btn {
+            border: 1px solid gray;
+            border-radius: 10px;
+            height: 40px;
+            padding: 0 16px;
+            background-color: var(--accent);
+            font-family: 'Press Start 2P';
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+            cursor: pointer;
+        }
+
+        .practice:hover,
+        .next-btn:hover{
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .run-btn:hover{
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .practice::after,
+        .next-btn::after,
+        .run-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(-100%);
+            transition: transform .4s;
+            pointer-events: none;
+        }
+
+        .practice:hover::after,
+        .next-btn:hover::after,
+        .run-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .lesson-wrapper {
+            max-width: 1200px;
+            margin: 60px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .lesson-theory {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .lesson-title {
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .lesson-theory p {
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .lesson-theory strong {
+            color: var(--accent);
+        }
+
+        .concept-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .concept-block .label {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .methods-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .method-item {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .method-item code {
+            color: var(--accent);
+            font-size: 11px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .code-area {
+            background: #0b0b1f;
+            border: var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .code-title {
+            color: var(--accent);
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+        }
+
+        .code-area pre {
+            background: #111;
+            padding: 15px;
+            border-radius: 8px;
+            color: #00ff90;
+            border-left: 3px solid var(--accent);
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-label {
+            font-size: 11px;
+            opacity: 0.4;
+            margin-bottom: -8px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 160px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: white;
+        }
+
+        .next-btn {
+            margin-top: auto;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html"><button class="material-symbols-outlined">home</button></a>
+        <div class="ToolButtons">
+            <a href="../Courses/Practice.html"><button class="practice">Practice</button></a>
+        </div>
+    </div>
+
+    <div class="lesson-wrapper">
+        <div class="lesson-theory">
+            <h1 class="lesson-title">Lesson 6 — Strings</h1>
+
+            <p>A <strong>string</strong> is a sequence of characters. In Python, strings are written inside quotes —
+                single or double. Strings are one of the most important types in Python, especially for competition
+                problems.</p>
+
+            <div class="concept-block">
+                <span class="label">INDEXING & SLICING</span>
+                Strings work exactly like lists — each character has an index starting at 0. You can slice with
+                <strong>s[start:end]</strong> and use negative indexes. <strong>s[::-1]</strong> reverses the string.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">COMMON METHODS</span>
+                <div class="methods-grid">
+                    <div class="method-item"><code>upper()</code>All uppercase</div>
+                    <div class="method-item"><code>lower()</code>All lowercase</div>
+                    <div class="method-item"><code>strip()</code>Remove spaces</div>
+                    <div class="method-item"><code>split()</code>Split to list</div>
+                    <div class="method-item"><code>replace(a,b)</code>Replace text</div>
+                    <div class="method-item"><code>count(x)</code>Count occurrences</div>
+                    <div class="method-item"><code>find(x)</code>Find index</div>
+                    <div class="method-item"><code>startswith()</code>Check prefix</div>
+                </div>
+            </div>
+
+            <div class="concept-block">
+                <span class="label">F-STRINGS</span>
+                f-strings let you embed variables directly inside a string. Write <strong>f"..."</strong> and use
+                <strong>{variable}</strong> inside. This is cleaner than concatenation with +.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">STRINGS ARE IMMUTABLE</span>
+                You cannot change a character in a string directly. You must create a new string. This is why
+                <strong>replace()</strong> returns a new string instead of modifying the original.
+            </div>
+
+            <button class="next-btn" onclick="awardLessonXP('lesson_py_strings', '../Tests/PyC2-Test.html')">Finish
+                Chapter →</button>
+        </div>
+
+        <div class="code-area">
+            <div class="code-title">Try It Yourself</div>
+
+            <p class="code-label">Indexing and slicing:</p>
+            <pre>word = "Python"
+print(word[0])     # P
+print(word[-1])    # n
+print(word[0:3])   # Pyt
+print(word[::-1])  # nohtyP (reversed)</pre>
+
+            <p class="code-label">String methods:</p>
+            <pre>s = "  Hello World  "
+print(s.strip())          # "Hello World"
+print(s.lower())          # "  hello world  "
+print(s.replace("World", "Python"))
+words = "a,b,c".split(",")
+print(words)  # ['a', 'b', 'c']</pre>
+
+            <p class="code-label">f-strings and counting:</p>
+            <pre>name = "Arman"
+score = 99
+print(f"Player {name} scored {score}!")
+
+text = "banana"
+print(text.count("a"))  # 3
+print(text.find("n"))   # 2</pre>
+
+            <button class="run-btn" onclick="runCode()">Run Code ▶</button>
+            <iframe id="output"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function runCode() {
+            const iframe = document.getElementById("output");
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write('<pre style="font-family:monospace;padding:10px;">P\nn\nPyt\nnohtyP\nHello World\n  hello world  \n  Hello Python  \n[\'a\', \'b\', \'c\']\nPlayer Arman scored 99!\n3\n2</pre>');
+            doc.close();
+        }
+
+        function awardLessonXP(lessonKey, nextPage) {
+            if (!localStorage.getItem(lessonKey)) {
+                let xp = Number(localStorage.getItem("xp")) || 0;
+                let lessons = Number(localStorage.getItem("lessonsCompleted")) || 0;
+                localStorage.setItem("xp", xp + 10);
+                localStorage.setItem("lessonsCompleted", lessons + 1);
+                localStorage.setItem(lessonKey, "true");
+                const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                let ri = Number(localStorage.getItem("rankIndex")) || 0;
+                let currentXp = Number(localStorage.getItem("xp")) || 0;
+                if (ri < RANKS.length - 1 && currentXp >= XP_NEEDED[ri]) {
+                    currentXp -= XP_NEEDED[ri]; ri++;
+                    localStorage.setItem("rankIndex", ri);
+                    localStorage.setItem("xp", currentXp);
+                    showRankUpAnimation(RANKS[ri]);
+                    setTimeout(() => { window.location.href = nextPage; }, 3500);
+                } else { window.location.href = nextPage; }
+            } else { window.location.href = nextPage; }
+        }
+    </script>
+</body>
+
+</html>

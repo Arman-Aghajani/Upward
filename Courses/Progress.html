@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress — Upward</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            --green: #00ff90;
+            --red: #ff4d4d;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            height: 70px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 38px;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .material-symbols-outlined:hover {
+            transform: scale(1.1);
+        }
+
+        .toolbar-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 13px;
+            color: var(--accent);
+        }
+
+        .page-content {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 40px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* SECTION LABEL */
+        .section-label {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            opacity: 0.5;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+
+        /* HERO STATS */
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: transform .2s, border-color .2s;
+        }
+
+        .hero-stat:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        .hero-stat-value {
+            font-family: 'Press Start 2P';
+            font-size: 24px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .hero-stat-label {
+            font-size: 12px;
+            opacity: 0.4;
+        }
+
+        /* RANK SECTION */
+        .rank-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .rank-circle-big {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P';
+            font-size: 24px;
+            color: var(--accent);
+            background: rgba(255, 215, 0, 0.08);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-info h3 {
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .rank-info p {
+            font-size: 13px;
+            opacity: 0.5;
+            margin-bottom: 14px;
+        }
+
+        .xp-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff99, #FFD700);
+            border-radius: 4px;
+            transition: width .5s ease;
+        }
+
+        .xp-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            opacity: 0.35;
+        }
+
+        /* BOSSES */
+        .bosses-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .boss-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 12px;
+            transition: all .2s;
+        }
+
+        .boss-chip.defeated {
+            border-color: rgba(0, 255, 144, 0.3);
+            background: rgba(0, 255, 144, 0.05);
+        }
+
+        .boss-chip.defeated .boss-chip-status {
+            color: var(--green);
+        }
+
+        .boss-chip.pending {
+            opacity: 0.4;
+        }
+
+        .boss-chip.pending .boss-chip-status {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .boss-chip-portrait {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .boss-chip.defeated .boss-chip-portrait {
+            border-color: var(--green);
+        }
+
+        .boss-chip-portrait img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .boss-chip-name {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            opacity: 0.8;
+        }
+
+        .boss-chip-status {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        /* PRACTICE GRID */
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .practice-rank-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all .2s;
+        }
+
+        .practice-rank-card.has-progress {
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        .practice-rank-letter {
+            font-family: 'Press Start 2P';
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.4;
+        }
+
+        .practice-rank-card.has-progress .practice-rank-letter {
+            opacity: 1;
+        }
+
+        .practice-solved {
+            font-size: 11px;
+            opacity: 0.4;
+        }
+
+        .practice-rank-card.has-progress .practice-solved {
+            opacity: 0.7;
+            color: var(--green);
+        }
+
+        /* LESSONS */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .lesson-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 12px;
+            opacity: 0.4;
+            transition: all .2s;
+        }
+
+        .lesson-chip.done {
+            opacity: 1;
+            border-color: rgba(0, 255, 144, 0.2);
+            background: rgba(0, 255, 144, 0.03);
+        }
+
+        .lesson-chip-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .lesson-chip-name {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .lesson-chip-check {
+            margin-left: auto;
+            color: var(--green);
+            font-size: 14px;
+            display: none;
+        }
+
+        .lesson-chip.done .lesson-chip-check {
+            display: block;
+        }
+
+        .lesson-course-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .lesson-course-header {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            opacity: 0.8;
+            display: inline-block;
+        }
+
+        .lesson-icon {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .course-header-container {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="toolbar-title">Progress</div>
+    </div>
+
+    <div class="page-content">
+
+        <!-- HERO STATS -->
+        <div>
+            <p class="section-label">Overview</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-value" id="statXP">0</span>
+                    <span class="hero-stat-label">Current XP</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-value" id="statLessons">0</span>
+                    <span class="hero-stat-label">Lessons Done</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-value" id="statBosses">0</span>
+                    <span class="hero-stat-label">Guardians Defeated</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-value" id="statProblems">0</span>
+                    <span class="hero-stat-label">Problems Solved</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RANK -->
+        <div>
+            <p class="section-label">Rank Progress</p>
+            <div class="rank-card">
+                <div class="rank-circle-big" id="rankCircle">E</div>
+                <div class="rank-info">
+                    <h3 id="rankTitle">Rank E</h3>
+                    <p id="rankDesc">Keep solving problems and defeating guardians to rank up.</p>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="xpBar"></div>
+                    </div>
+                    <div class="xp-labels">
+                        <span id="xpCurrent">0 XP</span>
+                        <span id="xpNeeded">100 XP to next rank</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOSSES -->
+        <div>
+            <p class="section-label">Guardians</p>
+            <div class="bosses-row" id="bossesRow"></div>
+        </div>
+
+        <!-- PRACTICE -->
+        <div>
+            <p class="section-label">Practice Problems</p>
+            <div class="practice-grid" id="practiceGrid"></div>
+        </div>
+
+        <!-- LESSONS -->
+        <!-- LESSONS -->
+        <div>
+            <p class="section-label">Lessons</p>
+
+            <div style="display:flex; flex-direction:column; gap:16px;">
+
+                <div class="lesson-course-card">
+                    <div class="course-header-container">
+                        <img class="lesson-icon" src="../logos/HTML-Logo.png">
+                        <div class="lesson-course-header">Html</div>
+                    </div>
+                    <div class="lessons-grid" id="htmlLessons"></div>
+                </div>
+
+                <div class="lesson-course-card">
+                    <div class="course-header-container">
+                        <img class="lesson-icon" src="../logos/CSS-Logo.png">
+                        <div class="lesson-course-header">CSS</div>
+                    </div>
+                    <div class="lessons-grid" id="cssLessons"></div>
+                </div>
+
+                <div class="lesson-course-card">
+                    <div class="course-header-container">
+                        <img class="lesson-icon" src="../logos/Python-Logo.png">
+                        <div class="lesson-course-header">Python</div>
+                    </div>
+                    <div class="lessons-grid" id="pyLessons"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const ranks = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+        const xpNeeded = [100, 150, 200, 250, 300, 400, Infinity];
+
+        let rankIndex = Number(localStorage.getItem("rankIndex")) || 0;
+        let xp = Number(localStorage.getItem("xp")) || 0;
+
+        while (rankIndex < ranks.length - 1 && xp >= xpNeeded[rankIndex]) {
+            xp -= xpNeeded[rankIndex]; rankIndex++;
+            localStorage.setItem("rankIndex", rankIndex);
+            localStorage.setItem("xp", xp);
+        }
+
+        const currentRankXP = xpNeeded[rankIndex];
+        const percent = Math.min((xp / currentRankXP) * 100, 100);
+
+        // BOSS DATA
+        const bosses = [
+            { rank: "E", name: "The Apprentice", img: "../logos/bosses/E.png", key: "boss_e_done" },
+            { rank: "D", name: "The Chipher", img: "../logos/bosses/D.png", key: "boss_d_done" },
+            { rank: "C", name: "The Strategist", img: "../logos/bosses/C.png", key: "boss_c_done" },
+            { rank: "B", name: "The Forger", img: "../logos/bosses/B.png", key: "boss_b_done" },
+            { rank: "A", name: "The Sage", img: "../logos/bosses/A.png", key: "boss_a_done" },
+            { rank: "S", name: "The Master Sentinel", img: "../logos/bosses/S.png", key: "boss_s_done" },
+            { rank: "N", name: "The Architect", img: "../logos/bosses/National.png", key: "boss_national_done" },
+        ];
+
+        // PRACTICE DATA
+        const practiceRanks = [
+            { letter: "E", keys: ["practice_e_1", "practice_e_2", "practice_e_3"] },
+            { letter: "D", keys: ["practice_d_1", "practice_d_2", "practice_d_3"] },
+            { letter: "C", keys: ["practice_c_1", "practice_c_2", "practice_c_3"] },
+            { letter: "B", keys: ["practice_b_1", "practice_b_2", "practice_b_3"] },
+            { letter: "A", keys: ["practice_a_1", "practice_a_2", "practice_a_3"] },
+            { letter: "S", keys: ["practice_s_1", "practice_s_2", "practice_s_3"] },
+            { letter: "N", keys: ["practice_national_1", "practice_national_2", "practice_national_3"] },
+        ];
+
+        // LESSONS DATA
+        const lessonGroups = {
+            html: [
+                { name: "Structure", key: "lesson_html_structure" },
+                { name: "Text", key: "lesson_html_text" },
+                { name: "Links & Img", key: "lesson_html_links" },
+                { name: "Lists & Tables", key: "lesson_html_lists" },
+                { name: "Forms & Imputs", key: "lesson_html_forms" },
+                { name: "Semantic HTML", key: "lesson_html_semantic" },
+            ],
+            css: [
+                { name: "Colors", key: "lesson_css_colors" },
+                { name: "Fonts", key: "lesson_css_fonts" },
+                { name: "Spacing", key: "lesson_css_spacing" },
+                { name: "Selectors", key: "lesson_css_selectors" },
+                { name: "Box Model", key: "lesson_css_boxmodel" },
+                { name: "Positioning", key: "lesson_css_positioning" },
+            ],
+            py: [
+                { name: "Variables", key: "lesson_py_var" },
+                { name: "Conditions", key: "lesson_py_conditions" },
+                { name: "Loops", key: "lesson_py_loops" },
+                { name: "Functions", key: "lesson_py_functions" },
+                { name: "Lists", key: "lesson_py_lists" },
+                { name: "Strings", key: "lesson_py_strings" },
+            ]
+        };
+
+        // COUNT BOSSES DEFEATED
+        const bossesDefeated = bosses.filter(b => localStorage.getItem(b.key)).length;
+
+        // COUNT PROBLEMS SOLVED
+        const problemsSolved = practiceRanks.reduce((total, r) => {
+            return total + r.keys.filter(k => localStorage.getItem(k)).length;
+        }, 0);
+
+        // POPULATE HERO STATS
+        document.getElementById('statXP').innerText = xp;
+        document.getElementById('statLessons').innerText = localStorage.getItem('lessonsCompleted') || 0;
+        document.getElementById('statBosses').innerText = bossesDefeated;
+        document.getElementById('statProblems').innerText = problemsSolved;
+
+        // POPULATE RANK
+        const rankLabel = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
+        document.getElementById('rankCircle').innerText = rankLabel;
+        document.getElementById('rankTitle').innerText = 'Rank ' + ranks[rankIndex];
+        document.getElementById('xpBar').style.width = percent + '%';
+        document.getElementById('xpCurrent').innerText = xp + ' XP';
+        document.getElementById('xpNeeded').innerText = currentRankXP === Infinity ? 'MAX RANK' : currentRankXP + ' XP to next rank';
+
+        // POPULATE BOSSES
+        const bossesRow = document.getElementById('bossesRow');
+        bosses.forEach(b => {
+            const defeated = localStorage.getItem(b.key);
+            const chip = document.createElement('div');
+            chip.className = 'boss-chip ' + (defeated ? 'defeated' : 'pending');
+            chip.innerHTML = `
+            <div class="boss-chip-portrait">
+                <img src="${b.img}" alt="${b.name}">
+            </div>
+            <div>
+                <div class="boss-chip-name">${b.name}</div>
+                <div class="boss-chip-status">${defeated ? '✓ Defeated' : 'Pending'}</div>
+            </div>
+        `;
+            bossesRow.appendChild(chip);
+        });
+
+        // POPULATE PRACTICE
+        const practiceGrid = document.getElementById('practiceGrid');
+        practiceRanks.forEach(r => {
+            const solved = r.keys.filter(k => localStorage.getItem(k)).length;
+            const card = document.createElement('div');
+            card.className = 'practice-rank-card' + (solved > 0 ? ' has-progress' : '');
+            card.innerHTML = `
+            <span class="practice-rank-letter">${r.letter}</span>
+            <div class="practice-solved">${solved} / 3 solved</div>
+        `;
+            practiceGrid.appendChild(card);
+        });
+
+        // POPULATE LESSONS
+        ['html', 'css', 'py'].forEach(course => {
+            const grid = document.getElementById(course + 'Lessons');
+            lessonGroups[course].forEach(l => {
+                const done = localStorage.getItem(l.key);
+                const chip = document.createElement('div');
+                chip.className = 'lesson-chip' + (done ? ' done' : '');
+                chip.innerHTML = `
+            <span class="lesson-chip-name">${l.name}</span>
+            <span class="lesson-chip-check">✓</span>
+        `;
+                grid.appendChild(chip);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

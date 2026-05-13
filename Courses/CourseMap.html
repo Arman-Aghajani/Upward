@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="../rankup.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-dark: #020223;
+      --bg-mid: #06063d;
+      --bg-light: #0a0a4a;
+      --accent: #FFD700;
+      --accent-glow: rgba(255, 215, 0, 0.15);
+      --border: 1px solid rgba(255, 255, 255, 0.08);
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      color: white;
+      background: #020223;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ANIMATED BACKGROUND */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(255, 215, 0, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(100, 100, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(0, 255, 150, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+      background-size: 50px 50px;
+      opacity: 0.03;
+      animation: drift 80s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate(0, 0);
+      }
+
+      to {
+        transform: translate(-100px, -100px);
+      }
+    }
+
+    /* LAYOUT */
+    .wrapper {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        "toolbar sidebar"
+        "main sidebar";
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+      grid-area: toolbar;
+      height: 72px;
+      background: rgba(6, 6, 61, 0.6);
+      border-bottom: var(--border);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .toolbar-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+    }
+
+    .material-symbols-outlined {
+      color: var(--accent);
+      font-size: 36px;
+      cursor: pointer;
+      transition: transform .2s;
+    }
+
+    .material-symbols-outlined:hover {
+      transform: scale(1.1);
+    }
+
+    .toolbar-btn {
+      font-family: 'Press Start 2P';
+      font-size: 8px;
+      padding: 0 18px;
+      height: 38px;
+      background: var(--accent);
+      color: #020223;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      display: inline-block;
+      text-decoration: none;
+      line-height: 38px;
+    }
+
+    .toolbar-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+
+    .toolbar-btn-ghost {
+      font-family: 'Press Start 2P';
+      font-size: 8px;
+      padding: 0 18px;
+      height: 38px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      border: var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-block;
+      text-decoration: none;
+      line-height: 38px;
+    }
+
+    .toolbar-btn-ghost:hover {
+      color: white;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .account-icon {
+      margin-left: auto;
+      text-decoration: none;
+      line-height: 0;
+    }
+
+    /* MAIN */
+    .main {
+      grid-area: main;
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    /* WELCOME BANNER */
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0.02) 100%);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .welcome-text h2 {
+      font-family: 'Press Start 2P';
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .welcome-text p {
+      font-size: 13px;
+      opacity: 0.5;
+      line-height: 1.6;
+    }
+
+    .welcome-rank {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .welcome-rank-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Press Start 2P';
+      font-size: 20px;
+      color: var(--accent);
+      background: rgba(255, 215, 0, 0.08);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+    }
+
+    .welcome-rank span {
+      font-size: 10px;
+      opacity: 0.4;
+    }
+
+    /* SECTION TITLE */
+    .section-label {
+      font-family: 'Press Start 2P';
+      font-size: 8px;
+      color: var(--accent);
+      opacity: 0.5;
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+    }
+
+    /* COURSE CARDS GRID */
+    .courses-grid {
+      gap: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .course-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      cursor: pointer;
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: white;
+      display: block;
+      width: 240px;
+      flex: 0 0 240px;
+    }
+
+    .course-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity .25s;
+    }
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 215, 0, 0.2);
+      border-color: rgba(255, 215, 0, 0.2);
+    }
+
+    .course-card:hover::before {
+      opacity: 1;
+    }
+
+    .course-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .course-title {
+      font-family: 'Press Start 2P';
+      font-size: 11px;
+      color: var(--accent);
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .course-desc {
+      font-size: 12px;
+      opacity: 0.5;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .course-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .course-lessons {
+      font-size: 11px;
+      opacity: 0.35;
+    }
+
+    .course-arrow {
+      font-size: 18px;
+      opacity: 0.3;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .course-card:hover .course-arrow {
+      opacity: 1;
+      transform: translateX(4px);
+      color: var(--accent);
+    }
+
+    /* MAP CARD */
+    .map-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      cursor: pointer;
+      transition: transform .25s, box-shadow .25s;
+      text-decoration: none;
+      color: white;
+    }
+
+    .map-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .map-thumb {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: var(--border);
+    }
+
+    .map-info h3 {
+      font-family: 'Press Start 2P';
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .map-info p {
+      font-size: 13px;
+      opacity: 0.5;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .map-tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 4px 12px;
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 20px;
+      color: var(--accent);
+      opacity: 0.8;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      grid-area: sidebar;
+      border-left: var(--border);
+      background: rgba(6, 6, 61, 0.4);
+      backdrop-filter: blur(20px);
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-title {
+      font-family: 'Press Start 2P';
+      font-size: 9px;
+      color: var(--accent);
+      opacity: 0.6;
+      letter-spacing: 2px;
+      text-align: center;
+      padding-bottom: 16px;
+      border-bottom: var(--border);
+    }
+
+    /* STAT BOXES */
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      opacity: 0.4;
+      letter-spacing: 1px;
+    }
+
+    .stat-value {
+      font-family: 'Press Start 2P';
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* XP BAR */
+    .xp-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff99, #FFD700);
+      border-radius: 3px;
+      transition: width .5s ease;
+    }
+
+    .xp-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      opacity: 0.35;
+      margin-top: 4px;
+    }
+
+    /* QUICK ACTIONS */
+    .quick-btn {
+      font-family: 'Press Start 2P';
+      font-size: 7px;
+      padding: 12px;
+      background: rgba(255, 215, 0, 0.08);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      border-radius: 10px;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+
+    .quick-btn:hover {
+      background: rgba(255, 215, 0, 0.15);
+      border-color: rgba(255, 215, 0, 0.4);
+      transform: translateX(3px);
+    }
+
+    /* PIXEL ART IMAGE */
+    .sidebar-img {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: auto;
+      opacity: 0.7;
+      border: var(--border);
+    }
+
+    /* RANK BADGE */
+    .rank-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rank-circle-small {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Press Start 2P';
+      font-size: 12px;
+      color: var(--accent);
+      background: rgba(255, 215, 0, 0.08);
+      flex-shrink: 0;
+      gap: 10px;
+    }
+
+    .course-icon-img {
+      width: 100px;
+      margin-left: -30px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wrapper">
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <a href="CourseMap.html">
+        <span class="material-symbols-outlined">home</span>
+      </a>
+
+      <div class="toolbar-center">
+        <a href="Practice.html" class="toolbar-btn">Practice</a>
+        <a href="../AI-Tutor/Chat.html" class="toolbar-btn-ghost">Chat</a>
+        <a href="../Courses/Progress.html" class="toolbar-btn-ghost">Progress</a>
+      </div>
+
+      <a href="../AccountManagement/Account.html" class="account-icon">
+        <span class="material-symbols-outlined" style="font-size:34px; margin-right:4px;">account_circle</span>
+      </a>
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- WELCOME BANNER -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h2 id="welcomeText">Welcome back!</h2>
+          <p>Pick up where you left off. Your next rank is waiting.</p>
+        </div>
+        <div class="welcome-rank">
+          <div class="welcome-rank-circle" id="welcomeRankCircle">E</div>
+          <span>Current Rank</span>
+        </div>
+      </div>
+
+      <!-- COURSES -->
+      <div>
+        <p class="section-label">Courses</p>
+        <div class="courses-grid">
+
+          <a href="../Courses/Html.html" class="course-card">
+            <img src="../logos/HTML-Logo.png" class="course-icon-img">
+            <h3 class="course-title">HTML</h3>
+            <p class="course-desc">Build the structure of websites. Learn tags, elements and semantic HTML.</p>
+            <div class="course-meta">
+              <span class="course-lessons">6 lessons</span>
+              <span class="course-arrow">→</span>
+            </div>
+          </a>
+
+          <a href="../Courses/CSS.html" class="course-card">
+            <img src="../logos/CSS-Logo.png" class="course-icon-img">
+            <h3 class="course-title">CSS</h3>
+            <p class="course-desc">Style and design beautiful interfaces with colors, layouts and animations.</p>
+            <div class="course-meta">
+              <span class="course-lessons">6 lessons</span>
+              <span class="course-arrow">→</span>
+            </div>
+          </a>
+
+          <a href="../Courses/Python.html" class="course-card">
+            <img src="../logos/Python-Logo.png" class="course-icon-img">
+            <h3 class="course-title">Python</h3>
+            <p class="course-desc">Write real programs, automate tasks and learn core programming logic.</p>
+            <div class="course-meta">
+              <span class="course-lessons">6 lessons</span>
+              <span class="course-arrow">→</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- WORLD MAP -->
+      <div>
+        <p class="section-label">Explore</p>
+        <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:stretch;">
+
+          <a href="../maps/mapBuildingWeb.html" class="map-card" style="flex:1; min-width:280px;">
+            <img class="map-thumb" src="../logos/Map4-Repair.png" alt="World Map">
+            <div class="map-info">
+              <h3>Building Websites</h3>
+              <p>Explore the interactive learning map. Navigate through lessons and unlock new territories as you
+                progress.</p>
+              <span class="map-tag">⭐ Open Map</span>
+            </div>
+          </a>
+
+          <a href="../Courses/Duel.html" class="course-card" style="flex:0 0 200px;">
+            <img src="../logos/Duel-Icon.png" class="course-icon-img">
+            <h3 class="course-title">Duel Mode</h3>
+            <p class="course-desc">Challenge another player to a coding battle. Same problem, same timer — first correct
+              solution wins.</p>
+            <div class="course-meta">
+              <span class="course-lessons">Python · 5 min</span>
+              <span class="course-arrow">→</span>
+            </div>
+          </a>
+
+          <a href="../Courses/Bosses.html" class="course-card" style="flex:0 0 200px;">
+            <img src="../logos/Guardian-Icon.png" class="course-icon-img">
+            <h3 class="course-title">Coding Guardians</h3>
+            <p class="course-desc">Face the guardians of each rank. Defeat them in trial to prove your skills and earn bonus XP. </p>
+            <div class="course-meta">
+              <span class="course-lessons">7 Guardians · Python</span>
+              <span class="course-arrow">→</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <p class="sidebar-title">Player Stats</p>
+
+      <!-- RANK + XP -->
+      <div class="stat-box">
+        <div class="stat-row">
+          <div class="rank-badge">
+            <div class="rank-circle-small" id="rankCircle">E</div>
+            <div>
+              <div class="stat-label">Current Rank</div>
+              <div class="stat-value" id="rankDisplay" style=margin-top:4px>Rank E</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:4px;">
+          <div class="xp-bar-container">
+            <div class="xp-bar-fill" id="xpBar"></div>
+          </div>
+          <div class="xp-labels">
+            <span id="xpCurrent">0 XP</span>
+            <span id="xpNeeded">100 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LESSONS -->
+      <div class="stat-box">
+        <div class="stat-label">Lessons Completed</div>
+        <div class="stat-value" id="lessonsDisplay">0</div>
+      </div>
+
+      <!-- NEXT RANK -->
+      <div class="stat-box">
+        <div class="stat-label">Next Rank</div>
+        <div class="stat-value" id="nextRankDisplay">D</div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <p class="sidebar-title" style="margin-top:8px;">Quick Actions</p>
+      <a href="Practice.html" class="quick-btn">⚔ Go to Practice</a>
+      <a href="../AI-Tutor/Chat.html" class="quick-btn">💬 Open AI Tutor</a>
+      <a href="../AccountManagement/Account.html" class="quick-btn">👤 My Account</a>
+
+      <img class="sidebar-img"
+        src="https://static.vecteezy.com/system/resources/previews/024/542/163/original/landscape-8bit-pixel-art-summer-natural-landscape-mountain-scenery-arcade-video-game-background-vector.jpg"
+        alt="pixel landscape">
+
+    </div>
+
+  </div>
+
+  <script>
+    const ranks = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+    const xpNeeded = [100, 150, 200, 250, 300, 400, Infinity];
+
+    let rankIndex = Number(localStorage.getItem("rankIndex")) || 0;
+    let xp = Number(localStorage.getItem("xp")) || 0;
+
+    while (rankIndex < ranks.length - 1 && xp >= xpNeeded[rankIndex]) {
+      xp -= xpNeeded[rankIndex];
+      rankIndex++;
+      localStorage.setItem("rankIndex", rankIndex);
+      localStorage.setItem("xp", xp);
+    }
+
+    const currentRankXP = xpNeeded[rankIndex];
+    const percent = Math.min((xp / currentRankXP) * 100, 100);
+    const userName = localStorage.getItem("user_name") || "Adventurer";
+    const nextRank = ranks[rankIndex + 1] || "MAX";
+
+    document.getElementById("welcomeText").innerText = "Hey, " + userName + "!";
+    document.getElementById("welcomeRankCircle").innerText = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
+    document.getElementById("rankCircle").innerText = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
+    document.getElementById("rankDisplay").innerText = "Rank " + ranks[rankIndex];
+    document.getElementById("xpBar").style.width = percent + "%";
+    document.getElementById("xpCurrent").innerText = xp + " XP";
+    document.getElementById("xpNeeded").innerText = currentRankXP === Infinity ? "MAX" : currentRankXP + " XP";
+    document.getElementById("nextRankDisplay").innerText = nextRank;
+    document.getElementById("lessonsDisplay").innerText = localStorage.getItem("lessonsCompleted") || 0;
+  </script>
+
+  <script type="module" src="../firebase-sync.js"></script>
+</body>
+
+</html>

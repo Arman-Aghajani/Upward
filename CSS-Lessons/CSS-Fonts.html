@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 2 — CSS Fonts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-mid: #06063d;
+            --bg-light: #0a0a4a;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.06;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            border-bottom: var(--border);
+            background-color: var(--bg-mid);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .practice,
+        .next-btn,
+        .run-btn {
+            border: 1px solid gray;
+            border-radius: 10px;
+            height: 40px;
+            padding: 0 16px;
+            background-color: var(--accent);
+            font-family: 'Press Start 2P';
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+            cursor: pointer;
+        }
+
+        .practice:hover,
+        .next-btn:hover,
+        .run-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .practice::after,
+        .next-btn::after,
+        .run-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(-100%);
+            transition: transform .4s;
+            pointer-events: none;
+        }
+
+        .practice:hover::after,
+        .next-btn:hover::after,
+        .run-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .back-link {
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        .toolbar-btn-ghost {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+            display: inline-block;
+            text-decoration: none;
+            line-height: 38px;
+        }
+
+        .toolbar-btn-ghost:hover {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .lesson-wrapper {
+            max-width: 1200px;
+            margin: 60px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .lesson-theory {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .lesson-title {
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .lesson-theory p {
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .lesson-theory strong {
+            color: var(--accent);
+        }
+
+        .concept-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .concept-block .label {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .code-area {
+            background: #0b0b1f;
+            border: var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .code-title {
+            color: var(--accent);
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+        }
+
+        .code-area pre {
+            background: #111;
+            padding: 15px;
+            border-radius: 8px;
+            color: #00ff90;
+            border-left: 3px solid var(--accent);
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-label {
+            font-size: 11px;
+            opacity: 0.4;
+            margin-bottom: -8px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 220px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: white;
+        }
+
+        .next-btn {
+            margin-top: auto;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html"><button class="material-symbols-outlined">home</button></a>
+        <div class="ToolButtons">
+            <a href="../Courses/Practice.html"><button class="practice">Practice</button></a>
+        </div>
+        <a href="../Courses/CSS.html" class="back-link"><button class="toolbar-btn-ghost">Back to Course</button></a>
+    </div>
+
+    <div class="lesson-wrapper">
+        <div class="lesson-theory">
+            <h1 class="lesson-title">Lesson 2 — Fonts</h1>
+
+            <p>Typography is one of the most important parts of a website's design. Good font choices make text easy to
+                read; bad ones make even great content frustrating. CSS gives you complete control over how text looks.
+            </p>
+
+            <div class="concept-block">
+                <span class="label">FONT FAMILY</span>
+                The <strong>font-family</strong> property sets the typeface. List multiple fonts as fallbacks:
+                <strong>font-family: Arial, Helvetica, sans-serif;</strong> — the browser uses the first one available.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">FONT SIZE</span>
+                Use <strong>font-size</strong> to control how big text is. Common units: <strong>px</strong> (fixed
+                pixels), <strong>em</strong> (relative to parent), <strong>rem</strong> (relative to root).
+            </div>
+
+            <div class="concept-block">
+                <span class="label">FONT WEIGHT</span>
+                <strong>font-weight</strong> sets how thick the text is. Use names (<strong>normal</strong>,
+                <strong>bold</strong>) or numbers from 100 (thin) to 900 (heavy).
+            </div>
+
+            <div class="concept-block">
+                <span class="label">FONT STYLE</span>
+                <strong>font-style: italic</strong> makes text slanted. Use sparingly for emphasis or quotes.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">GOOGLE FONTS</span>
+                You can load custom fonts from Google Fonts. Add a <strong>&lt;link&gt;</strong> in the head, then use
+                the font name in CSS like any other. That's how Upward uses "Press Start 2P" everywhere.
+            </div>
+
+            <button class="next-btn" onclick="awardLessonXP('lesson_css_fonts', 'CSS-Spacing.html')">Next Lesson
+                →</button>
+        </div>
+
+        <div class="code-area">
+            <div class="code-title">Try It Yourself</div>
+
+            <p class="code-label">Basic font properties:</p>
+            <pre>body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: bold;
+}</pre>
+
+            <p class="code-label">Italic and different weights:</p>
+            <pre>.quote {
+  font-style: italic;
+  font-weight: 300;
+}
+
+.title {
+  font-weight: 900;
+}</pre>
+
+            <p class="code-label">Using Google Fonts:</p>
+            <pre>&lt;!-- in HTML head --&gt;
+&lt;link href="https://fonts.googleapis.com/css2?
+       family=Press+Start+2P" rel="stylesheet"&gt;
+
+/* in CSS */
+.gamer-text {
+  font-family: 'Press Start 2P';
+  font-size: 14px;
+}</pre>
+
+            <button class="run-btn" onclick="runCode()">Run Code ▶</button>
+            <iframe id="output"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function runCode() {
+            const iframe = document.getElementById("output");
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 12px; color: #222; margin: 0; }
+                    h1 { font-size: 28px; font-weight: bold; margin-bottom: 8px; }
+                    .quote { font-style: italic; font-weight: 300; color: #555; margin-bottom: 8px; }
+                    .title { font-weight: 900; font-size: 22px; }
+                    p { font-size: 14px; line-height: 1.5; }
+                </style>
+                <h1>Bold Heading</h1>
+                <p class="quote">"An italic, light-weight quote"</p>
+                <p class="title">HEAVY WEIGHT TITLE</p>
+                <p>Regular paragraph text in default size.</p>
+            `);
+            doc.close();
+        }
+
+        function awardLessonXP(lessonKey, nextPage) {
+            if (!localStorage.getItem(lessonKey)) {
+                let xp = Number(localStorage.getItem("xp")) || 0;
+                let lessons = Number(localStorage.getItem("lessonsCompleted")) || 0;
+                localStorage.setItem("xp", xp + 10);
+                localStorage.setItem("lessonsCompleted", lessons + 1);
+                localStorage.setItem(lessonKey, "true");
+                const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                let ri = Number(localStorage.getItem("rankIndex")) || 0;
+                let currentXp = Number(localStorage.getItem("xp")) || 0;
+                if (ri < RANKS.length - 1 && currentXp >= XP_NEEDED[ri]) {
+                    currentXp -= XP_NEEDED[ri]; ri++;
+                    localStorage.setItem("rankIndex", ri);
+                    localStorage.setItem("xp", currentXp);
+                    showRankUpAnimation(RANKS[ri]);
+                    setTimeout(() => { window.location.href = nextPage; }, 3500);
+                } else { window.location.href = nextPage; }
+            } else { window.location.href = nextPage; }
+        }
+    </script>
+</body>
+
+</html>

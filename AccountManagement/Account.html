@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account — Upward</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            height: 70px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 38px;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .material-symbols-outlined:hover {
+            transform: scale(1.1);
+        }
+
+        .toolbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 13px;
+            color: var(--accent);
+        }
+
+        .page-content {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 0 40px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            background: rgba(255, 215, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P';
+            font-size: 24px;
+            color: var(--accent);
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-family: 'Press Start 2P';
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .profile-email {
+            font-size: 13px;
+            opacity: 0.4;
+            margin-bottom: 10px;
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Press Start 2P';
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.4;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .xp-bar-wrapper {
+            margin-top: 4px;
+        }
+
+        .xp-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff99, #FFD700);
+            border-radius: 4px;
+            transition: width .5s ease;
+        }
+
+        .xp-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            opacity: 0.35;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            opacity: 0.5;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: var(--border);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            padding: 0 14px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .input-group input:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .save-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .save-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform .4s;
+            pointer-events: none;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .save-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .danger-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 12px 24px;
+            background: transparent;
+            color: #ff4d4d;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .danger-btn:hover {
+            background: rgba(255, 77, 77, 0.1);
+            border-color: #ff4d4d;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .success-msg {
+            background: rgba(0, 255, 144, 0.08);
+            border: 1px solid #00ff90;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #00ff90;
+            display: none;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div class="toolbar-center">Account</div>
+    </div>
+
+    <div class="page-content">
+        <div class="profile-card">
+            <div class="avatar" id="avatarEl">?</div>
+            <div class="profile-info">
+                <p class="profile-name" id="profileName">Loading...</p>
+                <p class="profile-email" id="profileEmail"></p>
+                <div class="rank-badge">⭐ <span id="profileRank">Rank E</span></div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-value" id="statXP">0</span><span class="stat-label">Current
+                    XP</span></div>
+            <div class="stat-card"><span class="stat-value" id="statLessons">0</span><span class="stat-label">Lessons
+                    Done</span></div>
+            <div class="stat-card"><span class="stat-value" id="statRank">E</span><span class="stat-label">Current
+                    Rank</span></div>
+        </div>
+
+        <div class="section-card">
+            <p class="section-title">Rank Progress</p>
+            <div class="xp-bar-wrapper">
+                <div class="xp-bar-container">
+                    <div class="xp-bar-fill" id="xpBarFill"></div>
+                </div>
+                <div class="xp-labels"><span id="xpCurrent">0 XP</span><span id="xpNeeded">100 XP</span></div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <p class="section-title">Edit Profile</p>
+            <div class="input-group"><label>Display Name</label><input type="text" id="editName"
+                    placeholder="Your name"></div>
+            <div class="input-group"><label>Email</label><input type="email" id="editEmail" disabled></div>
+            <div class="btn-row"><button class="save-btn" onclick="saveName()">Save Changes</button></div>
+            <div class="success-msg" id="successMsg">✓ Name updated!</div>
+        </div>
+
+        <div class="section-card">
+            <p class="section-title">Account</p>
+            <div class="btn-row">
+                <button class="danger-btn" onclick="logout()">Log Out</button>
+                <button class="danger-btn" onclick="deleteAccount()">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+        import { getAuth, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDug8Iz8FkYck24-E8bFHyW-nt-PgXfvew",
+            authDomain: "upward-44313.firebaseapp.com",
+            projectId: "upward-44313",
+            storageBucket: "upward-44313.firebasestorage.app",
+            messagingSenderId: "101564287746",
+            appId: "1:101564287746:web:a5b50c89520fadc006d01b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const ranks = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+        const xpNeeded = [100, 150, 200, 250, 300, 400, Infinity];
+
+        const uid = localStorage.getItem('current_user');
+        if (!uid) { window.location.href = '../AccountManagement/Login.html'; }
+
+        const userName = localStorage.getItem('user_name') || 'Adventurer';
+        const userEmail = localStorage.getItem('user_email') || '';
+        let rankIndex = Number(localStorage.getItem('rankIndex')) || 0;
+        let xp = Number(localStorage.getItem('xp')) || 0;
+        const lessons = Number(localStorage.getItem('lessonsCompleted')) || 0;
+
+        const currentRankXP = xpNeeded[rankIndex];
+        const percent = currentRankXP === Infinity ? 100 : Math.min((xp / currentRankXP) * 100, 100);
+        const rankLabel = ranks[rankIndex] === 'National' ? 'N' : ranks[rankIndex];
+
+        document.getElementById('avatarEl').innerText = userName.charAt(0).toUpperCase();
+        document.getElementById('profileName').innerText = userName;
+        document.getElementById('profileEmail').innerText = userEmail;
+        document.getElementById('profileRank').innerText = 'Rank ' + ranks[rankIndex];
+        document.getElementById('statXP').innerText = xp;
+        document.getElementById('statLessons').innerText = lessons;
+        document.getElementById('statRank').innerText = rankLabel;
+        document.getElementById('xpBarFill').style.width = percent + '%';
+        document.getElementById('xpCurrent').innerText = xp + ' XP';
+        document.getElementById('xpNeeded').innerText = currentRankXP === Infinity ? 'MAX RANK' : currentRankXP + ' XP to next rank';
+        document.getElementById('editName').value = userName;
+        document.getElementById('editEmail').value = userEmail;
+
+        window.saveName = async function () {
+            const newName = document.getElementById('editName').value.trim();
+            if (!newName) return;
+            try {
+                await updateDoc(doc(db, 'users', uid), { name: newName });
+                localStorage.setItem('user_name', newName);
+                document.getElementById('profileName').innerText = newName;
+                document.getElementById('avatarEl').innerText = newName.charAt(0).toUpperCase();
+                const msg = document.getElementById('successMsg');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
+            } catch (err) { console.error(err); }
+        }
+
+        window.logout = async function () {
+            await signOut(auth);
+            localStorage.clear();
+            window.location.href = '../AccountManagement/Login.html';
+        }
+
+        window.deleteAccount = async function () {
+            if (!confirm('Are you sure? All your progress will be permanently deleted. This cannot be undone.')) return;
+            try {
+                await deleteDoc(doc(db, 'users', uid));
+                await deleteUser(auth.currentUser);
+                localStorage.clear();
+                window.location.href = '../AccountManagement/Signup.html';
+            } catch (err) {
+                if (err.code === 'auth/requires-recent-login') {
+                    alert('Please log out and log back in before deleting your account.');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

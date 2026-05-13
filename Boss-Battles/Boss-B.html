@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardian Trial — The Forger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --red: #ff4d4d;
+            --green: #00ff90;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            height: 70px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 38px;
+            cursor: pointer;
+        }
+
+        .boss-header {
+            background: linear-gradient(180deg, rgba(255, 50, 50, 0.08) 0%, transparent 100%);
+            border-bottom: var(--border);
+            padding: 28px 40px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .boss-portrait {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--red);
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 77, 77, 0.4);
+            flex-shrink: 0;
+        }
+
+        .boss-portrait img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .boss-info {
+            flex: 1;
+        }
+
+        .boss-rank-label {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .boss-name {
+            font-family: 'Press Start 2P';
+            font-size: 18px;
+            color: var(--red);
+            text-shadow: 0 0 20px rgba(255, 77, 77, 0.4);
+            margin-bottom: 16px;
+        }
+
+        .hp-section {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .hp-label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .hp-label {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--red);
+        }
+
+        .hp-numbers {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .hp-bar-container {
+            width: 100%;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+            border: var(--border);
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #cc0000, #ff4d4d, #ff8080);
+            border-radius: 8px;
+            transition: width .8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hp-bar-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            animation: hpShine 2s infinite;
+        }
+
+        @keyframes hpShine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .timer-section {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .timer-label {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            opacity: 0.5;
+            margin-bottom: 6px;
+        }
+
+        .timer-value {
+            font-family: 'Press Start 2P';
+            font-size: 28px;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .timer-value.warning {
+            color: var(--red);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .damage-flash {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 0, 0, 0.15);
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity .1s;
+        }
+
+        .damage-flash.flash {
+            opacity: 1;
+        }
+
+        .damage-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Press Start 2P';
+            font-size: 48px;
+            color: var(--red);
+            text-shadow: 0 0 20px rgba(255, 77, 77, 0.8);
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity .2s;
+        }
+
+        .battle-content {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 40px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .problems-nav {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .problem-tab {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+        }
+
+        .problem-tab.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(255, 215, 0, 0.06);
+        }
+
+        .problem-tab.solved {
+            border-color: var(--green);
+            color: var(--green);
+            background: rgba(0, 255, 144, 0.06);
+        }
+
+        .problem-tab.solved::after {
+            content: "✓";
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--green);
+            color: #020223;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .problem-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            display: none;
+        }
+
+        .problem-card.active {
+            display: block;
+        }
+
+        .problem-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .problem-number {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--red);
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            border-radius: 6px;
+            padding: 6px 12px;
+        }
+
+        .problem-type {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+
+        .problem-type.coding {
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .problem-type.multiple {
+            border: 1px solid #66aaff;
+            color: #66aaff;
+        }
+
+        .damage-tag {
+            margin-left: auto;
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: var(--red);
+            opacity: 0.7;
+        }
+
+        .problem-title {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: var(--accent);
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .problem-desc {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .example-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid var(--accent);
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--green);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            background: rgba(0, 0, 0, 0.3);
+            border: var(--border);
+            border-radius: 10px;
+            color: var(--green);
+            font-family: monospace;
+            font-size: 14px;
+            padding: 16px;
+            resize: vertical;
+            outline: none;
+            line-height: 1.7;
+            transition: border-color .2s;
+            pointer-events: all;
+            margin-bottom: 16px;
+        }
+
+        textarea:focus {
+            border-color: rgba(255, 77, 77, 0.4);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .answer-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: white;
+            font-size: 14px;
+            text-align: left;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+        }
+
+        .answer-btn::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--accent);
+            opacity: 0;
+            transition: .2s;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .answer-btn:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .answer-btn:hover::before,
+        .answer-btn.selected::before {
+            opacity: 1;
+        }
+
+        .answer-btn.selected {
+            border-color: var(--accent);
+            background: rgba(255, 215, 0, 0.06);
+        }
+
+        .answer-btn.correct {
+            border-color: var(--green);
+            background: rgba(0, 255, 144, 0.06);
+            color: var(--green);
+        }
+
+        .answer-btn.wrong {
+            border-color: var(--red);
+            background: rgba(255, 77, 77, 0.06);
+            color: #ff8080;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #ff4d4d, #cc0000);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform .4s;
+            pointer-events: none;
+        }
+
+        .submit-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback-box {
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .feedback-box.success {
+            background: rgba(0, 255, 144, 0.08);
+            border: 1px solid var(--green);
+            color: var(--green);
+            display: block;
+        }
+
+        .feedback-box.error {
+            background: rgba(255, 77, 77, 0.08);
+            border: 1px solid var(--red);
+            color: #ff8080;
+            display: block;
+        }
+
+        .feedback-box.loading {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--border);
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+            display: block;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 2, 35, 0.95);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .overlay.show {
+            display: flex;
+        }
+
+        .overlay-icon {
+            width:200px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .overlay-title {
+            font-family: 'Press Start 2P';
+            font-size: 22px;
+            line-height: 1.5;
+        }
+
+        .overlay-title.win {
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .overlay-title.lose {
+            color: var(--red);
+            text-shadow: 0 0 30px rgba(255, 77, 77, 0.5);
+        }
+
+        .overlay-subtitle {
+            font-size: 14px;
+            opacity: 0.5;
+        }
+
+        .overlay-xp {
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: var(--green);
+        }
+
+        .overlay-btn {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s;
+            margin-top: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .overlay-btn.win {
+            background: var(--accent);
+            color: #020223;
+        }
+
+        .overlay-btn.lose {
+            background: var(--red);
+            color: white;
+        }
+
+        .overlay-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="damage-flash" id="damageFlash"></div>
+    <div class="damage-popup" id="damagePopup"></div>
+
+    <div class="ToolBar">
+        <a href="../Courses/Bosses.html">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+    </div>
+
+    <div class="boss-header">
+        <div class="boss-portrait">
+            <img src="../logos/bosses/B.png" alt="The Guardian">
+        </div>
+        <div class="boss-info">
+            <div class="boss-rank-label">Rank B Guardian</div>
+            <div class="boss-name">The Forger</div>
+        </div>
+        <div class="hp-section">
+            <div class="hp-label-row">
+                <span class="hp-label">HP</span>
+                <span class="hp-numbers" id="hpNumbers">100 / 100</span>
+            </div>
+            <div class="hp-bar-container">
+                <div class="hp-bar-fill" id="hpBar" style="width:100%"></div>
+            </div>
+        </div>
+        <div class="timer-section">
+            <div class="timer-label">Time Left</div>
+            <div class="timer-value" id="timerDisplay">9:00</div>
+        </div>
+    </div>
+
+    <div class="battle-content">
+        <div class="problems-nav">
+            <div class="problem-tab active" id="tab1" onclick="showProblem(1)">Problem 1</div>
+            <div class="problem-tab" id="tab2" onclick="showProblem(2)">Problem 2</div>
+            <div class="problem-tab" id="tab3" onclick="showProblem(3)">Problem 3</div>
+        </div>
+
+        <!-- PROBLEM 1 -->
+        <div class="problem-card active" id="problem1">
+            <div class="problem-header">
+                <span class="problem-number">01</span>
+                <span class="problem-type coding">Coding</span>
+                <span class="damage-tag">⚔ 35 HP damage</span>
+            </div>
+            <h3 class="problem-title">Remove Duplicates</h3>
+            <p class="problem-desc">Write a function called <strong>remove_dupes</strong> that takes a list and returns
+                a new list with all duplicate values removed, preserving the original order. Do not use set().</p>
+            <div class="example-box">remove_dupes([1, 2, 2, 3, 1, 4]) → [1, 2, 3, 4]<br>remove_dupes(['a', 'b', 'a',
+                'c']) → ['a', 'b', 'c']</div>
+            <textarea id="code1" placeholder="Write your Python solution here..."></textarea>
+            <div class="feedback-box" id="feedback1"></div>
+            <button class="submit-btn" id="submitBtn1" onclick="submitCoding(1)">Strike! ⚔</button>
+        </div>
+
+        <!-- PROBLEM 2 -->
+        <div class="problem-card" id="problem2">
+            <div class="problem-header">
+                <span class="problem-number">02</span>
+                <span class="problem-type coding">Coding</span>
+                <span class="damage-tag">⚔ 35 HP damage</span>
+            </div>
+            <h3 class="problem-title">Merge Dictionaries</h3>
+            <p class="problem-desc">Write a function called <strong>merge_dicts</strong> that takes two dictionaries and
+                returns a new dictionary that contains all key-value pairs from both. If a key exists in both, the value
+                from the second dictionary wins.</p>
+            <div class="example-box">merge_dicts({'a': 1, 'b': 2}, {'b': 3, 'c': 4})<br>→ {'a': 1, 'b': 3, 'c': 4}</div>
+            <textarea id="code2" placeholder="Write your Python solution here..."></textarea>
+            <div class="feedback-box" id="feedback2"></div>
+            <button class="submit-btn" id="submitBtn2" onclick="submitCoding(2)">Strike! ⚔</button>
+        </div>
+
+        <!-- PROBLEM 3 -->
+        <div class="problem-card" id="problem3">
+            <div class="problem-header">
+                <span class="problem-number">03</span>
+                <span class="problem-type multiple">Multiple Choice</span>
+                <span class="damage-tag">⚔ 30 HP damage</span>
+            </div>
+            <h3 class="problem-title">List Slicing</h3>
+            <p class="problem-desc">What does this code print?</p>
+            <div class="example-box">nums = [10, 20, 30, 40, 50]<br>print(nums[1:-1])</div>
+            <div class="answers">
+                <button class="answer-btn" data-option="a" onclick="selectAnswer(this)">A. &nbsp; [10, 20, 30,
+                    40]</button>
+                <button class="answer-btn" data-option="b" onclick="selectAnswer(this)">B. &nbsp; [20, 30, 40,
+                    50]</button>
+                <button class="answer-btn" data-option="c" onclick="selectAnswer(this)">C. &nbsp; [20, 30, 40]</button>
+                <button class="answer-btn" data-option="d" onclick="selectAnswer(this)">D. &nbsp; [10, 20, 30, 40,
+                    50]</button>
+            </div>
+            <div class="feedback-box" id="feedback3"></div>
+            <button class="submit-btn" id="submitBtn3" onclick="submitMC()">Strike! ⚔</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="victoryOverlay">
+        <img class= "overlay-icon" src="../logos/victory.png">
+        <div class="overlay-title win">The Forger<br>has been defeated!</div>
+        <div class="overlay-subtitle">Rank B conquered. Few reach this level.</div>
+        <div class="overlay-xp">+50 XP Earned!</div>
+        <a href="../Courses/Bosses.html" class="overlay-btn win">Return to Bosses</a>
+    </div>
+
+    <div class="overlay" id="defeatOverlay">
+        <img class= "overlay-icon" src="../logos/Defeat.png">
+        <div class="overlay-title lose">The Forger<br>stands victorious.</div>
+        <div class="overlay-subtitle" id="defeatReason">Time ran out. Train harder and try again.</div>
+        <a href="../Courses/Bosses.html" class="overlay-btn lose">Retreat</a>
+    </div>
+
+    <script>
+        const BOSS_KEY = "boss_b_done";
+        const TOTAL_TIME = 540;
+        let hp = 100, timeLeft = TOTAL_TIME, timerInterval = null;
+        let solved = [false, false, false], selectedAnswer = null, bossDefeated = false;
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 60) document.getElementById('timerDisplay').classList.add('warning');
+                if (timeLeft <= 0) { clearInterval(timerInterval); if (!bossDefeated) showDefeat("Time ran out. Train harder and try again."); }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+            document.getElementById('timerDisplay').innerText = m + ':' + String(s).padStart(2, '0');
+        }
+
+        function showProblem(n) {
+            document.querySelectorAll('.problem-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.problem-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('problem' + n).classList.add('active');
+            document.getElementById('tab' + n).classList.add('active');
+        }
+
+        function dealDamage(amount, problemIndex) {
+            hp = Math.max(0, hp - amount);
+            document.getElementById('hpBar').style.width = hp + '%';
+            document.getElementById('hpNumbers').innerText = hp + ' / 100';
+            const flash = document.getElementById('damageFlash');
+            flash.classList.add('flash');
+            setTimeout(() => flash.classList.remove('flash'), 200);
+            const popup = document.getElementById('damagePopup');
+            popup.innerText = '-' + amount + ' HP';
+            popup.style.opacity = '1';
+            setTimeout(() => { popup.style.opacity = '0'; }, 1000);
+            solved[problemIndex - 1] = true;
+            document.getElementById('tab' + problemIndex).classList.remove('active');
+            document.getElementById('tab' + problemIndex).classList.add('solved');
+            if (hp <= 0) {
+                clearInterval(timerInterval);
+                bossDefeated = true;
+                setTimeout(() => {
+                    if (!localStorage.getItem(BOSS_KEY)) {
+                        localStorage.setItem('xp', Number(localStorage.getItem('xp') || 0) + 50);
+                        localStorage.setItem(BOSS_KEY, 'true');
+                    }
+                    document.getElementById('victoryOverlay').classList.add('show');
+                }, 800);
+            } else {
+                for (let i = 0; i < solved.length; i++) { if (!solved[i]) { showProblem(i + 1); break; } }
+            }
+        }
+
+        const prompts = {
+            1: "Write a function called remove_dupes that takes a list and returns a new list with duplicates removed, preserving order, without using set(). Test: remove_dupes([1,2,2,3,1,4])=[1,2,3,4]",
+            2: "Write a function called merge_dicts that takes two dictionaries and returns a merged one where the second dict's values win on conflicts. Test: merge_dicts({'a':1,'b':2},{'b':3,'c':4})={'a':1,'b':3,'c':4}"
+        };
+
+        async function submitCoding(problemNum) {
+            const code = document.getElementById('code' + problemNum).value.trim();
+            if (!code) return;
+            const btn = document.getElementById('submitBtn' + problemNum);
+            const feedback = document.getElementById('feedback' + problemNum);
+            btn.disabled = true;
+            feedback.className = 'feedback-box loading';
+            feedback.innerText = 'The Forger evaluates your attack...';
+            try {
+                const response = await fetch('https://us-central1-upward-44313.cloudfunctions.net/api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500, messages: [{ role: 'user', content: `You are evaluating a Python solution for a boss battle.\n\nPROBLEM: ${prompts[problemNum]}\n\nSTUDENT CODE:\n${code}\n\nBe strict but fair.\n\nRespond in this exact format:\nRESULT: PASS or FAIL\nFEEDBACK: (one encouraging sentence)` }] })
+                });
+                const data = await response.json();
+                const text = data.content[0].text;
+                const passed = text.includes('RESULT: PASS');
+                const feedbackText = text.split('FEEDBACK:')[1]?.trim() || '';
+                if (passed) {
+                    feedback.className = 'feedback-box success';
+                    feedback.innerText = '⚔ Hit! ' + feedbackText;
+                    btn.disabled = true;
+                    dealDamage(35, problemNum);
+                } else {
+                    feedback.className = 'feedback-box error';
+                    feedback.innerText = '✗ Missed! ' + feedbackText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                feedback.className = 'feedback-box error';
+                feedback.innerText = 'Could not connect to AI. Check your internet.';
+                btn.disabled = false;
+            }
+        }
+
+        function selectAnswer(btn) {
+            if (btn.disabled) return;
+            document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedAnswer = btn.dataset.option;
+        }
+
+        function submitMC() {
+            if (!selectedAnswer) return;
+            const correct = 'c';
+            const btn = document.getElementById('submitBtn3');
+            const feedback = document.getElementById('feedback3');
+            document.querySelectorAll('.answer-btn').forEach(b => {
+                b.disabled = true; b.classList.remove('selected');
+                if (b.dataset.option === correct) b.classList.add('correct');
+                if (b.dataset.option === selectedAnswer && selectedAnswer !== correct) b.classList.add('wrong');
+            });
+            btn.disabled = true;
+            if (selectedAnswer === correct) {
+                feedback.className = 'feedback-box success';
+                feedback.innerText = '⚔ Hit! nums[1:-1] starts at index 1 (20) and goes up to but not including the last element — giving [20, 30, 40].';
+                dealDamage(30, 3);
+            } else {
+                feedback.className = 'feedback-box error';
+                feedback.innerText = '✗ Missed! [1:-1] means from index 1 to the second-to-last element. So [10,20,30,40,50][1:-1] = [20,30,40]. Answer is C.';
+                document.querySelectorAll('.answer-btn').forEach(b => b.disabled = false);
+                btn.disabled = false; selectedAnswer = null;
+            }
+        }
+
+        function showDefeat(reason) {
+            document.getElementById('defeatReason').innerText = reason;
+            document.getElementById('defeatOverlay').classList.add('show');
+        }
+
+        startTimer();
+    </script>
+</body>
+
+</html>

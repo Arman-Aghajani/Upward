@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardian Trials — Upward</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --accent: #FFD700;
+            --border: 1px solid rgba(255,255,255,0.08);
+            --shadow: 0 20px 60px rgba(0,0,0,0.7);
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%; height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes move { from { transform: translate(0,0); } to { transform: translate(-200px,-200px); } }
+
+        .ToolBar {
+            position: sticky; top: 0; z-index: 10;
+            background: rgba(6,6,61,0.7);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex; align-items: center;
+            padding: 14px 0; height: 70px;
+        }
+        .material-symbols-outlined { color: var(--accent); margin-left: 20px; font-size: 38px; cursor: pointer; transition: transform .2s; }
+        .material-symbols-outlined:hover { transform: scale(1.1); }
+        .toolbar-title { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Press Start 2P'; font-size: 13px; color: var(--accent); }
+
+        .page-content { max-width: 1100px; margin: 60px auto; padding: 0 40px 80px; }
+
+        .page-header { text-align: center; margin-bottom: 16px; }
+        .page-title { font-family: 'Press Start 2P'; font-size: 22px; color: var(--accent); text-shadow: 0 0 20px rgba(255,215,0,0.4); margin-bottom: 12px; }
+        .page-subtitle { font-size: 14px; opacity: 0.5; line-height: 1.7; margin-bottom: 40px; }
+
+        .warning-box {
+            background: rgba(255,100,100,0.06);
+            border: 1px solid rgba(255,100,100,0.2);
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 13px;
+            color: #ff8080;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .bosses-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .boss-card {
+            width: 220px;
+            flex: 0 0 220px;
+            background: rgba(255,255,255,0.02);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform .25s, box-shadow .25s, border-color .25s;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .boss-card::before {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,50,50,0.05) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity .25s;
+            pointer-events: none;
+        }
+
+        .boss-card:hover:not(.locked) {
+            transform: translateY(-8px);
+            border-color: rgba(255,100,100,0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,100,100,0.15);
+        }
+
+        .boss-card:hover:not(.locked)::before { opacity: 1; }
+
+        /* BOSS PORTRAIT */
+        .boss-portrait {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid #ff4d4d;
+            overflow: hidden;
+            margin: 0 auto 16px auto;
+            box-shadow: 0 0 20px rgba(255,77,77,0.3);
+            transition: box-shadow .3s, transform .3s;
+            position: relative;
+        }
+
+        .boss-card:hover:not(.locked) .boss-portrait {
+            box-shadow: 0 0 35px rgba(255,77,77,0.5);
+            transform: scale(1.05);
+        }
+
+        .boss-portrait img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .boss-portrait-locked {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            font-size: 32px;
+            opacity: 0.4;
+        }
+
+        .boss-rank {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            opacity: 0.6;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        .boss-name {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: #ff8080;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .boss-hp {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .boss-hp-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .boss-hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4d4d, #ff8080);
+            border-radius: 3px;
+            transition: width .5s ease;
+        }
+
+        .boss-hp-label { font-size: 10px; opacity: 0.4; text-align: right; }
+
+        .boss-time { font-size: 11px; opacity: 0.4; margin-bottom: 18px; }
+
+        .defeated-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,255,144,0.1);
+            border: 1px solid #00ff90;
+            color: #00ff90;
+            font-family: 'Press Start 2P';
+            font-size: 6px;
+            padding: 5px 8px;
+            border-radius: 6px;
+        }
+
+        .your-rank-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--accent);
+            color: #020223;
+            font-family: 'Press Start 2P';
+            font-size: 6px;
+            padding: 5px 8px;
+            border-radius: 6px;
+        }
+
+        .fight-btn {
+            display: inline-block;
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff4d4d, #cc0000);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .fight-btn::after {
+            content: "";
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform .4s;
+            pointer-events: none;
+        }
+        .fight-btn:hover::after { transform: translateX(100%); }
+        .fight-btn:hover { transform: scale(1.08); box-shadow: 0 0 15px rgba(255,77,77,0.5); }
+
+        .locked { opacity: 0.3; cursor: not-allowed; }
+        .locked .boss-name { color: rgba(255,255,255,0.3); }
+        .locked .fight-btn { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); cursor: not-allowed; }
+        .locked .fight-btn:hover { transform: none; box-shadow: none; }
+        .locked .boss-hp-fill { background: rgba(255,255,255,0.15); }
+    </style>
+</head>
+<body>
+
+<div class="ToolBar">
+    <a href="../Courses/CourseMap.html">
+        <span class="material-symbols-outlined">home</span>
+    </a>
+    <div class="toolbar-title">⚔ Boss Battles</div>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1 class="page-title">Guardian Trials</h1>
+        <p class="page-subtitle">Face the guardians of each rank. Solve 3 problems before time runs out to defeat them, earning bonus XP.</p>
+    </div>
+
+    <div class="warning-box">
+        ⚠ Guardians are harder than practice problems. Solve all 3 within the time limit or the guardian wins.
+    </div>
+
+    <div class="bosses-grid" id="bossesGrid"></div>
+</div>
+
+<script>
+    const bosses = [
+        { rank: "E",        name: "The Apprentice", img: "../logos/bosses/E.png", time: "6 min",  page: "../Boss-Battles/Boss-E.html",              key: "boss_e_done" },
+        { rank: "D",        name: "The Cipher",   img: "../logos/bosses/D.png",   time: "7 min",  page: "../Boss-Battles/Boss-D.html",              key: "boss_d_done" },
+        { rank: "C",        name: "The Strategist",     img: "../logos/bosses/C.png",     time: "8 min",  page: "../Boss-Battles/Boss-C.html",              key: "boss_c_done" },
+        { rank: "B",        name: "The Forger",   img: "../logos/bosses/B.png",   time: "9 min",  page: "../Boss-Battles/Boss-B.html",              key: "boss_b_done" },
+        { rank: "A",        name: "The Sage",   img: "../logos/bosses/A.png",   time: "10 min", page: "../Boss-Battles/Boss-A.html",              key: "boss_a_done" },
+        { rank: "S",        name: "The Master Sentinel",       img: "../logos/bosses/S.png",       time: "12 min", page: "../Boss-Battles/Boss-S.html",              key: "boss_s_done" },
+        { rank: "National", name: "The Architect",   img: "../logos/bosses/National.png",   time: "15 min", page: "../Boss-Battles/Boss-National.html", key: "boss_national_done" },
+    ];
+
+    const currentRankIndex = Number(localStorage.getItem("rankIndex")) || 0;
+    const grid = document.getElementById("bossesGrid");
+
+    bosses.forEach((b, i) => {
+        const isLocked = i > currentRankIndex;
+        const isCurrent = i === currentRankIndex;
+        const isDefeated = localStorage.getItem(b.key);
+        const hpPercent = isDefeated ? 0 : 100;
+
+        const card = document.createElement("a");
+        card.className = "boss-card" + (isLocked ? " locked" : "");
+        card.href = isLocked ? "#" : b.page;
+
+        card.innerHTML = `
+            ${isDefeated ? '<span class="defeated-badge">✓ Defeated</span>' : ''}
+            ${isCurrent && !isDefeated ? '<span class="your-rank-badge">FIGHT NOW</span>' : ''}
+
+            ${isLocked
+                ? `<div class="boss-portrait-locked">🔒</div>`
+                : `<div class="boss-portrait">
+                        <img src="${b.img}" alt="${b.name}">
+                   </div>`
+            }
+
+            <span class="boss-rank">Rank ${b.rank}</span>
+            <div class="boss-name">${b.name}</div>
+
+            <div class="boss-hp">
+                <div class="boss-hp-bar">
+                    <div class="boss-hp-fill" style="width:${hpPercent}%"></div>
+                </div>
+                <div class="boss-hp-label">${isDefeated ? '0 / 100 HP' : '100 / 100 HP'}</div>
+            </div>
+
+            <div class="boss-time">⏱ ${b.time}</div>
+            <span class="fight-btn">${isLocked ? 'LOCKED' : isDefeated ? 'REMATCH' : 'FIGHT'}</span>
+        `;
+
+        if (isLocked) card.addEventListener('click', e => e.preventDefault());
+        grid.appendChild(card);
+    });
+</script>
+
+</body>
+</html>

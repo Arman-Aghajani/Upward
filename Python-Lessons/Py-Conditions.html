@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 2 — Conditions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-mid: #06063d;
+            --bg-light: #0a0a4a;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.06;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            border-bottom: var(--border);
+            background-color: var(--bg-mid);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .ToolButtons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .practice,
+        .next-btn,
+        .run-btn {
+            border: 1px solid gray;
+            border-radius: 10px;
+            height: 40px;
+            padding: 0 16px;
+            background-color: var(--accent);
+            font-family: 'Press Start 2P';
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+            cursor: pointer;
+        }
+
+        .practice:hover,
+        .next-btn:hover,
+        .run-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .practice::after,
+        .next-btn::after,
+        .run-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(-100%);
+            transition: transform .4s;
+            pointer-events: none;
+        }
+
+        .practice:hover::after,
+        .next-btn:hover::after,
+        .run-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .back-link {
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        .toolbar-btn-ghost {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+            display: inline-block;
+            text-decoration: none;
+            line-height: 38px;
+        }
+
+        .toolbar-btn-ghost:hover {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .lesson-wrapper {
+            max-width: 1200px;
+            margin: 60px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .lesson-theory {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .lesson-title {
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .lesson-theory p {
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .lesson-theory strong {
+            color: var(--accent);
+        }
+
+        .concept-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .concept-block .label {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .code-area {
+            background: #0b0b1f;
+            border: var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .code-title {
+            color: var(--accent);
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+        }
+
+        .code-area pre {
+            background: #111;
+            padding: 15px;
+            border-radius: 8px;
+            color: #00ff90;
+            border-left: 3px solid var(--accent);
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-label {
+            font-size: 11px;
+            opacity: 0.4;
+            margin-bottom: -8px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 180px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: white;
+        }
+
+        .next-btn {
+            margin-top: auto;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html"><button class="material-symbols-outlined">home</button></a>
+        <div class="ToolButtons">
+            <a href="../Courses/Practice.html"><button class="practice">Practice</button></a>
+        </div>
+        <a href="../Courses/Python.html" class="back-link"><button class="toolbar-btn-ghost">Back to Course</button></a>
+    </div>
+
+    <div class="lesson-wrapper">
+        <div class="lesson-theory">
+            <h1 class="lesson-title">Lesson 2 — Conditions</h1>
+
+            <p>Programs make <strong>decisions</strong>. Should the user be allowed in? Did they win or lose? Should the
+                boss attack or wait? Conditions let your code react differently based on the situation.</p>
+
+            <div class="concept-block">
+                <span class="label">IF STATEMENT</span>
+                The <strong>if</strong> keyword runs a block of code only when a condition is true. Notice the colon at
+                the end and the indented line — Python uses indentation to know what's "inside" the if.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">ELSE</span>
+                The <strong>else</strong> keyword runs when the if condition is false. Together they cover all cases —
+                one or the other always runs.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">ELIF</span>
+                <strong>elif</strong> (else-if) lets you check multiple conditions in order. Python tries each one until
+                it finds a true condition, then runs that block and skips the rest.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">COMPARISON OPERATORS</span>
+                Use <strong>==</strong> (equal), <strong>!=</strong> (not equal), <strong>&gt;</strong> (greater),
+                <strong>&lt;</strong> (less), <strong>&gt;=</strong> (greater or equal), <strong>&lt;=</strong> (less or
+                equal) to compare values.
+            </div>
+
+            <div class="concept-block">
+                <span class="label">LOGICAL OPERATORS</span>
+                Combine conditions with <strong>and</strong> (both true), <strong>or</strong> (either true), and
+                <strong>not</strong> (flip true/false). This lets you check complex situations in one line.
+            </div>
+
+            <button class="next-btn"
+                onclick="awardLessonXP('lesson_py_conditions', '../Python-Lessons/Py-Loops.html')">Next Lesson
+                →</button>
+        </div>
+
+        <div class="code-area">
+            <div class="code-title">Try It Yourself</div>
+
+            <p class="code-label">Simple if/else:</p>
+            <pre>age = 18
+
+if age &gt;= 18:
+    print("You are an adult")
+else:
+    print("You are a minor")</pre>
+
+            <p class="code-label">Using elif for multiple cases:</p>
+            <pre>xp = 175
+
+if xp &lt; 100:
+    print("Rank E")
+elif xp &lt; 150:
+    print("Rank D")
+elif xp &lt; 200:
+    print("Rank C")
+else:
+    print("Rank B or higher")</pre>
+
+            <p class="code-label">Combining conditions:</p>
+            <pre>level = 5
+has_key = True
+
+if level &gt;= 3 and has_key:
+    print("You may enter the trial")
+else:
+    print("Access denied")</pre>
+
+            <button class="run-btn" onclick="runCode()">Run Code ▶</button>
+            <iframe id="output"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function runCode() {
+            const iframe = document.getElementById("output");
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write('<pre style="font-family:monospace;padding:10px;">You are an adult\nRank C\nYou may enter the trial</pre>');
+            doc.close();
+        }
+
+        function awardLessonXP(lessonKey, nextPage) {
+            if (!localStorage.getItem(lessonKey)) {
+                let xp = Number(localStorage.getItem("xp")) || 0;
+                let lessons = Number(localStorage.getItem("lessonsCompleted")) || 0;
+                localStorage.setItem("xp", xp + 10);
+                localStorage.setItem("lessonsCompleted", lessons + 1);
+                localStorage.setItem(lessonKey, "true");
+                const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                let ri = Number(localStorage.getItem("rankIndex")) || 0;
+                let currentXp = Number(localStorage.getItem("xp")) || 0;
+                if (ri < RANKS.length - 1 && currentXp >= XP_NEEDED[ri]) {
+                    currentXp -= XP_NEEDED[ri]; ri++;
+                    localStorage.setItem("rankIndex", ri);
+                    localStorage.setItem("xp", currentXp);
+                    showRankUpAnimation(RANKS[ri]);
+                    setTimeout(() => { window.location.href = nextPage; }, 3500);
+                } else { window.location.href = nextPage; }
+            } else { window.location.href = nextPage; }
+        }
+    </script>
+</body>
+
+</html>

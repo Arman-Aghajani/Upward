@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Upward</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="../rankup.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255,255,255,0.15);
+            --shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%; height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes move { from { transform: translate(0,0); } to { transform: translate(-200px,-200px); } }
+
+        .ToolBar {
+            position: sticky; top: 0; z-index: 5;
+            background: var(--bg-mid);
+            border-bottom: var(--border);
+            display: flex; align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+        }
+        .material-symbols-outlined { color: var(--accent); margin-left: 20px; font-size: 40px; cursor: pointer; }
+        .toolbar-center {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        .page-content {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 40px 80px;
+        }
+
+        .policy-header {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .policy-title {
+            font-family: 'Press Start 2P';
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(255,215,0,0.3);
+        }
+
+        .policy-date {
+            font-size: 13px;
+            opacity: 0.4;
+        }
+
+        .policy-section {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .policy-section h2 {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .policy-section p {
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+
+        .policy-section p:last-child { margin-bottom: 0; }
+
+        .policy-section ul {
+            list-style: none;
+            margin-top: 8px;
+        }
+
+        .policy-section ul li {
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.7;
+            padding-left: 16px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .policy-section ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            opacity: 0.6;
+        }
+
+        .highlight-box {
+            background: rgba(255,215,0,0.06);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            font-size: 13px;
+            line-height: 1.7;
+            opacity: 0.8;
+        }
+
+        .contact-btn {
+            display: inline-block;
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform .2s, box-shadow .2s;
+            margin-top: 16px;
+            display: inline-block;
+        }
+        .contact-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,215,0,0.4); }
+    </style>
+</head>
+<body>
+
+<div class="ToolBar">
+    <a href="index.html">
+        <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <div class="toolbar-center">Privacy Policy</div>
+</div>
+
+<div class="page-content">
+
+    <div class="policy-header">
+        <h1 class="policy-title">Privacy Policy</h1>
+        <p class="policy-date">Last updated: April 2026</p>
+    </div>
+
+    <div class="policy-section">
+        <h2>Who We Are</h2>
+        <p>Upward is a gamified programming learning platform built for students. This privacy policy explains what data we collect, how we use it, and your rights regarding that data.</p>
+        <p>Upward was created as an educational project for Infoeducație 2026.</p>
+    </div>
+
+    <div class="policy-section">
+        <h2>What Data We Collect</h2>
+        <p>Upward collects only the minimum data needed to provide the service:</p>
+        <ul>
+            <li>Your display name (provided during signup)</li>
+            <li>Your email address (provided during signup)</li>
+            <li>Your learning progress — XP, rank, completed lessons and practice problems</li>
+            <li>Your AI tutor chat history (stored locally on your device only)</li>
+        </ul>
+        <div class="highlight-box">
+            ⚠ All data is stored in your browser's localStorage. This means your data never leaves your device and is not stored on any external server.
+        </div>
+    </div>
+
+    <div class="policy-section">
+        <h2>How We Use Your Data</h2>
+        <p>Your data is used exclusively to:</p>
+        <ul>
+            <li>Display your name and progress in the sidebar</li>
+            <li>Track which lessons and problems you have completed</li>
+            <li>Calculate your current rank and XP</li>
+            <li>Provide context to the AI tutor so it can help you better</li>
+        </ul>
+        <p>We do not sell, share or transmit your personal data to any third party.</p>
+    </div>
+
+    <div class="policy-section">
+        <h2>AI Features & Third Party Services</h2>
+        <p>Upward uses the Anthropic Claude API to power AI feedback and the tutor chat. When you submit code for evaluation or send a message to the tutor, that content is sent to Anthropic's API to generate a response.</p>
+        <ul>
+            <li>Code you submit for evaluation is sent to Anthropic for processing</li>
+            <li>Chat messages are sent to Anthropic for processing</li>
+            <li>Anthropic's own privacy policy applies to this data</li>
+        </ul>
+        <p>No personal information (name, email) is included in API requests.</p>
+    </div>
+
+    <div class="policy-section">
+        <h2>Cookies & Local Storage</h2>
+        <p>Upward uses browser localStorage (not cookies) to store your data. localStorage is a standard browser feature that keeps data on your device.</p>
+        <ul>
+            <li>No tracking cookies are used</li>
+            <li>No advertising cookies are used</li>
+            <li>No third party analytics are used</li>
+        </ul>
+    </div>
+
+    <div class="policy-section">
+        <h2>Your Rights (GDPR)</h2>
+        <p>Under GDPR you have the following rights:</p>
+        <ul>
+            <li><strong>Right to access</strong> — you can view all your data in your Account page</li>
+            <li><strong>Right to rectification</strong> — you can change your display name in your Account page at any time</li>
+            <li><strong>Right to erasure</strong> — you can delete your account and all associated data from your Account page using the Delete Account button</li>
+            <li><strong>Right to data portability</strong> — your data is stored in localStorage and can be accessed directly through your browser's DevTools</li>
+        </ul>
+        <div class="highlight-box">
+            To delete all your data immediately: go to Account → Delete Account. This permanently removes all data from your device.
+        </div>
+    </div>
+
+    <div class="policy-section">
+        <h2>Data Retention</h2>
+        <p>Your data is retained in localStorage until you either delete your account or clear your browser data. We have no control over data once stored on your device.</p>
+    </div>
+
+    <div class="policy-section">
+        <h2>Changes to This Policy</h2>
+        <p>We may update this privacy policy from time to time. Any changes will be reflected by updating the date at the top of this page.</p>
+    </div>
+
+</div>
+
+</body>
+</html>
