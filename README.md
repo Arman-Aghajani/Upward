@@ -41,7 +41,7 @@ Upward se adresează elevilor de gimnaziu și liceu fără experiență anterioa
 5. **Practice — evaluare AI a codului**
    - Probleme libere de antrenament pentru fiecare rang
    - Cod scris de utilizator trimis spre evaluare AI
-   - Feedback narativ personalizat în limba română prin Anthropic Claude
+   - Feedback narativ personalizat în limba engleză prin Anthropic Claude
 
 6. **Duel Mode — competiție cod-versus-cod**
    - Două panouri paralele, aceeași problemă, același timer
@@ -51,11 +51,9 @@ Upward se adresează elevilor de gimnaziu și liceu fără experiență anterioa
 7. **Guardians (Guardian Trials)**
    - La final de rang, utilizatorul se confruntă cu un Gardian
    - Set de probleme tematice mai dificile, cronometrate
-   - Probleme reprezentative: prime up to N, Caesar cipher, recursive factorial, flatten nested list, Fibonacci recursion trace
-   - Înfrângerea Guardianului deblochează rangul următor
+   - Probleme reprezentative: prime up to N, Caesar cipher, recursive factorial, flatten nested list, Fibonacci recursion 
 
 8. **AI Tutor context-aware**
-   - Bulă plutitoare de chat disponibilă pe orice pagină
    - System prompt construit dinamic, ancorat în lecția curentă a utilizatorului
    - Răspunsuri specifice contextului, nu generice
 
