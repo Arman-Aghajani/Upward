@@ -1,6 +1,6 @@
 # Upward
 
-Platformă educațională gamificată pentru învățarea programării (Python, HTML, CSS). Utilizatorii avansează prin lecții, câștigă XP, urcă în ranguri, se confruntă cu Guardieni la final de capitol și se pot provoca în duel cod-versus-cod, cu evaluare AI integrată.
+Platformă educațională gamificată pentru învățarea programării (Python, HTML, CSS). Utilizatorii avansează prin lecții, câștigă XP, urcă în ranguri, se confruntă cu Gardieni la final de rang și se pot provoca în duel cod-versus-cod, cu evaluare AI integrată.
 
 **Live:** https://upward-44313.web.app
 
