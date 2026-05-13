@@ -25,7 +25,7 @@ Upward se adresează elevilor de gimnaziu și liceu fără experiență anterioa
 2. **Hartă interactivă a cursurilor (CourseMap)**
    - Vizualizare a celor trei trasee de învățare: Python, HTML, CSS
    - Lecții deblocabile progresiv
-   - Acces direct la modulele Practice, Duel Mode și camerele Guardians
+   - Acces direct la modulele Practice, Duel Mode și provocările gardienilor
 
 3. **18 lecții interactive**
    - 6 lecții Python (variabile, condiții, bucle, funcții, liste & dicționare, șiruri & algoritmi)
@@ -35,7 +35,7 @@ Upward se adresează elevilor de gimnaziu și liceu fără experiență anterioa
 
 4. **Sistem de ranguri și progresie RPG**
    - Șase ranguri deblocabile: E → D → C → B → A → S → National
-   - Fiecare rang are propriul prag XP și propriul Guardian de înfruntat
+   - Fiecare rang are propriul prag XP și propriul Gardian de înfruntat
    - Sistem motivațional inspirat din jocurile RPG
 
 5. **Practice — evaluare AI a codului**
@@ -48,8 +48,8 @@ Upward se adresează elevilor de gimnaziu și liceu fără experiență anterioa
    - AI-ul evaluează ambele soluții
    - Câștigătorul primește XP bonus
 
-7. **Guardians (Boss Battles)**
-   - La final de rang, utilizatorul se confruntă cu un Guardian
+7. **Guardians (Guardian Trials)**
+   - La final de rang, utilizatorul se confruntă cu un Gardian
    - Set de probleme tematice mai dificile, cronometrate
    - Probleme reprezentative: prime up to N, Caesar cipher, recursive factorial, flatten nested list, Fibonacci recursion trace
    - Înfrângerea Guardianului deblochează rangul următor
