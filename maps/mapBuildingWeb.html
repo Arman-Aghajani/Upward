@@ -232,10 +232,13 @@
         })
 
         window.addEventListener("resize", () => {
-            const minScale = getMinScale()
-            if (scale < minScale) scale = minScale
-            updateTransform()
-        })
+            mapHeight = mapImg.naturalHeight * (mapWidth / mapImg.naturalWidth);
+            const minScale = getMinScale();
+            scale = minScale;
+            posX = 0;
+            posY = 0;
+            updateTransform();
+        });
     </script>
 
 </body>

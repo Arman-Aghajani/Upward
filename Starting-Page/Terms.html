@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,112 +8,259 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script src="../rankup.js"></script>
+    <script src="../rankup.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --bg-dark: #020223; --bg-mid: #06063d; --accent: #FFD700; --border: 1px solid rgba(255,255,255,0.08); --shadow: 0 20px 60px rgba(0,0,0,0.7); }
-        body { font-family: Arial, sans-serif; color: white; background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223); min-height: 100vh; overflow-x: hidden; }
-        body::before { content: ""; position: fixed; width: 200%; height: 200%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 40px 40px; opacity: 0.05; animation: move 60s linear infinite; pointer-events: none; }
-        @keyframes move { from { transform: translate(0,0); } to { transform: translate(-200px,-200px); } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        .ToolBar { position: sticky; top: 0; z-index: 10; background: rgba(6,6,61,0.7); border-bottom: var(--border); backdrop-filter: blur(20px); display: flex; align-items: center; padding: 14px 0; height: 70px; }
-        .material-symbols-outlined { color: var(--accent); margin-left: 20px; font-size: 38px; cursor: pointer; }
-        .toolbar-title { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Press Start 2P'; font-size: 12px; color: var(--accent); }
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
 
-        .page-content { max-width: 800px; margin: 60px auto; padding: 0 40px 80px; }
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        .policy-header { margin-bottom: 50px; text-align: center; }
-        .policy-title { font-family: 'Press Start 2P'; font-size: 18px; color: var(--accent); margin-bottom: 12px; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
-        .policy-date { font-size: 13px; opacity: 0.4; }
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
 
-        .policy-section { background: rgba(255,255,255,0.02); border: var(--border); border-radius: 12px; padding: 28px; margin-bottom: 20px; }
-        .policy-section h2 { font-family: 'Press Start 2P'; font-size: 10px; color: var(--accent); margin-bottom: 16px; opacity: 0.9; }
-        .policy-section p { font-size: 14px; line-height: 1.8; opacity: 0.7; margin-bottom: 12px; }
-        .policy-section p:last-child { margin-bottom: 0; }
-        .policy-section ul { list-style: none; margin-top: 8px; }
-        .policy-section ul li { font-size: 14px; line-height: 1.8; opacity: 0.7; padding-left: 16px; position: relative; margin-bottom: 6px; }
-        .policy-section ul li::before { content: "→"; position: absolute; left: 0; color: var(--accent); opacity: 0.6; }
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
 
-        .highlight-box { background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; padding: 16px; margin-top: 12px; font-size: 13px; line-height: 1.7; opacity: 0.8; }
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            height: 70px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 38px;
+            cursor: pointer;
+        }
+
+        .toolbar-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        .page-content {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 40px 80px;
+        }
+
+        .policy-header {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .policy-title {
+            font-family: 'Press Start 2P';
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .policy-date {
+            font-size: 13px;
+            opacity: 0.4;
+        }
+
+        .policy-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .policy-section h2 {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .policy-section p {
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+
+        .policy-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .policy-section ul {
+            list-style: none;
+            margin-top: 8px;
+        }
+
+        .policy-section ul li {
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.7;
+            padding-left: 16px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .policy-section ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            opacity: 0.6;
+        }
+
+        .highlight-box {
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            font-size: 13px;
+            line-height: 1.7;
+            opacity: 0.8;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="ToolBar">
-    <a href="../Starting-Page/index.html">
-        <span class="material-symbols-outlined">arrow_back</span>
-    </a>
-    <div class="toolbar-title">Terms of Service</div>
-</div>
-
-<div class="page-content">
-
-    <div class="policy-header">
-        <h1 class="policy-title">Terms of Service</h1>
-        <p class="policy-date">Last updated: April 2026</p>
+    <div class="ToolBar">
+        <a href="../Starting-Page/index.html">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="toolbar-title">Terms of Service</div>
     </div>
 
-    <div class="policy-section">
-        <h2>Acceptance of Terms</h2>
-        <p>By accessing or using Upward, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform.</p>
-        <p>Upward is an educational platform created as a project for Infoeducație 2026. These terms govern your use of the platform.</p>
-    </div>
+    <div class="page-content">
 
-    <div class="policy-section">
-        <h2>Use of the Platform</h2>
-        <p>Upward is intended for educational purposes only. By using this platform you agree to:</p>
-        <ul>
-            <li>Use the platform only for lawful educational purposes</li>
-            <li>Not attempt to abuse, exploit or reverse engineer the AI features</li>
-            <li>Not share your account credentials with others</li>
-            <li>Provide accurate information when creating an account</li>
-            <li>Not attempt to manipulate the XP or rank system through exploits</li>
-        </ul>
-    </div>
-
-    <div class="policy-section">
-        <h2>User Accounts</h2>
-        <p>When you create an account on Upward, you are responsible for maintaining the security of your account. Your account data including name, email, XP and progress is stored locally on your device using browser localStorage.</p>
-        <p>You may delete your account at any time from the Account page. Deleting your account permanently removes all associated data from your device.</p>
-    </div>
-
-    <div class="policy-section">
-        <h2>AI Features</h2>
-        <p>Upward uses the Anthropic Claude API to power code evaluation, the AI tutor and duel mode. When using these features:</p>
-        <ul>
-            <li>Code you submit is sent to Anthropic's API for evaluation</li>
-            <li>Do not submit personal, sensitive or harmful content as code</li>
-            <li>AI feedback is provided for educational purposes and may not always be perfect</li>
-            <li>Anthropic's own terms of service apply to API usage</li>
-        </ul>
-    </div>
-
-    <div class="policy-section">
-        <h2>Intellectual Property</h2>
-        <p>All content on Upward — including the design, code, lesson content, problems and boss battle system — is the intellectual property of the Upward project team.</p>
-        <p>You may not copy, reproduce or distribute any part of this platform without permission.</p>
-    </div>
-
-    <div class="policy-section">
-        <h2>Disclaimer</h2>
-        <p>Upward is provided as an educational demo project. The platform is provided "as is" without warranties of any kind. We are not responsible for any data loss resulting from clearing browser storage or technical issues.</p>
-        <div class="highlight-box">
-            Since all data is stored in your browser's localStorage, clearing your browser data or using a different device will result in loss of progress. We recommend not clearing browser data while actively using the platform.
+        <div class="policy-header">
+            <h1 class="policy-title">Terms of Service</h1>
+            <p class="policy-date">Last updated: April 2026</p>
         </div>
-    </div>
 
-    <div class="policy-section">
-        <h2>Changes to Terms</h2>
-        <p>We may update these terms from time to time. Continued use of the platform after changes constitutes acceptance of the new terms. The date at the top of this page reflects when the terms were last updated.</p>
-    </div>
+        <div class="policy-section">
+            <h2>Acceptance of Terms</h2>
+            <p>By accessing or using Upward, you agree to be bound by these Terms of Service. If you do not agree to
+                these terms, please do not use the platform.</p>
+            <p>Upward is an educational platform created as a project for Infoeducație 2026. These terms govern your use
+                of the platform.</p>
+        </div>
 
-    <div class="policy-section">
-        <h2>Contact</h2>
-        <p>If you have any questions about these Terms of Service, you can reach us through the platform's contact information provided in the project documentation.</p>
-    </div>
+        <div class="policy-section">
+            <h2>Use of the Platform</h2>
+            <p>Upward is intended for educational purposes only. By using this platform you agree to:</p>
+            <ul>
+                <li>Use the platform only for lawful educational purposes</li>
+                <li>Not attempt to abuse, exploit or reverse engineer the AI features</li>
+                <li>Not share your account credentials with others</li>
+                <li>Provide accurate information when creating an account</li>
+                <li>Not attempt to manipulate the XP or rank system through exploits</li>
+            </ul>
+        </div>
 
-</div>
+        <div class="policy-section">
+            <h2>User Accounts</h2>
+            <p>When you create an account on Upward, you are responsible for maintaining the security of your account.
+                Your account data including name, email, XP and progress is stored locally on your device using browser
+                localStorage.</p>
+            <p>You may delete your account at any time from the Account page. Deleting your account permanently removes
+                all associated data from your device.</p>
+        </div>
+
+        <div class="policy-section">
+            <h2>AI Features</h2>
+            <p>Upward uses the Anthropic Claude API to power code evaluation, the AI tutor and duel mode. When using
+                these features:</p>
+            <ul>
+                <li>Code you submit is sent to Anthropic's API for evaluation</li>
+                <li>Do not submit personal, sensitive or harmful content as code</li>
+                <li>AI feedback is provided for educational purposes and may not always be perfect</li>
+                <li>Anthropic's own terms of service apply to API usage</li>
+            </ul>
+        </div>
+
+        <div class="policy-section">
+            <h2>Intellectual Property</h2>
+            <p>All content on Upward — including the design, code, lesson content, problems and boss battle system — is
+                the intellectual property of the Upward project team.</p>
+            <p>You may not copy, reproduce or distribute any part of this platform without permission.</p>
+        </div>
+
+        <div class="policy-section">
+            <h2>Disclaimer</h2>
+            <p>Upward is provided as an educational demo project. The platform is provided "as is" without warranties of
+                any kind. We are not responsible for any data loss resulting from clearing browser storage or technical
+                issues.</p>
+            <div class="highlight-box">
+                Since all data is stored in your browser's localStorage, clearing your browser data or using a different
+                device will result in loss of progress. We recommend not clearing browser data while actively using the
+                platform.
+            </div>
+        </div>
+
+        <div class="policy-section">
+            <h2>Changes to Terms</h2>
+            <p>We may update these terms from time to time. Continued use of the platform after changes constitutes
+                acceptance of the new terms. The date at the top of this page reflects when the terms were last updated.
+            </p>
+        </div>
+
+        <div class="policy-section">
+            <h2>Contact</h2>
+            <p>If you have any questions about these Terms of Service, you can reach us through the platform's contact
+                information provided in the project documentation.</p>
+        </div>
+
+    </div>
 
 </body>
+
 </html>

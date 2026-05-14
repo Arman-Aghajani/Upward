@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="../rankup.js"></script>
@@ -514,6 +515,87 @@
       width: 100px;
       margin-left: -30px;
     }
+
+    @media (max-width: 768px) {
+
+      .wrapper {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "toolbar"
+          "main"
+          "sidebar";
+      }
+
+      .toolbar {
+        padding: 0 12px;
+        height: 60px;
+      }
+
+      .toolbar-center {
+        position: static;
+        transform: none;
+        gap: 6px;
+      }
+
+      .toolbar-btn,
+      .toolbar-btn-ghost {
+        font-size: 6px;
+        padding: 0 10px;
+        height: 32px;
+        line-height: 32px;
+      }
+
+      .main {
+        padding: 20px 16px;
+        gap: 28px;
+      }
+
+      .welcome-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+        gap: 16px;
+      }
+
+      .courses-grid {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .course-card {
+        width: 100%;
+        flex: 0 0 auto;
+      }
+
+      .map-card {
+        flex-direction: column;
+        min-width: unset !important;
+      }
+
+      .map-thumb {
+        width: 100%;
+        height: 160px;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-left: none;
+        border-top: var(--border);
+        padding: 20px 16px;
+      }
+
+      /* Explore section */
+      [style*="display:flex"][style*="flex-wrap:wrap"] {
+        flex-direction: column !important;
+      }
+
+      .course-card[style*="flex:0 0 200px"] {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+      }
+
+    }
   </style>
 </head>
 
@@ -621,7 +703,8 @@
           <a href="../Courses/Bosses.html" class="course-card" style="flex:0 0 200px;">
             <img src="../logos/Guardian-Icon.png" class="course-icon-img">
             <h3 class="course-title">Coding Guardians</h3>
-            <p class="course-desc">Face the guardians of each rank. Defeat them in trial to prove your skills and earn bonus XP. </p>
+            <p class="course-desc">Face the guardians of each rank. Defeat them in trial to prove your skills and earn
+              bonus XP. </p>
             <div class="course-meta">
               <span class="course-lessons">7 Guardians · Python</span>
               <span class="course-arrow">→</span>

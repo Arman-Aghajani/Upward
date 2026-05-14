@@ -239,3 +239,33 @@
     height: 18px;
     fill: #020223;
 }
+
+@media (max-width: 768px) {
+
+  .chat-bubble {
+    bottom: 16px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .chat-panel {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 70vh;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+  }
+
+  .chat-panel.open {
+    transform: translateY(0);
+  }
+
+  /* fix animatia de deschidere - era scale() care arata ciudat pe mobile */
+  .chat-panel {
+    transform: translateY(40px);
+  }
+
+}

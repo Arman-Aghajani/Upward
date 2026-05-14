@@ -253,30 +253,96 @@
             align-self: flex-start;
         }
 
-        .back-link {
-            margin-left: auto;
-            margin-right: 20px;
-        }
+        @media (max-width: 768px) {
 
-        .toolbar-btn-ghost {
-            font-family: 'Press Start 2P';
-            font-size: 8px;
-            padding: 0 18px;
-            height: 38px;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.6);
-            border: var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all .2s;
-            display: inline-block;
-            text-decoration: none;
-            line-height: 38px;
-        }
+            .ToolBar {
+                padding: 10px 12px;
+                border-radius: 0;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                gap: 0;
+            }
 
-        .toolbar-btn-ghost:hover {
-            color: white;
-            border-color: rgba(255, 255, 255, 0.3);
+            .ToolButtons {
+                position: static;
+                transform: none;
+            }
+
+            .practice,
+            .next-btn,
+            .run-btn {
+                font-size: 7px;
+                padding: 0 10px;
+                height: 32px;
+            }
+
+            .toolbar-btn-ghost {
+                font-size: 7px;
+                padding: 0 10px;
+                height: 32px;
+                line-height: 32px;
+            }
+
+            .back-link {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .lesson-wrapper {
+                grid-template-columns: 1fr;
+                margin: 16px auto;
+                padding: 12px;
+                gap: 16px;
+                width: 100%;
+            }
+
+            .lesson-theory {
+                padding: 16px;
+            }
+
+            .lesson-title {
+                font-size: 10px;
+            }
+
+            .code-area {
+                padding: 16px;
+            }
+
+            .code-area pre {
+                font-size: 11px;
+            }
+
+            iframe {
+                height: 160px;
+            }
+
+            .next-btn {
+                align-self: stretch;
+                width: 100%;
+                text-align: center;
+            }
+
+            body {
+                overflow-x: hidden;
+                padding: 0;
+            }
+
+            .lesson-wrapper {
+                grid-template-columns: 1fr;
+                margin: 16px auto;
+                padding: 12px;
+                gap: 16px;
+                width: 100%;
+                max-width: 100vw;
+                box-sizing: border-box;
+            }
+
+            .lesson-theory,
+            .code-area {
+                width: 100%;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
         }
     </style>
 </head>

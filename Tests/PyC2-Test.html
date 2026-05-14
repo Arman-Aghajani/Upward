@@ -263,6 +263,51 @@
         .back-btn:hover {
             transform: scale(1.05);
         }
+
+        @media (max-width: 768px) {
+
+            .ToolBar {
+                height: auto;
+                padding: 10px 12px;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+            }
+
+            .ToolButtons {
+                position: static;
+                transform: none;
+            }
+
+            .practice {
+                font-size: 7px;
+                padding: 0 10px;
+                height: 32px;
+            }
+
+            .quiz-wrapper {
+                margin: 16px auto;
+                padding: 20px 16px;
+                width: 100%;
+                max-width: 100vw;
+                box-sizing: border-box;
+            }
+
+            .quiz-title {
+                font-size: 11px;
+            }
+
+            .answers button {
+                font-size: 13px;
+                padding: 12px 12px;
+            }
+
+            .submit-btn {
+                font-size: 8px;
+                padding: 12px 20px;
+                width: 100%;
+            }
+
+        }
     </style>
 </head>
 
@@ -309,7 +354,8 @@
 
         <div class="question" data-answer="b"
             data-hint="The return statement sends a value back to whoever called the function. Without it, the function returns None by default.">
-            <p>2. What does this code print?<br><br>def add(a, b):<br>&nbsp;&nbsp;&nbsp;&nbsp;return a + b<br><br>print(add(3, 4))</p>
+            <p>2. What does this code print?<br><br>def add(a, b):<br>&nbsp;&nbsp;&nbsp;&nbsp;return a +
+                b<br><br>print(add(3, 4))</p>
             <div class="answers">
                 <button data-option="a">A. &nbsp; None</button>
                 <button data-option="b">B. &nbsp; 7</button>

@@ -564,8 +564,82 @@
             transform: scale(1.05);
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
-        .trophy{
+
+        .trophy {
             font-size: 80px;
+        }
+
+        @media (max-width: 768px) {
+
+            .ToolBar {
+                padding: 10px 0;
+            }
+
+            .toolbar-title {
+                font-size: 9px;
+            }
+
+            .lobby {
+                margin: 24px auto;
+                padding: 0 16px;
+                gap: 20px;
+            }
+
+            .lobby-title {
+                font-size: 13px;
+            }
+
+            .players-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .duel-header {
+                padding: 10px 12px;
+                gap: 6px;
+            }
+
+            .player-tag {
+                font-size: 7px;
+                padding: 6px 8px;
+                min-width: 70px;
+            }
+
+            .timer-display {
+                font-size: 16px;
+            }
+
+            .problem-bar {
+                padding: 12px 16px;
+            }
+
+            .problem-text {
+                font-size: 13px;
+            }
+
+            /* ASTA e fix-ul cheie */
+            .duel-arena {
+                grid-template-columns: 1fr !important;
+                overflow-y: auto;
+            }
+
+            .player-panel {
+                border-right: none !important;
+                border-bottom: var(--border);
+                padding: 16px;
+                min-height: 300px;
+            }
+
+            .code-editor {
+                min-height: 140px;
+                font-size: 12px;
+            }
+
+            .submit-panel-btn {
+                font-size: 7px;
+                padding: 10px;
+            }
+
         }
     </style>
 </head>

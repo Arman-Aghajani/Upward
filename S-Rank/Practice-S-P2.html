@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script src="../rankup.js"></script>
+    <script src="../rankup.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         * {
@@ -241,6 +241,49 @@
             cursor: not-allowed;
             transform: none;
         }
+
+        @media (max-width: 768px) {
+
+            .ToolBar {
+                border-radius: 0;
+                padding: 10px 0;
+                flex-wrap: wrap;
+                height: auto;
+                gap: 8px;
+            }
+
+            .ToolButtons {
+                position: static;
+                transform: none;
+                width: 100%;
+                text-align: center;
+                font-size: 8px;
+                padding-bottom: 8px;
+            }
+
+            .page-content {
+                grid-template-columns: 1fr;
+                margin: 20px auto;
+                padding: 0 16px 40px;
+                gap: 20px;
+            }
+
+            .problem-panel,
+            .code-panel {
+                padding: 20px;
+            }
+
+            textarea {
+                min-height: 160px;
+                font-size: 13px;
+            }
+
+            .submit-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
     </style>
 </head>
 
@@ -317,7 +360,7 @@ FEEDBACK: (2-3 sentences. If passed, explain what makes their approach correct. 
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
-checkRankUp();
+                    checkRankUp();
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
