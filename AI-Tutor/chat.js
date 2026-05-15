@@ -64,6 +64,7 @@
     bubble.addEventListener('click', () => {
         isOpen = !isOpen;
         panel.classList.toggle('open', isOpen);
+        document.body.classList.toggle('chat-open', isOpen);
         document.getElementById('chatNotifDot').style.display = 'none';
         if (isOpen) {
             setTimeout(() => document.getElementById('chatInput').focus(), 300);
@@ -73,6 +74,7 @@
     document.getElementById('chatCloseBtn').addEventListener('click', () => {
         isOpen = false;
         panel.classList.remove('open');
+        document.body.classList.remove('chat-open');
     });
 
     // ===== SEND MESSAGE =====
