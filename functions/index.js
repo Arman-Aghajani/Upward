@@ -1,31 +1,15 @@
-const {onRequest} = require("firebase-functions/v2/https");
-const {defineSecret} = require("firebase-functions/params");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
 
-// Cheia API este stocată ca secret în Firebase, nu în cod
 const ANTHROPIC_API_KEY = defineSecret("ANTHROPIC_API_KEY");
 
-exports.api = onRequest(
+exports.api = onCall(
   {
     secrets: [ANTHROPIC_API_KEY],
-    cors: true,
+    enforceAppCheck: true, // 🔒 Blochează requesturi fără token valid
   },
-  async (req, res) => {
-    // Permite OPTIONS pentru CORS preflight
-    if (req.method === "OPTIONS") {
-      res.set("Access-Control-Allow-Origin", "*");
-      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-      res.set("Access-Control-Allow-Headers", "Content-Type");
-      res.status(204).send("");
-      return;
-    }
-
-    if (req.method !== "POST") {
-      res.status(405).send("Method not allowed");
-      return;
-    }
-
+  async (request) => {
     try {
-      // Trimite request la Anthropic API cu cheia secretă
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -33,15 +17,13 @@ exports.api = onRequest(
           "x-api-key": ANTHROPIC_API_KEY.value(),
           "anthropic-version": "2023-06-01",
         },
-        body: JSON.stringify(req.body),
+        body: JSON.stringify(request.data), // <-- onCall folosește request.data
       });
 
       const data = await response.json();
-      res.set("Access-Control-Allow-Origin", "*");
-      res.status(response.status).json(data);
+      return data; // <-- onCall returnează direct, fără res.json()
     } catch (err) {
-      res.set("Access-Control-Allow-Origin", "*");
-      res.status(500).json({error: "Proxy error: " + err.message});
+      throw new HttpsError("internal", "Proxy error: " + err.message);
     }
   }
 );

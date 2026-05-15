@@ -1,4 +1,4 @@
-(function() {
+(function () {
     // ===== CONTEXT =====
     // Each lesson page can set window.LESSON_CONTEXT before loading this script
     // If not set, defaults to general tutor mode
@@ -44,9 +44,9 @@
             <div class="chat-msg ai">
                 <span class="msg-label">Tutor</span>
                 <div class="bubble">${context
-                    ? `Hey! I can see you're working on <strong>${context.split('—')[0].trim()}</strong>. Ask me anything about this lesson and I'll help you out!`
-                    : `Hey! I'm your AI tutor. Ask me anything about HTML, CSS or Python and I'll help you out!`
-                }</div>
+            ? `Hey! I can see you're working on <strong>${context.split('—')[0].trim()}</strong>. Ask me anything about this lesson and I'll help you out!`
+            : `Hey! I'm your AI tutor. Ask me anything about HTML, CSS or Python and I'll help you out!`
+        }</div>
             </div>
         </div>
         <div class="chat-input-area">
@@ -93,25 +93,20 @@
         const typingEl = addTyping();
 
         try {
-            const response = await fetch('https://us-central1-upward-44313.cloudfunctions.net/api', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'claude-sonnet-4-20250514',
-                    max_tokens: 1000,
-                    system: systemPrompt,
-                    messages: conversationHistory
-                })
+            const callApi = firebase.functions().httpsCallable('api');
+            const result = await callApi({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1000,
+                system: systemPrompt,
+                messages: conversationHistory
             });
 
-            const data = await response.json();
-            const reply = data.content[0].text;
-
+            const reply = result.data.content[0].text;
             typingEl.remove();
             addMessage('ai', reply);
             conversationHistory.push({ role: 'assistant', content: reply });
 
-        } catch(err) {
+        } catch (err) {
             typingEl.remove();
             addMessage('ai', 'Sorry, I could not connect right now. Check your internet and try again.');
         }
@@ -160,7 +155,7 @@
     });
 
     // Auto resize textarea
-    document.getElementById('chatInput').addEventListener('input', function() {
+    document.getElementById('chatInput').addEventListener('input', function () {
         this.style.height = '40px';
         this.style.height = Math.min(this.scrollHeight, 100) + 'px';
     });
