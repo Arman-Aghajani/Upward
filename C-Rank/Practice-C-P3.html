@@ -8,8 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script src="../rankup.js"></script>
+    <script src="../rankup.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="../AI-Tutor/chat.css">
+
     <style>
         * {
             margin: 0;
@@ -312,7 +314,7 @@
                 if (!localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
-checkRankUp();
+                    checkRankUp();
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } else {
@@ -321,6 +323,20 @@ checkRankUp();
             }
         }
     </script>
+
+    <script>
+        window.LESSON_CONTEXT = "Practice Problem: What Does This Return? (Rank C, Multiple Choice) — Trace a function call and identify the correct return value. Related lesson: Functions. Mode: HINT_ONLY — explain how to trace function calls, but do not reveal the correct answer.";
+    </script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+
+    <!-- Init proiect + App Check -->
+    <script src="../firebase-init.js"></script>
+
+    <script src="../AI-Tutor/chat.js"></script>
 </body>
 
 </html>
