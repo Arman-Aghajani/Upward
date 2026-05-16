@@ -164,7 +164,18 @@
             color: var(--accent);
         }
 
-        textarea {
+        .code-panel {
+            background: #0b0b1f;
+            border: var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 500px;
+        }
+
+        .code-panel textarea {
             width: 100%;
             flex: 1;
             min-height: 200px;
@@ -180,7 +191,7 @@
             line-height: 1.6;
         }
 
-        textarea:focus {
+        .code-panel textarea:focus {
             border-color: var(--accent);
         }
 
@@ -282,7 +293,7 @@
                 padding: 20px;
             }
 
-            textarea {
+            .code-panel textarea {
                 min-height: 160px;
                 font-size: 13px;
             }
@@ -316,7 +327,7 @@
         <div class="code-panel">
             <span class="code-label">Your Solution</span>
             <div class="done-banner" id="doneBanner">✓ Already completed — XP awarded</div>
-            <textarea id="codeInput" placeholder="Write your Python code here..."></textarea>
+            <textarea id="codeInput" placeholder="Write your Python code here..." spellcheck="false"></textarea>
             <p class="loading-text" id="loadingText">AI is checking your solution...</p>
             <div class="feedback-box" id="feedbackBox"></div>
             <button class="submit-btn" id="submitBtn" onclick="submitCode()">Submit Solution</button>

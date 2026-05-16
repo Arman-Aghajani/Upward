@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script src="../rankup.js"></script>
+    <script src="../rankup.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         * {
@@ -569,7 +569,7 @@
         }
 
         .overlay-icon {
-            width:200px;
+            width: 200px;
             animation: bounce 1s ease infinite;
         }
 
@@ -638,6 +638,187 @@
         .overlay-btn:hover {
             transform: scale(1.05);
         }
+
+        @media (max-width: 768px) {
+
+            .ToolBar {
+                height: auto;
+                padding: 10px 0;
+            }
+
+            .boss-header {
+                padding: 18px 16px;
+                gap: 16px;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .boss-portrait {
+                width: 72px;
+                height: 72px;
+                margin: 0 auto;
+            }
+
+            .boss-info {
+                text-align: center;
+            }
+
+            .boss-name {
+                font-size: 13px;
+                margin-bottom: 0;
+            }
+
+            .boss-rank-label {
+                font-size: 7px;
+            }
+
+            .hp-section {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .hp-label {
+                font-size: 7px;
+            }
+
+            .hp-numbers {
+                font-size: 11px;
+            }
+
+            .hp-bar-container {
+                height: 14px;
+            }
+
+            .timer-section {
+                width: 100%;
+            }
+
+            .timer-label {
+                font-size: 7px;
+            }
+
+            .timer-value {
+                font-size: 22px;
+            }
+
+            .damage-popup {
+                font-size: 32px;
+            }
+
+            .battle-content {
+                margin: 20px auto;
+                padding: 0 16px 60px;
+                gap: 20px;
+                max-width: 100vw;
+            }
+
+            .problems-nav {
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .problem-tab {
+                font-size: 7px;
+                padding: 8px 12px;
+                flex: 1;
+                min-width: 0;
+                text-align: center;
+            }
+
+            .problem-card {
+                padding: 18px;
+                border-radius: 12px;
+            }
+
+            .problem-header {
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+
+            .problem-number {
+                font-size: 8px;
+                padding: 5px 10px;
+            }
+
+            .problem-type {
+                font-size: 6px;
+                padding: 4px 8px;
+            }
+
+            .damage-tag {
+                font-size: 6px;
+                width: 100%;
+                text-align: right;
+                margin-left: 0;
+            }
+
+            .problem-title {
+                font-size: 10px;
+                margin-bottom: 10px;
+            }
+
+            .problem-desc {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+
+            .example-box {
+                font-size: 12px;
+                padding: 10px 12px;
+                overflow-x: auto;
+                white-space: pre;
+            }
+
+            textarea {
+                min-height: 150px;
+                font-size: 13px;
+                padding: 12px;
+            }
+
+            .answer-btn {
+                font-size: 13px;
+                padding: 12px 14px;
+            }
+
+            .submit-btn {
+                width: 100%;
+                font-size: 8px;
+                padding: 12px 20px;
+            }
+
+            .feedback-box {
+                font-size: 12px;
+                padding: 12px 14px;
+            }
+
+            .overlay {
+                padding: 24px;
+                gap: 14px;
+            }
+
+            .overlay-icon {
+                width: 130px;
+            }
+
+            .overlay-title {
+                font-size: 14px;
+            }
+
+            .overlay-subtitle {
+                font-size: 12px;
+            }
+
+            .overlay-xp {
+                font-size: 11px;
+            }
+
+            .overlay-btn {
+                font-size: 8px;
+                padding: 12px 24px;
+            }
+        }
     </style>
 </head>
 
@@ -693,7 +874,7 @@
             <p class="problem-desc">Write a function called <strong>average</strong> that takes a list of numbers and
                 returns their average. Do not use any built-in average functions.</p>
             <div class="example-box">average([1, 2, 3, 4, 5]) → 3.0<br>average([10, 20]) → 15.0</div>
-            <textarea id="code1" placeholder="Write your Python solution here..."></textarea>
+            <textarea id="code1" placeholder="Write your Python solution here..." spellcheck="false"></textarea>
             <div class="feedback-box" id="feedback1"></div>
             <button class="submit-btn" id="submitBtn1" onclick="submitCoding(1)">Strike! ⚔</button>
         </div>
@@ -709,7 +890,7 @@
             <p class="problem-desc">Write a function called <strong>count_item</strong> that takes a list and a value,
                 and returns how many times that value appears in the list. Do not use the built-in count() method.</p>
             <div class="example-box">count_item([1, 2, 2, 3, 2], 2) → 3<br>count_item(['a', 'b', 'a'], 'a') → 2</div>
-            <textarea id="code2" placeholder="Write your Python solution here..."></textarea>
+            <textarea id="code2" placeholder="Write your Python solution here..." spellcheck="false"></textarea>
             <div class="feedback-box" id="feedback2"></div>
             <button class="submit-btn" id="submitBtn2" onclick="submitCoding(2)">Strike! ⚔</button>
         </div>
@@ -737,7 +918,7 @@
     </div>
 
     <div class="overlay" id="victoryOverlay">
-        <img class= "overlay-icon" src="../logos/victory.png">
+        <img class="overlay-icon" src="../logos/victory.png">
         <div class="overlay-title win">The Cipher<br>has been defeated!</div>
         <div class="overlay-subtitle">Rank D conquered. You grow stronger.</div>
         <div class="overlay-xp">+50 XP Earned!</div>
@@ -745,7 +926,7 @@
     </div>
 
     <div class="overlay" id="defeatOverlay">
-        <img class= "overlay-icon" src="../logos/Defeat.png">
+        <img class="overlay-icon" src="../logos/Defeat.png">
         <div class="overlay-title lose">The Cipher<br>stands victorious.</div>
         <div class="overlay-subtitle" id="defeatReason">Time ran out. Train harder and try again.</div>
         <a href="../Courses/Bosses.html" class="overlay-btn lose">Retreat</a>

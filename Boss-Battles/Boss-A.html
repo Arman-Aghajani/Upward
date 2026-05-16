@@ -637,6 +637,187 @@
         .overlay-btn:hover {
             transform: scale(1.05);
         }
+
+        @media (max-width: 768px) {
+
+            .ToolBar {
+                height: auto;
+                padding: 10px 0;
+            }
+
+            .boss-header {
+                padding: 18px 16px;
+                gap: 16px;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .boss-portrait {
+                width: 72px;
+                height: 72px;
+                margin: 0 auto;
+            }
+
+            .boss-info {
+                text-align: center;
+            }
+
+            .boss-name {
+                font-size: 13px;
+                margin-bottom: 0;
+            }
+
+            .boss-rank-label {
+                font-size: 7px;
+            }
+
+            .hp-section {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .hp-label {
+                font-size: 7px;
+            }
+
+            .hp-numbers {
+                font-size: 11px;
+            }
+
+            .hp-bar-container {
+                height: 14px;
+            }
+
+            .timer-section {
+                width: 100%;
+            }
+
+            .timer-label {
+                font-size: 7px;
+            }
+
+            .timer-value {
+                font-size: 22px;
+            }
+
+            .damage-popup {
+                font-size: 32px;
+            }
+
+            .battle-content {
+                margin: 20px auto;
+                padding: 0 16px 60px;
+                gap: 20px;
+                max-width: 100vw;
+            }
+
+            .problems-nav {
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .problem-tab {
+                font-size: 7px;
+                padding: 8px 12px;
+                flex: 1;
+                min-width: 0;
+                text-align: center;
+            }
+
+            .problem-card {
+                padding: 18px;
+                border-radius: 12px;
+            }
+
+            .problem-header {
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+
+            .problem-number {
+                font-size: 8px;
+                padding: 5px 10px;
+            }
+
+            .problem-type {
+                font-size: 6px;
+                padding: 4px 8px;
+            }
+
+            .damage-tag {
+                font-size: 6px;
+                width: 100%;
+                text-align: right;
+                margin-left: 0;
+            }
+
+            .problem-title {
+                font-size: 10px;
+                margin-bottom: 10px;
+            }
+
+            .problem-desc {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+
+            .example-box {
+                font-size: 12px;
+                padding: 10px 12px;
+                overflow-x: auto;
+                white-space: pre;
+            }
+
+            textarea {
+                min-height: 150px;
+                font-size: 13px;
+                padding: 12px;
+            }
+
+            .answer-btn {
+                font-size: 13px;
+                padding: 12px 14px;
+            }
+
+            .submit-btn {
+                width: 100%;
+                font-size: 8px;
+                padding: 12px 20px;
+            }
+
+            .feedback-box {
+                font-size: 12px;
+                padding: 12px 14px;
+            }
+
+            .overlay {
+                padding: 24px;
+                gap: 14px;
+            }
+
+            .overlay-icon {
+                width: 130px;
+            }
+
+            .overlay-title {
+                font-size: 14px;
+            }
+
+            .overlay-subtitle {
+                font-size: 12px;
+            }
+
+            .overlay-xp {
+                font-size: 11px;
+            }
+
+            .overlay-btn {
+                font-size: 8px;
+                padding: 12px 24px;
+            }
+        }
     </style>
 </head>
 
@@ -693,7 +874,7 @@
                 returns a list of all prime numbers from 2 up to and including n.</p>
             <div class="example-box">primes_up_to(10) → [2, 3, 5, 7]<br>primes_up_to(20) → [2, 3, 5, 7, 11, 13, 17,
                 19]<br>primes_up_to(2) → [2]</div>
-            <textarea id="code1" placeholder="Write your Python solution here..."></textarea>
+            <textarea id="code1" placeholder="Write your Python solution here..." spellcheck="false"></textarea>
             <div class="feedback-box" id="feedback1"></div>
             <button class="submit-btn" id="submitBtn1" onclick="submitCoding(1)">Strike! ⚔</button>
         </div>
@@ -711,7 +892,7 @@
                 return the one that appears <strong>first</strong> in the string.</p>
             <div class="example-box">most_frequent("hello") → "l"<br>most_frequent("aabbb") →
                 "b"<br>most_frequent("abc") → "a"<br>most_frequent("mississippi") → "i"</div>
-            <textarea id="code2" placeholder="Write your Python solution here..."></textarea>
+            <textarea id="code2" placeholder="Write your Python solution here..." spellcheck="false"></textarea>
             <div class="feedback-box" id="feedback2"></div>
             <button class="submit-btn" id="submitBtn2" onclick="submitCoding(2)">Strike! ⚔</button>
         </div>

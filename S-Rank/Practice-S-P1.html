@@ -156,13 +156,7 @@
             min-height: 500px;
         }
 
-        .code-label {
-            font-family: 'Press Start 2P';
-            font-size: 10px;
-            color: var(--accent);
-        }
-
-        textarea {
+        .code-panel textarea {
             width: 100%;
             flex: 1;
             min-height: 200px;
@@ -178,9 +172,17 @@
             line-height: 1.6;
         }
 
-        textarea:focus {
+        .code-panel textarea:focus {
             border-color: var(--accent);
         }
+
+        .code-label {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+        }
+
+
 
         .feedback-box {
             background: #111;
@@ -266,17 +268,40 @@
             .page-content {
                 grid-template-columns: 1fr;
                 margin: 20px auto;
-                padding: 0 16px 40px;
-                gap: 20px;
+                padding: 0 16px 80px;
+                gap: 16px;
+                max-width: 100vw;
             }
 
             .problem-panel,
             .code-panel {
-                padding: 20px;
+                padding: 18px;
             }
 
-            textarea {
-                min-height: 160px;
+            .panel-title {
+                font-size: 10px;
+            }
+
+            .problem-desc {
+                font-size: 13px;
+            }
+
+            .example-box {
+                font-size: 12px;
+                overflow-x: auto;
+                white-space: pre;
+            }
+
+            .hint-box {
+                font-size: 12px;
+            }
+
+            .code-panel {
+                min-height: auto;
+            }
+
+            .code-panel textarea {
+                min-height: 180px;
                 font-size: 13px;
             }
 
@@ -285,6 +310,9 @@
                 text-align: center;
             }
 
+            .feedback-box {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -310,7 +338,7 @@
         <div class="code-panel">
             <span class="code-label">Your Solution</span>
             <div class="done-banner" id="doneBanner">✓ Already completed — XP awarded</div>
-            <textarea id="codeInput" placeholder="Write your Python code here..."></textarea>
+            <textarea id="codeInput" placeholder="Write your Python code here..." spellcheck="false"></textarea>
             <p class="loading-text" id="loadingText">AI is checking your solution...</p>
             <div class="feedback-box" id="feedbackBox"></div>
             <button class="submit-btn" id="submitBtn" onclick="submitCode()">Submit Solution</button>
