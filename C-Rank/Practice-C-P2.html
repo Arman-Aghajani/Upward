@@ -337,33 +337,52 @@
             const feedback = document.getElementById("feedbackBox");
             btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating a beginner's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating a student's solution.
 
-PROBLEM: Write a function called check_number that takes a number and returns "Even" or "Odd". Then call it with at least two numbers and print the results.
+PROBLEM: Write a function called check_number that takes one number as a parameter and returns the string "Even" or "Odd" depending on the number. The student must call the function with at least two different numbers and print the results.
 
 STUDENT CODE:
 ${code}
 
-Evaluate if this correctly solves the problem. The function must correctly identify even and odd numbers using the modulo operator or equivalent logic. Be lenient with exact string casing.
+Test mentally:
+- check_number(4) should return "Even"
+- check_number(7) should return "Odd"
+- check_number(0) should return "Even"
+
+The solution MUST:
+- Define a function literally called "check_number"
+- Take one number parameter
+- Return (not print) the string "Even" or "Odd"
+- Use the modulo operator (%) or equivalent logic to determine even/odd
+- After defining, call the function with at least two different numbers and print the results
+
+FAIL the solution if:
+- The function prints the result instead of returning it
+- The returned strings are not exactly "Even" and "Odd" (case-sensitive)
+- It doesn't call the function with at least two different numbers
+- The logic is wrong (e.g., reversed even/odd)
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences of friendly encouraging feedback. If passed, congratulate and explain what they did well. If failed, explain what's wrong and give a specific hint. Keep it beginner-friendly.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
-                loading.style.display = "none"; feedback.style.display = "block";
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
@@ -371,9 +390,11 @@ FEEDBACK: (2-3 sentences of friendly encouraging feedback. If passed, congratula
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
-                loading.style.display = "none"; feedback.style.display = "block";
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }

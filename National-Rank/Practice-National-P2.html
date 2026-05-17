@@ -340,39 +340,50 @@
             const feedback = document.getElementById("feedbackBox");
             btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating a competition-level student's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating an advanced student's solution.
 
-PROBLEM: Implement binary search. Function called binary_search, takes a sorted list and target, returns the index or -1. Must be O(log n) — no linear search allowed.
+PROBLEM: Write a function called binary_search that takes a sorted list and a target value. It must return the index of the target if found, or -1 if not. The solution must correctly implement the binary search algorithm and run in O(log n) time.
 
 STUDENT CODE:
 ${code}
 
-Verify all cases:
-- binary_search([1,3,5,7,9,11], 7) = 3
-- binary_search([1,3,5,7,9,11], 6) = -1
-- binary_search([2], 2) = 0
-- binary_search([], 5) = -1
+Test mentally:
+- binary_search([1,3,5,7,9,11], 7) should return 3
+- binary_search([1,3,5,7,9,11], 6) should return -1
+- binary_search([2], 2) should return 0
+- binary_search([], 5) should return -1
 
-Check that the implementation uses left/right/mid pointers and halves the search space each step. Linear search (iterating through every element) must FAIL.
+The solution MUST:
+- Use binary search logic (left/right pointers, midpoint calculation, halving the search space each iteration)
+- Handle the empty list case correctly (return -1)
+- Return -1 when target is not found
+
+FAIL the solution if:
+- It uses linear search (a single loop checking each element one by one)
+- It uses built-in shortcuts like list.index(), "in" keyword, or bisect module
+- The midpoint logic is broken or could cause infinite loops
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences. If passed, confirm their boundary handling is correct. If failed, point to whether the mid calculation, boundary updates, or edge case handling is wrong — without giving the answer.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
-                loading.style.display = "none"; feedback.style.display = "block";
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
@@ -380,9 +391,11 @@ FEEDBACK: (2-3 sentences. If passed, confirm their boundary handling is correct.
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
-                loading.style.display = "none"; feedback.style.display = "block";
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }

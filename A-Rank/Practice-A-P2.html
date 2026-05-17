@@ -339,38 +339,41 @@
             const feedback = document.getElementById("feedbackBox");
             btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating an advanced student's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating an advanced student's solution.
 
-PROBLEM: Write a function called caesar that takes a string and shift number, shifts each letter forward by that amount, wraps around the alphabet, preserves case, and leaves non-letters unchanged.
+PROBLEM: Write a function called caesar that takes a string and a shift number, and returns the encrypted string by shifting each letter forward by that amount. Non-letter characters stay unchanged. The cipher wraps around (z + 1 = a). Preserve case — uppercase stays uppercase, lowercase stays lowercase.
 
 STUDENT CODE:
 ${code}
 
 Test mentally:
 - caesar("hello", 3) should return "khoor"
-- caesar("xyz", 2) should return "zab" (wrapping)
-- caesar("Hello, World!", 1) should return "Ifmmp, Xpsme!" (case preserved, comma and space unchanged)
+- caesar("xyz", 2) should return "zab"
+- caesar("Hello, World!", 1) should return "Ifmmp, Xpsme!"
 
-Evaluate if the logic handles all three cases correctly.
+The function must use ord/chr or equivalent logic, handle wrap-around with modulo, preserve case, and leave non-letters unchanged.
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to which case is failing without giving the answer.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
-                loading.style.display = "none"; feedback.style.display = "block";
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
@@ -378,9 +381,11 @@ FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they d
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
-                loading.style.display = "none"; feedback.style.display = "block";
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }

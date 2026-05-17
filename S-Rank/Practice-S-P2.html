@@ -338,15 +338,15 @@
             const feedback = document.getElementById("feedbackBox");
             btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating a master-level student's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating an advanced student's solution.
 
-PROBLEM: Write a recursive function called flatten that takes a nested list of any depth and returns a flat list of all values.
+PROBLEM: Write a function called flatten that takes a list which may contain other lists nested to any depth, and returns a single flat list of all the values in order.
 
 STUDENT CODE:
 ${code}
@@ -356,20 +356,30 @@ Test mentally:
 - flatten([[1, [2]], [3, [4, [5]]]]) should return [1, 2, 3, 4, 5]
 - flatten([1, 2, 3]) should return [1, 2, 3]
 
-The function must use isinstance() or equivalent to check if an item is a list, and must call itself recursively for nested lists.
+The solution MUST handle arbitrary nesting depth. This means it must either use recursion or an iterative approach with a stack/queue — a single fixed-depth loop is NOT enough.
+
+FAIL the solution if:
+- It only handles one or two levels of nesting (e.g., a single nested for loop without recursion)
+- It uses external libraries like itertools.chain that don't actually recurse into deeper levels
+- It doesn't preserve the order of elements
+
+Accept recursive solutions and iterative stack-based solutions that correctly handle any depth.
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences. If passed, explain what makes their approach correct. If failed, point to what part of the logic is wrong without giving the answer.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
-                loading.style.display = "none"; feedback.style.display = "block";
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
@@ -377,9 +387,11 @@ FEEDBACK: (2-3 sentences. If passed, explain what makes their approach correct. 
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
-                loading.style.display = "none"; feedback.style.display = "block";
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }

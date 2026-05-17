@@ -337,33 +337,50 @@
             const feedback = document.getElementById("feedbackBox");
             btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating a beginner's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating a student's solution.
 
-PROBLEM: Define a function called greet that takes a name parameter and returns a greeting string like "Hello, Alex!". Then call it and print the result.
+PROBLEM: Define a function called greet that takes one parameter called name and returns a greeting string in the format "Hello, <name>!". After defining the function, call it with any name and print the result.
 
 STUDENT CODE:
 ${code}
 
-Evaluate if this correctly solves the problem. The function must be named greet, take one parameter, return a string containing the name, and be called and printed. Be lenient with exact formatting as long as the concept is correct.
+Test mentally:
+- greet("Alex") should return "Hello, Alex!"
+- greet("Maria") should return "Hello, Maria!"
+
+The solution MUST:
+- Define a function literally called "greet"
+- Take one parameter literally called "name"
+- Return (not print) the formatted greeting string "Hello, <name>!"
+- After defining the function, actually call it with some name and print the result
+
+FAIL the solution if:
+- The function prints the greeting instead of returning it
+- It uses a different function or parameter name
+- It does not call the function and print the result afterward
+- The output format is wrong (missing comma, missing exclamation mark, wrong capitalization)
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences of friendly encouraging feedback. If passed, congratulate and explain what they did well. If failed, explain what's wrong and give a specific hint. Keep it beginner-friendly.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
-                loading.style.display = "none"; feedback.style.display = "block";
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
@@ -371,9 +388,11 @@ FEEDBACK: (2-3 sentences of friendly encouraging feedback. If passed, congratula
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
-                loading.style.display = "none"; feedback.style.display = "block";
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }

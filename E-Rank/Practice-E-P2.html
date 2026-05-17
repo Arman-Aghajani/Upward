@@ -347,38 +347,44 @@
             loading.style.display = "block";
             feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514",
-                        max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating a beginner's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating a beginner student's solution.
 
-PROBLEM: The student must create a variable called 'age', then use an if/else statement to print 'Access granted' if age >= 18, or 'Access denied' if age < 18.
+PROBLEM: Create a variable called "age" set to any number. Then write an if/else statement that prints "Access granted" if age is 18 or above, and "Access denied" if it is below 18.
 
 STUDENT CODE:
 ${code}
 
-Evaluate if this code correctly solves the problem. The actual age value doesn't matter, what matters is the correct if/else logic and correct print statements.
+The solution must:
+- Use a variable literally called "age"
+- Use an if/else statement (not just one print)
+- Print exactly "Access granted" when age >= 18
+- Print exactly "Access denied" when age < 18
+
+The exact value of age the student picks doesn't matter. The logic must be correct for both branches. Hardcoding only one print without the if/else logic should fail.
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences of friendly encouraging feedback. If they passed, congratulate them and explain what they did well. If they failed, explain what's wrong and give a specific hint to fix it. Keep it simple for a beginner.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
+
                 loading.style.display = "none";
                 feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
-                    let xp = Number(localStorage.getItem("xp")) || 0;
-                    localStorage.setItem("xp", xp + 10);
+                    localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
                     checkRankUp();
                     document.getElementById("doneBanner").style.display = "block";
@@ -387,7 +393,8 @@ FEEDBACK: (2-3 sentences of friendly encouraging feedback. If they passed, congr
                 loading.style.display = "none";
                 feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }

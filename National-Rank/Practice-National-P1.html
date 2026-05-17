@@ -341,39 +341,42 @@
             const feedback = document.getElementById("feedbackBox");
             btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating a competition-level student's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating an advanced student's solution.
 
-PROBLEM: Implement the Longest Common Subsequence algorithm. The function must be called lcs, take two strings, and return the integer length of the LCS. Must use dynamic programming (2D table), not pure recursion.
+PROBLEM: Write a function called lcs that takes two strings and returns the length of their longest common subsequence. A subsequence doesn't need to be contiguous, but must appear in the same order in both strings.
 
 STUDENT CODE:
 ${code}
 
-Verify:
-- lcs("abcde", "ace") = 3
-- lcs("abc", "abc") = 3
-- lcs("abc", "def") = 0
-- lcs("AGGTAB", "GXTXAYB") = 4
+Test mentally:
+- lcs("abcde", "ace") should return 3
+- lcs("abc", "abc") should return 3
+- lcs("abc", "def") should return 0
+- lcs("AGGTAB", "GXTXAYB") should return 4
 
-Check that the solution uses a DP table (nested lists or similar), not naive recursion. Memoized recursion with a cache is also acceptable.
+The solution MUST use dynamic programming — either a bottom-up 2D table or top-down recursion with memoization. A naive recursive solution without memoization should FAIL because it would time out on large inputs. The function must return the LENGTH (an integer), not the subsequence itself.
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences. If passed, comment on the elegance or correctness of their DP approach. If failed, identify specifically whether the table construction, the matching logic, or the final return value is wrong — without giving the solution.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
-                loading.style.display = "none"; feedback.style.display = "block";
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
@@ -381,9 +384,11 @@ FEEDBACK: (2-3 sentences. If passed, comment on the elegance or correctness of t
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
-                loading.style.display = "none"; feedback.style.display = "block";
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }

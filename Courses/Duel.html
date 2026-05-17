@@ -826,17 +826,13 @@
             else p2Submitted = true;
 
             try {
-                const response = await fetch('https://us-central1-upward-44313.cloudfunctions.net/api', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 500,
-                        messages: [{
-                            role: 'user',
-                            content: `You are evaluating a Python solution in a competitive coding duel.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 500,
+                    messages: [{
+                        role: 'user',
+                        content: `You are evaluating a Python solution in a competitive coding duel.
 
 PROBLEM: ${currentProblem.prompt}
 
@@ -848,12 +844,10 @@ Evaluate if this correctly solves the problem. Be strict — the function must e
 Respond in this exact format:
 RESULT: PASS or FAIL
 FEEDBACK: (one short sentence explaining why)`
-                        }]
-                    })
+                    }]
                 });
 
-                const data = await response.json();
-                const text = data.content[0].text;
+                const text = result.data.content[0].text;
                 const passed = text.includes('RESULT: PASS');
                 const feedbackText = text.split('FEEDBACK:')[1]?.trim() || '';
 
@@ -874,8 +868,11 @@ FEEDBACK: (one short sentence explaining why)`
 
             } catch (err) {
                 feedback.className = 'feedback-panel error';
-                feedback.innerText = 'Could not connect to AI. Check your internet.';
+                feedback.innerText = 'Error: ' + err.message;
+                console.error(err);
                 btn.disabled = false;
+                if (player === 1) p1Submitted = false;
+                else p2Submitted = false;
             }
         }
 
@@ -920,6 +917,11 @@ FEEDBACK: (one short sentence explaining why)`
         }
     </script>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+    <script src="../firebase-init.js"></script>
 </body>
 
 </html>

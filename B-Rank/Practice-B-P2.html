@@ -338,33 +338,40 @@
             const feedback = document.getElementById("feedbackBox");
             btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
             try {
-                const response = await fetch("https://us-central1-upward-44313.cloudfunctions.net/api", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-                        messages: [{
-                            role: "user", content: `You are a Python tutor evaluating an intermediate student's solution.
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: "claude-sonnet-4-20250514",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `You are a Python tutor evaluating a student's solution.
 
-PROBLEM: Write a function called second_largest that returns the second largest number in a list without sorting. Must use a loop and track values manually.
+PROBLEM: Write a function called second_largest that takes a list of numbers and returns the second largest value. The student is NOT allowed to sort the list or use built-in sort functions (no sorted(), no .sort()). They must find the answer by looping through the list manually and tracking values.
 
 STUDENT CODE:
 ${code}
 
-Evaluate if the logic correctly finds the second largest value. Test mentally with [3,1,4,1,5,9,2,6] which should return 6, and [10,20,30] which should return 20. Using sort() or sorted() is not allowed.
+Test mentally:
+- second_largest([3, 1, 4, 1, 5, 9, 2, 6]) should return 6
+- second_largest([10, 20, 30]) should return 20
+
+The function must use a loop and track the largest and second-largest values manually. Using sorted(), .sort(), heapq, or similar shortcuts should be marked as FAIL.
 
 Respond in this exact format:
 RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw in logic without giving the answer.)` }]
-                    })
+FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
+                    }]
                 });
-                const data = await response.json();
-                const text = data.content[0].text;
+
+                const text = result.data.content[0].text;
                 const passed = text.includes("RESULT: PASS");
                 const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
-                loading.style.display = "none"; feedback.style.display = "block";
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
+
                 if (passed && !localStorage.getItem(PROBLEM_KEY)) {
                     localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
                     localStorage.setItem(PROBLEM_KEY, "true");
@@ -372,9 +379,11 @@ FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they d
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
-                loading.style.display = "none"; feedback.style.display = "block";
+                loading.style.display = "none";
+                feedback.style.display = "block";
                 feedback.className = "feedback-box error";
-                feedback.innerText = "Could not connect to AI. Check your internet and try again.";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
             }
             btn.disabled = false;
         }
