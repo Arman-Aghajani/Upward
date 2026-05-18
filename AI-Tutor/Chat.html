@@ -858,10 +858,18 @@
             const area = document.getElementById('messagesArea');
             const row = document.createElement('div');
             row.className = `msg-row ${role}`;
+
+            // Escape HTML pentru ca tag-urile să apară ca text
+            const escaped = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\n/g, '<br>');
+
             row.innerHTML = `
-            <span class="msg-label">${role === 'user' ? 'You' : 'AI Tutor'}</span>
-            <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
-        `;
+        <span class="msg-label">${role === 'user' ? 'You' : 'AI Tutor'}</span>
+        <div class="msg-bubble">${escaped}</div>
+    `;
             area.appendChild(row);
             area.scrollTop = area.scrollHeight;
             return row;

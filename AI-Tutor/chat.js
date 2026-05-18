@@ -122,10 +122,18 @@
         const messages = document.getElementById('chatMessages');
         const msg = document.createElement('div');
         msg.className = `chat-msg ${role}`;
+
+        // Escape HTML pentru ca tag-urile să apară ca text
+        const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+
         msg.innerHTML = `
-            <span class="msg-label">${role === 'user' ? 'You' : 'Tutor'}</span>
-            <div class="bubble">${text.replace(/\n/g, '<br>')}</div>
-        `;
+        <span class="msg-label">${role === 'user' ? 'You' : 'Tutor'}</span>
+        <div class="bubble">${escaped}</div>
+    `;
         messages.appendChild(msg);
         messages.scrollTop = messages.scrollHeight;
         return msg;
