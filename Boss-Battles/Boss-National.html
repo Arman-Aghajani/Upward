@@ -537,6 +537,8 @@
             line-height: 1.7;
             margin-top: 12px;
             display: none;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .feedback-box.success {
@@ -1078,11 +1080,11 @@
             btn.disabled = true;
             if (selectedAnswer === correct) {
                 feedback.className = 'feedback-box success';
-                feedback.innerText = '⚔ Hit! mystery(8) → mystery(4)+1 → mystery(2)+1+1 → mystery(1)+1+1+1 → mystery(0)+1+1+1 → 0+3 = 3.';
+                feedback.innerText = '⚔ Hit! Trace: 8 → 4 → 2 → 1 → 0. Each even step adds 1, giving a total of 3.';
                 dealDamage(30, 3);
             } else {
                 feedback.className = 'feedback-box error';
-                feedback.innerText = '✗ Missed! Trace: mystery(8)→mystery(4)+1→mystery(2)+2→mystery(1)+2→mystery(0)+2→0+2... wait, 8→4→2→1→0, adding 1 for each even step: 3 steps. Answer is B.';
+                feedback.innerText = '✗ Missed! Trace: 8 → 4 → 2 → 1 → 0. Each even step adds 1, so the total is 3. The answer is B.';
                 document.querySelectorAll('.answer-btn').forEach(b => b.disabled = false);
                 btn.disabled = false; selectedAnswer = null;
             }
