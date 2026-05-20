@@ -431,19 +431,43 @@
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             doc.open();
             doc.write(`
-                <div style="font-family:Arial;padding:12px;color:#222;display:flex;flex-direction:column;gap:8px;">
-                    <form style="display:flex;flex-direction:column;gap:6px;">
-                        <label>Email:</label>
-                        <input type="email" placeholder="you@mail.com">
-                        <label>Password:</label>
-                        <input type="password">
-                        <button type="submit" style="width:80px;margin-top:4px;">Log In</button>
-                    </form>
-                    <hr>
-                    <select><option>Python</option><option>HTML</option><option>CSS</option></select>
+        <div style="font-family:Arial;padding:12px;color:#222;display:flex;flex-direction:column;gap:16px;">
+
+            <div>
+                <h3 style="color:#555;font-size:13px;margin:0 0 6px;">Simple login form:</h3>
+                <form style="display:flex;flex-direction:column;gap:6px;max-width:220px;">
+                    <label>Email:</label>
+                    <input type="email" placeholder="you@mail.com">
+                    <label>Password:</label>
+                    <input type="password">
+                    <button type="button">Log In</button>
+                </form>
+            </div>
+
+            <div>
+                <h3 style="color:#555;font-size:13px;margin:0 0 6px;">Different input types:</h3>
+                <div style="display:flex;flex-direction:column;gap:6px;max-width:220px;">
+                    <input type="text" placeholder="Name">
+                    <input type="number" placeholder="Age">
+                    <input type="date">
                     <label><input type="checkbox"> Agree to terms</label>
                 </div>
-            `);
+            </div>
+
+            <div>
+                <h3 style="color:#555;font-size:13px;margin:0 0 6px;">Dropdown and textarea:</h3>
+                <div style="display:flex;flex-direction:column;gap:6px;max-width:220px;">
+                    <select>
+                        <option>Python</option>
+                        <option>HTML</option>
+                        <option>CSS</option>
+                    </select>
+                    <textarea placeholder="Your message..."></textarea>
+                </div>
+            </div>
+
+        </div>
+    `);
             doc.close();
         }
 

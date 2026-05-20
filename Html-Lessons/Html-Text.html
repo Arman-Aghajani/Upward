@@ -407,15 +407,23 @@ words and &lt;em&gt;em&lt;/em&gt; for emphasis.&lt;/p&gt;</pre>
             const iframe = document.getElementById("output");
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             doc.open();
-            doc.write(`
-                <div style="font-family: Arial; padding: 10px; color: #222;">
-                    <h1>Main Title</h1>
-                    <h2>Section Title</h2>
-                    <p>Welcome to Upward. Use <strong>strong</strong> for important words and <em>em</em> for emphasis.</p>
-                    <hr>
-                    <p>First line<br>Second line</p>
-                </div>
-            `);
+            doc.write(
+                '<div style="font-family: Arial; padding: 10px; color: #222;">' +
+                '<h3 style="color:#555; font-size:11px;">Headings:<\/h3>' +
+                '<h1>Main Title<\/h1>' +
+                '<h2>Section Title<\/h2>' +
+                '<h3>Subsection<\/h3>' +
+                '<hr>' +
+                '<h3 style="color:#555; font-size:11px;">Paragraphs and emphasis:<\/h3>' +
+                '<p>Welcome to Upward. Climb the ranks and become a true warrior.<\/p>' +
+                '<p>Use <strong>strong<\/strong> for important words and <em>em<\/em> for emphasis.<\/p>' +
+                '<hr>' +
+                '<h3 style="color:#555; font-size:11px;">Line breaks and dividers:<\/h3>' +
+                '<p>First line<br>Second line<\/p>' +
+                '<hr>' +
+                '<p>A new section after the line.<\/p>' +
+                '<\/div>'
+            );
             doc.close();
         }
 

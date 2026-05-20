@@ -352,12 +352,17 @@
 
     <div class="lesson-wrapper">
         <div class="lesson-theory">
-            <h1 class="lesson-title">Lesson 3 — Spacing</li>
-            </h1>
+            <h1 class="lesson-title">Lesson 3 — Spacing</h1>
 
             <p>Spacing is what separates a messy webpage from a clean, professional one. CSS gives you two main tools to
                 control space: <strong>margin</strong> and <strong>padding</strong>. Master them and your designs
                 immediately look better.</p>
+
+            <div class="concept-block">
+                <span class="label">CSS MEETS HTML</span>
+                Remember: a selector like <strong>.card</strong> styles any element with
+                <strong>class="card"</strong>. The HTML creates the element; the CSS spaces it.
+            </div>
 
             <div class="concept-block">
                 <span class="label">MARGIN</span>
@@ -439,33 +444,41 @@
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             doc.open();
             doc.write(`
-                <style>
-                    body { font-family: Arial; padding: 10px; color: #222; margin: 0; }
-                    .card {
-                        padding: 16px;
-                        background: gold;
-                        color: black;
-                        margin-bottom: 10px;
-                    }
-                    .item {
-                        margin-bottom: 8px;
-                        padding: 8px;
-                        background: navy;
-                        color: white;
-                    }
-                    .container {
-                        width: 200px;
-                        margin: 10px auto;
-                        padding: 14px;
-                        background: gold;
-                        text-align: center;
-                    }
-                </style>
-                <div class="card">Card with padding</div>
-                <div class="item">Item 1</div>
-                <div class="item">Item 2</div>
-                <div class="container">Centered with margin auto</div>
-            `);
+    <style>
+        body { font-family: Arial; padding: 10px; color: #222; margin: 0; }
+        .card {
+            padding: 20px;
+            background: gold;
+            color: black;
+            margin-bottom: 10px;
+        }
+        .item {
+            margin-bottom: 8px;
+            padding: 10px;
+            background: navy;
+            color: white;
+        }
+        .banner {
+            margin: 20px 10px;
+            padding: 30px 15px 5px 15px;
+            background: crimson;
+            color: white;
+        }
+        .container {
+            width: 200px;
+            margin: 10px auto;
+            padding: 20px;
+            background: gold;
+            color: black;
+            text-align: center;
+        }
+    </style>
+    <div class="card">Card with padding</div>
+    <div class="item">Item 1</div>
+    <div class="item">Item 2</div>
+    <div class="banner">Banner with uneven padding</div>
+    <div class="container">Centered with margin auto</div>
+`);
             doc.close();
         }
 
@@ -495,7 +508,7 @@
         window.LESSON_CONTEXT = "CSS - Spacing";
     </script>
 
-     <!-- Firebase SDKs -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>

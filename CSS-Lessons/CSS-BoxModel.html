@@ -424,26 +424,35 @@
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             doc.open();
             doc.write(`
-                <style>
-                    body { font-family: Arial; padding: 10px; color: #222; margin: 0; }
-                    .box {
-                        width: 150px;
-                        padding: 20px;
-                        border: 3px solid gold;
-                        background: navy;
-                        color: white;
-                        margin-bottom: 10px;
-                    }
-                    .card {
-                        margin: 10px 0;
-                        padding: 12px;
-                        background: lightblue;
-                    }
-                </style>
-                <div class="box">A styled box</div>
-                <div class="card">A card with margin and padding</div>
-                <div class="card">Another card below</div>
-            `);
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial; padding: 10px; color: #222; margin: 0; }
+        .box {
+            width: 150px;
+            padding: 20px;
+            border: 3px solid gold;
+            background: navy;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .card {
+            margin: 15px 0;
+            padding: 12px;
+            background: lightblue;
+        }
+        .fixed {
+            width: 200px;
+            padding: 20px;
+            border: 5px solid red;
+            background: #eee;
+            margin-top: 12px;
+        }
+    </style>
+    <div class="box">A styled box</div>
+    <div class="card">A card with margin and padding</div>
+    <div class="card">Another card below</div>
+    <div class="fixed">Still 200px wide — border-box</div>
+`);
             doc.close();
         }
 

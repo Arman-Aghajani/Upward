@@ -423,19 +423,18 @@
             const iframe = document.getElementById("output");
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             doc.open();
-            doc.write(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>My Profile</title>
-    <\/head>
-    <body style="font-family: Arial; padding: 12px; color: #222;">
-        <h1>About Me</h1>
-        <p>Welcome to my page!</p>
-    <\/body>
-    <\/html>
-`);
+            doc.write(
+                '<!DOCTYPE html>' +
+                '<html lang="en"><head><meta charset="UTF-8"><title>Examples</title><\/head>' +
+                '<body style="font-family: Arial; padding: 12px; color: #222;">' +
+                '<h3 style="color:#555; font-size:11px; margin-bottom:4px;">Basic page skeleton:<\/h3>' +
+                '<h1>Hello World<\/h1><hr>' +
+                '<h3 style="color:#555; font-size:11px; margin-bottom:4px;">Page with more content:<\/h3>' +
+                '<h1>Welcome, Warrior<\/h1><p>Begin your training.<\/p><hr>' +
+                '<h3 style="color:#555; font-size:11px; margin-bottom:4px;">Page with metadata:<\/h3>' +
+                '<h1>About Me<\/h1>' +
+                '<\/body><\/html>'
+            );
             doc.close();
         }
 

@@ -417,7 +417,7 @@
   &lt;/section&gt;
 &lt;/main&gt;
 
-&lt;footer&gt;&copy; 2025 Upward&lt;/footer&gt;</pre>
+&lt;footer&gt;&copy; 2026 Upward&lt;/footer&gt;</pre>
 
             <button class="run-btn" onclick="runCode()">Run Code ▶</button>
             <iframe id="output"></iframe>
@@ -429,27 +429,43 @@
             const iframe = document.getElementById("output");
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             doc.open();
-            doc.write(`
-                <div style="font-family:Arial;padding:10px;color:#222;">
-                    <header style="background:#0a0a4a;color:#FFD700;padding:8px;border-radius:4px;">
-                        <h3 style="margin:0;">Upward</h3>
-                        <nav style="margin-top:4px;">
-                            <a href="#" style="color:white;margin-right:10px;">Home</a>
-                            <a href="#" style="color:white;">Lessons</a>
-                        </nav>
-                    </header>
-                    <main style="padding:8px 0;">
-                        <section>
-                            <h4 style="margin:6px 0;">Welcome</h4>
-                            <article style="background:#eee;padding:6px;border-radius:4px;">
-                                <b>First Lesson</b>
-                                <p style="margin:4px 0 0 0;">Start your journey...</p>
-                            </article>
-                        </section>
-                    </main>
-                    <footer style="background:#0a0a4a;color:#FFD700;padding:6px;border-radius:4px;font-size:12px;">&copy; 2025 Upward</footer>
-                </div>
-            `);
+            doc.write(
+                '<div style="font-family: Arial; color: #222;">' +
+
+                '<h3 style="color:#555; font-size:11px; padding: 8px;">Non-semantic (old way):<\/h3>' +
+                '<div style="border:1px dashed #aaa; padding:8px; margin:8px;">' +
+                '<div style="background:#eee; padding:4px;">div#header<\/div>' +
+                '<div style="background:#ddd; padding:4px; margin-top:4px;">div#nav<\/div>' +
+                '<div style="background:#eee; padding:4px; margin-top:4px;">div#main<\/div>' +
+                '<div style="background:#eee; padding:4px; margin-top:4px;">div#footer<\/div>' +
+                '<\/div>' +
+
+                '<h3 style="color:#555; font-size:11px; padding: 8px;">Semantic (modern way):<\/h3>' +
+                '<div style="border:1px dashed #aaa; padding:8px; margin:8px;">' +
+                '<header style="background:#d4edda; padding:4px;">&lt;header&gt;<\/header>' +
+                '<nav style="background:#cce5ff; padding:4px; margin-top:4px;">&lt;nav&gt;<\/nav>' +
+                '<main style="background:#fff3cd; padding:4px; margin-top:4px;">&lt;main&gt;<\/main>' +
+                '<footer style="background:#f8d7da; padding:4px; margin-top:4px;">&lt;footer&gt;<\/footer>' +
+                '<\/div>' +
+
+                '<h3 style="color:#555; font-size:11px; padding: 8px;">Full semantic page:<\/h3>' +
+                '<header style="background:#d4edda; padding:8px; margin:8px;">' +
+                '<h1 style="font-size:16px;">Upward<\/h1>' +
+                '<nav><a href="#" style="margin-right:8px;">Home<\/a><a href="#">Lessons<\/a><\/nav>' +
+                '<\/header>' +
+                '<main style="padding:8px; margin:8px;">' +
+                '<section>' +
+                '<h2 style="font-size:14px;">Welcome<\/h2>' +
+                '<article style="background:#f9f9f9; padding:6px; margin-top:4px;">' +
+                '<h3 style="font-size:12px;">First Lesson<\/h3>' +
+                '<p>Start your journey...<\/p>' +
+                '<\/article>' +
+                '<\/section>' +
+                '<\/main>' +
+                '<footer style="background:#f8d7da; padding:8px; margin:8px;">&copy; 2026 Upward<\/footer>' +
+
+                '<\/div>'
+            );
             doc.close();
         }
 
