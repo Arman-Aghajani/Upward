@@ -103,8 +103,8 @@
         }
 
         .lobby-icon {
-            width:200px;
-            display:block;
+            width: 200px;
+            display: block;
         }
 
         .lobby-title {
@@ -566,8 +566,9 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
 
-        .trophy {
-            font-size: 80px;
+        .trophy img {
+            width: 140px;
+            animation: bounce 1s ease infinite;
         }
 
         @media (max-width: 768px) {
@@ -884,14 +885,16 @@ FEEDBACK: (one short sentence explaining why)`
             const trophy = document.getElementById('winner-trophy');
 
             if (name) {
-                trophy.innerText = '🏆';
+                trophy.innerHTML = '<img src="../logos/trophy.png" alt="TROPHY">';
                 title.innerText = name + ' Wins! ';
                 subtitle.innerText = 'Correct solution submitted first';
             } else {
-                trophy.innerText = '⏰';
+                trophy.innerHTML = '<img src="../logos/clock.png" alt="CLOCK">';
                 title.innerText = "Time's Up!";
                 subtitle.innerText = 'Neither player submitted a correct solution in time';
             }
+
+            overlay.classList.add('show');
 
             overlay.classList.add('show');
         }
