@@ -792,7 +792,7 @@
             conversationHistory = [];
             const area = document.getElementById('messagesArea');
             area.innerHTML = '';
-            addMessageToUI('ai', `Switched to <strong>${name}</strong> mode. ${context ? `Ask me anything about ${name}!` : 'Ask me anything about HTML, CSS or Python!'}`);
+            addMessageToUI('ai', `Switched to <strong>${name}</strong> mode. ${context ? `Ask me anything about ${name}!` : 'Ask me anything about HTML, CSS or Python!'}`, true);
             document.getElementById('suggestions').style.display = 'none';
         }
 
@@ -854,21 +854,27 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        function addMessageToUI(role, text) {
+        function addMessageToUI(role, text, allowHTML = false) {
             const area = document.getElementById('messagesArea');
             const row = document.createElement('div');
             row.className = `msg-row ${role}`;
 
-            // Escape HTML pentru ca tag-urile să apară ca text
-            const escaped = text
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/\n/g, '<br>');
+            let content;
+            if (allowHTML) {
+                // Trusted source (your own UI messages) — only convert newlines
+                content = text.replace(/\n/g, '<br>');
+            } else {
+                // Untrusted (AI replies, user input) — escape everything
+                content = text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\n/g, '<br>');
+            }
 
             row.innerHTML = `
         <span class="msg-label">${role === 'user' ? 'You' : 'AI Tutor'}</span>
-        <div class="msg-bubble">${escaped}</div>
+        <div class="msg-bubble">${content}</div>
     `;
             area.appendChild(row);
             area.scrollTop = area.scrollHeight;
