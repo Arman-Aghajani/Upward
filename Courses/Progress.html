@@ -9,9 +9,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
-        * {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -19,65 +22,152 @@
 
         :root {
             --accent: #FFD700;
-            --border: 1px solid rgba(255, 255, 255, 0.08);
-            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            --accent-dim: rgba(255, 215, 0, 0.15);
+            --accent-glow: rgba(255, 215, 0, 0.35);
             --green: #00ff90;
-            --red: #ff4d4d;
+            --green-dim: rgba(0, 255, 144, 0.12);
+            --border: 1px solid rgba(255, 255, 255, 0.07);
+            --border-gold: 1px solid rgba(255, 215, 0, 0.2);
+            --surface: rgba(255, 255, 255, 0.025);
+            --surface-hover: rgba(255, 255, 255, 0.045);
+            --bg: #020223;
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
         }
 
         body {
             font-family: Arial, sans-serif;
             color: white;
-            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            background: var(--bg);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
+        /* Stars */
         body::before {
             content: "";
             position: fixed;
-            width: 200%;
-            height: 200%;
-            background-image: radial-gradient(white 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.05;
-            animation: move 60s linear infinite;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.55) 1px, transparent 1px);
+            background-size: 48px 48px;
+            opacity: 0.04;
+            animation: drift 90s linear infinite;
             pointer-events: none;
+            z-index: 0;
         }
 
-        @keyframes move {
+        /* Nebula */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 25%, rgba(255, 215, 0, 0.05) 0%, transparent 45%),
+                radial-gradient(ellipse at 85% 70%, rgba(80, 60, 220, 0.07) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 255, 144, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes drift {
             from {
                 transform: translate(0, 0);
             }
 
             to {
-                transform: translate(-200px, -200px);
+                transform: translate(-96px, -96px);
             }
         }
 
-        .ToolBar {
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @keyframes glow-ring {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 215, 0, 0.2);
+            }
+        }
+
+        @keyframes bar-fill {
+            from {
+                width: 0;
+            }
+        }
+
+        @keyframes fade-up {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* TOOLBAR */
+        .toolbar {
             position: sticky;
             top: 0;
-            z-index: 10;
-            background: rgba(6, 6, 61, 0.7);
+            z-index: 100;
+            height: 68px;
+            background: rgba(2, 2, 35, 0.75);
             border-bottom: var(--border);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
             display: flex;
             align-items: center;
-            padding: 14px 0;
-            height: 70px;
+            padding: 0 28px;
         }
 
-        .material-symbols-outlined {
+        .toolbar-back {
             color: var(--accent);
-            margin-left: 20px;
-            font-size: 38px;
+            font-size: 36px;
             cursor: pointer;
             transition: transform .2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
         }
 
-        .material-symbols-outlined:hover {
-            transform: scale(1.1);
+        .toolbar-back:hover {
+            transform: translateX(-3px) scale(1.05);
         }
 
         .toolbar-title {
@@ -85,555 +175,862 @@
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Press Start 2P';
-            font-size: 13px;
+            font-size: 12px;
             color: var(--accent);
+            letter-spacing: 2px;
         }
 
-        .page-content {
-            max-width: 1000px;
-            margin: 50px auto;
-            padding: 0 40px 80px;
+        /* LAYOUT */
+        .page {
+            position: relative;
+            z-index: 1;
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 48px 32px 100px;
             display: flex;
             flex-direction: column;
-            gap: 32px;
+            gap: 48px;
         }
 
-        /* SECTION LABEL */
-        .section-label {
+        /* SECTION */
+        .section-eyebrow {
             font-family: 'Press Start 2P';
-            font-size: 8px;
+            font-size: 7px;
             color: var(--accent);
-            opacity: 0.5;
-            letter-spacing: 3px;
-            margin-bottom: 16px;
+            opacity: 0.45;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
         }
 
-        /* HERO STATS */
-        .hero-stats {
+        /* ── RANK HERO ─────────────────────────────── */
+        .rank-hero {
+            background: var(--surface);
+            border: var(--border-gold);
+            border-radius: 24px;
+            padding: 36px 40px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        .hero-stat {
-            background: rgba(255, 255, 255, 0.02);
-            border: var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            transition: transform .2s, border-color .2s;
-        }
-
-        .hero-stat:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 215, 0, 0.2);
-        }
-
-        .hero-stat-value {
-            font-family: 'Press Start 2P';
-            font-size: 24px;
-            color: var(--accent);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .hero-stat-label {
-            font-size: 12px;
-            opacity: 0.4;
-        }
-
-        /* RANK SECTION */
-        .rank-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: var(--border);
-            border-radius: 16px;
-            padding: 28px 32px;
-            display: flex;
+            grid-template-columns: auto 1fr auto;
+            gap: 32px;
             align-items: center;
-            gap: 28px;
-            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+            animation: fade-up .5s ease both;
         }
 
-        .rank-circle-big {
-            width: 80px;
-            height: 80px;
+        .rank-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 0% 50%, rgba(255, 215, 0, 0.06) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        .rank-orb {
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             border: 3px solid var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Press Start 2P';
-            font-size: 24px;
+            font-size: 32px;
             color: var(--accent);
-            background: rgba(255, 215, 0, 0.08);
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.06);
+            animation: glow-ring 3s ease-in-out infinite, float 5s ease-in-out infinite;
             flex-shrink: 0;
         }
 
-        .rank-info {
-            flex: 1;
+        .rank-details {
+            min-width: 0;
         }
 
-        .rank-info h3 {
+        .rank-name {
             font-family: 'Press Start 2P';
-            font-size: 12px;
+            font-size: 16px;
             color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .rank-info p {
-            font-size: 13px;
-            opacity: 0.5;
-            margin-bottom: 14px;
-        }
-
-        .xp-bar-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 4px;
-            overflow: hidden;
             margin-bottom: 6px;
         }
 
-        .xp-bar-fill {
+        .rank-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .xp-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .xp-fill {
             height: 100%;
             background: linear-gradient(90deg, #00ff99, #FFD700);
-            border-radius: 4px;
-            transition: width .5s ease;
+            border-radius: 3px;
+            transition: width 1s cubic-bezier(.4, 0, .2, 1);
+            animation: bar-fill 1s ease both;
         }
 
         .xp-labels {
             display: flex;
             justify-content: space-between;
             font-size: 11px;
-            opacity: 0.35;
-        }
-
-        /* BOSSES */
-        .bosses-row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .boss-chip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            border-radius: 10px;
-            border: var(--border);
-            background: rgba(255, 255, 255, 0.02);
-            font-size: 12px;
-            transition: all .2s;
-        }
-
-        .boss-chip.defeated {
-            border-color: rgba(0, 255, 144, 0.3);
-            background: rgba(0, 255, 144, 0.05);
-        }
-
-        .boss-chip.defeated .boss-chip-status {
-            color: var(--green);
-        }
-
-        .boss-chip.pending {
-            opacity: 0.4;
-        }
-
-        .boss-chip.pending .boss-chip-status {
             color: rgba(255, 255, 255, 0.3);
         }
 
-        .boss-chip-portrait {
-            width: 32px;
-            height: 32px;
+        .rank-stat-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .rank-mini-stat {
+            text-align: center;
+        }
+
+        .rank-mini-value {
+            font-family: 'Press Start 2P';
+            font-size: 20px;
+            color: var(--accent);
+            display: block;
+        }
+
+        .rank-mini-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 4px;
+        }
+
+        /* ── RANK JOURNEY ──────────────────────────── */
+        .journey-wrap {
+            animation: fade-up .5s .1s ease both;
+        }
+
+        .journey-track {
+            background: var(--surface);
+            border: var(--border);
+            border-radius: 20px;
+            padding: 32px 28px 26px;
+        }
+
+        .journey-inner {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* grey baseline through circle centers */
+        .journey-inner::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 28px;
+            right: 28px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        /* gold/green filled portion */
+        .journey-line-fill {
+            position: absolute;
+            top: 50%;
+            left: 28px;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff99, #FFD700);
+            transform: translateY(-50%);
+            z-index: 0;
+            transition: width 1.2s cubic-bezier(.4, 0, .2, 1);
+            width: 0;
+        }
+
+        .journey-node {
+            position: relative;
+            z-index: 1;
+        }
+
+        .journey-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            background: #06063d;
+            color: rgba(255, 255, 255, 0.2);
+            transition: all .3s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .journey-node.done .journey-circle {
+            border-color: var(--green);
+            color: var(--green);
+            background: #051f12;
+            box-shadow: 0 0 12px rgba(0, 255, 144, 0.15);
+        }
+
+        .journey-node.current .journey-circle {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: #1a1500;
+            animation: glow-ring 2.5s ease-in-out infinite;
+        }
+
+        /* ── STATS GRID ────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            animation: fade-up .5s .15s ease both;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: transform .2s, border-color .2s, background .2s;
+            cursor: default;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 215, 0, 0.2);
+            background: var(--surface-hover);
+        }
+
+        .stat-value {
+            font-family: 'Press Start 2P';
+            font-size: 26px;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #FFD700, #ffe566, #FFD700);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* ── BOSS TROPHY CASE ──────────────────────── */
+        .bosses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 14px;
+            animation: fade-up .5s .2s ease both;
+        }
+
+        .boss-card {
+            background: var(--surface);
+            border: var(--border);
+            border-radius: 16px;
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            transition: all .25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .boss-card.defeated {
+            border-color: rgba(0, 255, 144, 0.2);
+            background: rgba(0, 255, 144, 0.025);
+        }
+
+        .boss-card.defeated::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(0, 255, 144, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .boss-card.defeated:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 255, 144, 0.4);
+            box-shadow: 0 12px 32px rgba(0, 255, 144, 0.1);
+        }
+
+        .boss-card.pending {
+            opacity: 0.3;
+            filter: grayscale(0.6);
+        }
+
+        .boss-portrait {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.1);
             flex-shrink: 0;
+            position: relative;
+            z-index: 1;
         }
 
-        .boss-chip.defeated .boss-chip-portrait {
+        .boss-card.defeated .boss-portrait {
             border-color: var(--green);
+            box-shadow: 0 0 16px rgba(0, 255, 144, 0.25);
         }
 
-        .boss-chip-portrait img {
+        .boss-portrait img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             object-position: top;
         }
 
-        .boss-chip-name {
+        .boss-name {
             font-family: 'Press Start 2P';
-            font-size: 7px;
-            opacity: 0.8;
+            font-size: 6px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
         }
 
-        .boss-chip-status {
+        .boss-status {
             font-size: 10px;
-            margin-top: 2px;
+            color: rgba(255, 255, 255, 0.25);
+            position: relative;
+            z-index: 1;
         }
 
-        /* PRACTICE GRID */
-        .practice-grid {
+        .boss-card.defeated .boss-status {
+            color: var(--green);
+        }
+
+        /* ── PRACTICE ──────────────────────────────── */
+        .practice-row {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(7, 1fr);
             gap: 12px;
+            animation: fade-up .5s .25s ease both;
         }
 
-        .practice-rank-card {
-            background: rgba(255, 255, 255, 0.02);
+        .practice-card {
+            background: var(--surface);
             border: var(--border);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 14px;
+            padding: 18px 10px;
             text-align: center;
             transition: all .2s;
         }
 
-        .practice-rank-card.has-progress {
+        .practice-card.has-progress {
             border-color: rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        .practice-card.completed {
+            border-color: rgba(0, 255, 144, 0.25);
+            background: rgba(0, 255, 144, 0.03);
+        }
+
+        .practice-card:hover {
+            transform: translateY(-3px);
         }
 
         .practice-rank-letter {
             font-family: 'Press Start 2P';
-            font-size: 18px;
-            color: var(--accent);
-            margin-bottom: 8px;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.15);
             display: block;
-            opacity: 0.4;
+            margin-bottom: 10px;
         }
 
-        .practice-rank-card.has-progress .practice-rank-letter {
-            opacity: 1;
+        .practice-card.has-progress .practice-rank-letter,
+        .practice-card.completed .practice-rank-letter {
+            color: var(--accent);
         }
 
-        .practice-solved {
+        .practice-pips {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .pip {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pip.filled {
+            background: var(--green);
+        }
+
+        .practice-card.completed .pip {
+            background: var(--green);
+        }
+
+        .practice-count {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .practice-card.has-progress .practice-count,
+        .practice-card.completed .practice-count {
+            color: rgba(0, 255, 144, 0.6);
+        }
+
+        /* ── LESSONS ───────────────────────────────── */
+        .lessons-section {
+            animation: fade-up .5s .3s ease both;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .course-block {
+            background: var(--surface);
+            border: var(--border);
+            border-radius: 20px;
+            padding: 24px 28px;
+        }
+
+        .course-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .course-logo {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .course-title {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--accent);
+            opacity: 0.85;
+        }
+
+        .course-progress-text {
+            margin-left: auto;
             font-size: 11px;
-            opacity: 0.4;
+            color: rgba(255, 255, 255, 0.25);
         }
 
-        .practice-rank-card.has-progress .practice-solved {
-            opacity: 0.7;
-            color: var(--green);
-        }
-
-        /* LESSONS */
-        .lessons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
+        .lessons-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .lesson-chip {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            border-radius: 10px;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 8px;
             border: var(--border);
             background: rgba(255, 255, 255, 0.02);
             font-size: 12px;
-            opacity: 0.4;
+            color: rgba(255, 255, 255, 0.25);
             transition: all .2s;
         }
 
         .lesson-chip.done {
-            opacity: 1;
             border-color: rgba(0, 255, 144, 0.2);
-            background: rgba(0, 255, 144, 0.03);
+            background: rgba(0, 255, 144, 0.05);
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .lesson-chip-icon {
-            font-size: 18px;
-            flex-shrink: 0;
+        .lesson-chip.done:hover {
+            border-color: rgba(0, 255, 144, 0.4);
+            transform: translateY(-2px);
         }
 
-        .lesson-chip-name {
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        .lesson-chip-check {
-            margin-left: auto;
+        .lesson-check {
             color: var(--green);
-            font-size: 14px;
+            font-size: 12px;
             display: none;
         }
 
-        .lesson-chip.done .lesson-chip-check {
-            display: block;
+        .lesson-chip.done .lesson-check {
+            display: inline;
         }
 
-        .lesson-course-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: var(--border);
-            border-radius: 16px;
-            padding: 24px;
+        /* ── RESPONSIVE ────────────────────────────── */
+        @media (max-width: 760px) {
+            .page {
+                padding: 32px 18px 80px;
+                gap: 36px;
+            }
+
+            .rank-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .rank-orb {
+                margin: 0 auto;
+            }
+
+            .rank-stat-col {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .practice-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .bosses-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .journey-track {
+                padding: 20px 16px;
+            }
+
+            .journey-inner::before {
+                left: 20px;
+                right: 20px;
+            }
+
+            .journey-line-fill {
+                left: 20px;
+            }
+
+            .journey-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
         }
 
-        .lesson-course-header {
-            font-family: 'Press Start 2P';
-            font-size: 10px;
-            color: var(--accent);
-            opacity: 0.8;
-            display: inline-block;
-        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
 
-        .lesson-icon {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-            flex-shrink: 0;
-        }
-
-        .course-header-container {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            margin-bottom: 16px;
+            .practice-row {
+                grid-template-columns: repeat(3, 1fr);
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="ToolBar">
-        <a href="../Courses/CourseMap.html">
+    <div class="toolbar">
+        <a class="toolbar-back" href="../Courses/CourseMap.html">
             <span class="material-symbols-outlined">arrow_back</span>
         </a>
         <div class="toolbar-title">Progress</div>
     </div>
 
-    <div class="page-content">
+    <div class="page">
 
-        <!-- HERO STATS -->
+        <!-- ── RANK HERO ───────────────────────────────── -->
         <div>
-            <p class="section-label">Overview</p>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <span class="hero-stat-value" id="statXP">0</span>
-                    <span class="hero-stat-label">Current XP</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-value" id="statLessons">0</span>
-                    <span class="hero-stat-label">Lessons Done</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-value" id="statBosses">0</span>
-                    <span class="hero-stat-label">Guardians Defeated</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-value" id="statProblems">0</span>
-                    <span class="hero-stat-label">Problems Solved</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- RANK -->
-        <div>
-            <p class="section-label">Rank Progress</p>
-            <div class="rank-card">
-                <div class="rank-circle-big" id="rankCircle">E</div>
-                <div class="rank-info">
-                    <h3 id="rankTitle">Rank E</h3>
-                    <p id="rankDesc">Keep solving problems and defeating guardians to rank up.</p>
-                    <div class="xp-bar-container">
-                        <div class="xp-bar-fill" id="xpBar"></div>
+            <p class="section-eyebrow">Current Rank</p>
+            <div class="rank-hero">
+                <div class="rank-orb" id="rankOrb">E</div>
+                <div class="rank-details">
+                    <div class="rank-name" id="rankName">Rank E</div>
+                    <div class="rank-subtitle" id="rankSubtitle">Keep going — the climb has just started.</div>
+                    <div class="xp-track">
+                        <div class="xp-fill" id="xpFill" style="width:0%"></div>
                     </div>
                     <div class="xp-labels">
                         <span id="xpCurrent">0 XP</span>
                         <span id="xpNeeded">100 XP to next rank</span>
                     </div>
                 </div>
+                <div class="rank-stat-col">
+                    <div class="rank-mini-stat">
+                        <span class="rank-mini-value" id="heroXP">0</span>
+                        <div class="rank-mini-label">Total XP</div>
+                    </div>
+                    <div class="rank-mini-stat">
+                        <span class="rank-mini-value" id="heroLessons">0</span>
+                        <div class="rank-mini-label">Lessons</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- BOSSES -->
-        <div>
-            <p class="section-label">Guardians</p>
-            <div class="bosses-row" id="bossesRow"></div>
+        <!-- ── RANK JOURNEY ─────────────────────────────── -->
+        <div class="journey-wrap">
+            <p class="section-eyebrow">Rank Journey</p>
+            <div class="journey-track">
+                <div class="journey-inner" id="journeyTrack">
+                    <div class="journey-line-fill" id="journeyLineFill"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- PRACTICE -->
+        <!-- ── STATS ────────────────────────────────────── -->
         <div>
-            <p class="section-label">Practice Problems</p>
-            <div class="practice-grid" id="practiceGrid"></div>
+            <p class="section-eyebrow">Overview</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value" id="statXP">0</span>
+                    <span class="stat-label">Current XP</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statLessons">0</span>
+                    <span class="stat-label">Lessons Done</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statBosses">0</span>
+                    <span class="stat-label">Guardians Defeated</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statProblems">0</span>
+                    <span class="stat-label">Problems Solved</span>
+                </div>
+            </div>
         </div>
 
-        <!-- LESSONS -->
-        <!-- LESSONS -->
+        <!-- ── GUARDIANS ─────────────────────────────────── -->
         <div>
-            <p class="section-label">Lessons</p>
+            <p class="section-eyebrow">Guardians</p>
+            <div class="bosses-grid" id="bossesGrid"></div>
+        </div>
 
-            <div style="display:flex; flex-direction:column; gap:16px;">
+        <!-- ── PRACTICE ──────────────────────────────────── -->
+        <div>
+            <p class="section-eyebrow">Practice Problems</p>
+            <div class="practice-row" id="practiceRow"></div>
+        </div>
 
-                <div class="lesson-course-card">
-                    <div class="course-header-container">
-                        <img class="lesson-icon" src="../logos/HTML-Logo.png">
-                        <div class="lesson-course-header">Html</div>
+        <!-- ── LESSONS ───────────────────────────────────── -->
+        <div>
+            <p class="section-eyebrow">Lessons</p>
+            <div class="lessons-section">
+                <div class="course-block">
+                    <div class="course-head">
+                        <img class="course-logo" src="../logos/HTML-Logo.png">
+                        <span class="course-title">HTML</span>
+                        <span class="course-progress-text" id="htmlProgress"></span>
                     </div>
-                    <div class="lessons-grid" id="htmlLessons"></div>
+                    <div class="lessons-chips" id="htmlLessons"></div>
                 </div>
-
-                <div class="lesson-course-card">
-                    <div class="course-header-container">
-                        <img class="lesson-icon" src="../logos/CSS-Logo.png">
-                        <div class="lesson-course-header">CSS</div>
+                <div class="course-block">
+                    <div class="course-head">
+                        <img class="course-logo" src="../logos/CSS-Logo.png">
+                        <span class="course-title">CSS</span>
+                        <span class="course-progress-text" id="cssProgress"></span>
                     </div>
-                    <div class="lessons-grid" id="cssLessons"></div>
+                    <div class="lessons-chips" id="cssLessons"></div>
                 </div>
-
-                <div class="lesson-course-card">
-                    <div class="course-header-container">
-                        <img class="lesson-icon" src="../logos/Python-Logo.png">
-                        <div class="lesson-course-header">Python</div>
+                <div class="course-block">
+                    <div class="course-head">
+                        <img class="course-logo" src="../logos/Python-Logo.png">
+                        <span class="course-title">Python</span>
+                        <span class="course-progress-text" id="pyProgress"></span>
                     </div>
-                    <div class="lessons-grid" id="pyLessons"></div>
+                    <div class="lessons-chips" id="pyLessons"></div>
                 </div>
-
             </div>
         </div>
 
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+
     <script>
-        const ranks = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
-        const xpNeeded = [100, 150, 200, 250, 300, 400, Infinity];
-
-        let rankIndex = Number(localStorage.getItem("rankIndex")) || 0;
-        let xp = Number(localStorage.getItem("xp")) || 0;
-
-        while (rankIndex < ranks.length - 1 && xp >= xpNeeded[rankIndex]) {
-            xp -= xpNeeded[rankIndex]; rankIndex++;
-            localStorage.setItem("rankIndex", rankIndex);
-            localStorage.setItem("xp", xp);
-        }
-
-        const currentRankXP = xpNeeded[rankIndex];
-        const percent = Math.min((xp / currentRankXP) * 100, 100);
-
-        // BOSS DATA
-        const bosses = [
-            { rank: "E", name: "The Apprentice", img: "../logos/bosses/E.png", key: "boss_e_done" },
-            { rank: "D", name: "The Chipher", img: "../logos/bosses/D.png", key: "boss_d_done" },
-            { rank: "C", name: "The Strategist", img: "../logos/bosses/C.png", key: "boss_c_done" },
-            { rank: "B", name: "The Forger", img: "../logos/bosses/B.png", key: "boss_b_done" },
-            { rank: "A", name: "The Sage", img: "../logos/bosses/A.png", key: "boss_a_done" },
-            { rank: "S", name: "The Master Sentinel", img: "../logos/bosses/S.png", key: "boss_s_done" },
-            { rank: "N", name: "The Architect", img: "../logos/bosses/National.png", key: "boss_national_done" },
+        const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+        const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+        const RANK_DESCS = [
+            "Every journey starts here. Keep solving and climbing.",
+            "You're finding your footing. Push through.",
+            "The path sharpens. Stay focused.",
+            "You've come far. The real challenge begins.",
+            "Elite territory. Few make it this far.",
+            "The pinnacle. You've mastered the fundamentals.",
+            "National rank. You are among the best.",
+            "MAX RANK — the summit reached."
         ];
 
-        // PRACTICE DATA
-        const practiceRanks = [
-            { letter: "E", keys: ["practice_e_1", "practice_e_2", "practice_e_3"] },
-            { letter: "D", keys: ["practice_d_1", "practice_d_2", "practice_d_3"] },
-            { letter: "C", keys: ["practice_c_1", "practice_c_2", "practice_c_3"] },
-            { letter: "B", keys: ["practice_b_1", "practice_b_2", "practice_b_3"] },
-            { letter: "A", keys: ["practice_a_1", "practice_a_2", "practice_a_3"] },
-            { letter: "S", keys: ["practice_s_1", "practice_s_2", "practice_s_3"] },
-            { letter: "N", keys: ["practice_national_1", "practice_national_2", "practice_national_3"] },
+        const BOSSES = [
+            { letter: "E", name: "The Apprentice", img: "../logos/bosses/E.png", key: "e" },
+            { letter: "D", name: "The Cipher", img: "../logos/bosses/D.png", key: "d" },
+            { letter: "C", name: "The Strategist", img: "../logos/bosses/C.png", key: "c" },
+            { letter: "B", name: "The Forger", img: "../logos/bosses/B.png", key: "b" },
+            { letter: "A", name: "The Sage", img: "../logos/bosses/A.png", key: "a" },
+            { letter: "S", name: "The Master Sentinel", img: "../logos/bosses/S.png", key: "s" },
+            { letter: "N", name: "The Architect", img: "../logos/bosses/National.png", key: "national" },
         ];
 
-        // LESSONS DATA
-        const lessonGroups = {
+        const PRACTICE_RANKS = [
+            { letter: "E", keys: ["e_1", "e_2", "e_3"] },
+            { letter: "D", keys: ["d_1", "d_2", "d_3"] },
+            { letter: "C", keys: ["c_1", "c_2", "c_3"] },
+            { letter: "B", keys: ["b_1", "b_2", "b_3"] },
+            { letter: "A", keys: ["a_1", "a_2", "a_3"] },
+            { letter: "S", keys: ["s_1", "s_2", "s_3"] },
+            { letter: "N", keys: ["national_1", "national_2", "national_3"] },
+        ];
+
+        const LESSON_GROUPS = {
             html: [
-                { name: "Structure", key: "lesson_html_structure" },
-                { name: "Text", key: "lesson_html_text" },
-                { name: "Links & Img", key: "lesson_html_links" },
-                { name: "Lists & Tables", key: "lesson_html_lists" },
-                { name: "Forms & Imputs", key: "lesson_html_forms" },
-                { name: "Semantic HTML", key: "lesson_html_semantic" },
+                { name: "Structure", key: "html_structure" },
+                { name: "Text", key: "html_text" },
+                { name: "Links & Img", key: "html_links" },
+                { name: "Lists & Tables", key: "html_lists" },
+                { name: "Forms", key: "html_forms" },
+                { name: "Semantic HTML", key: "html_semantic" },
             ],
             css: [
-                { name: "Colors", key: "lesson_css_colors" },
-                { name: "Fonts", key: "lesson_css_fonts" },
-                { name: "Spacing", key: "lesson_css_spacing" },
-                { name: "Selectors", key: "lesson_css_selectors" },
-                { name: "Box Model", key: "lesson_css_boxmodel" },
-                { name: "Positioning", key: "lesson_css_positioning" },
+                { name: "Colors", key: "css_colors" },
+                { name: "Fonts", key: "css_fonts" },
+                { name: "Spacing", key: "css_spacing" },
+                { name: "Selectors", key: "css_selectors" },
+                { name: "Box Model", key: "css_boxmodel" },
+                { name: "Positioning", key: "css_positioning" },
             ],
             py: [
-                { name: "Variables", key: "lesson_py_var" },
-                { name: "Conditions", key: "lesson_py_conditions" },
-                { name: "Loops", key: "lesson_py_loops" },
-                { name: "Functions", key: "lesson_py_functions" },
-                { name: "Lists", key: "lesson_py_lists" },
-                { name: "Strings", key: "lesson_py_strings" },
+                { name: "Variables", key: "py_var" },
+                { name: "Conditions", key: "py_conditions" },
+                { name: "Loops", key: "py_loops" },
+                { name: "Functions", key: "py_functions" },
+                { name: "Lists", key: "py_lists" },
+                { name: "Strings", key: "py_strings" },
             ]
         };
 
-        // COUNT BOSSES DEFEATED
-        const bossesDefeated = bosses.filter(b => localStorage.getItem(b.key)).length;
+        function renderProgress() {
+            const rankIndex = storage.getRankIndex();
+            const xp = storage.getXP();
+            const needed = XP_NEEDED[rankIndex];
+            const percent = needed === Infinity ? 100 : Math.min((xp / needed) * 100, 100);
+            const rankLabel = RANKS[rankIndex] === "National" ? "N" : RANKS[rankIndex];
 
-        // COUNT PROBLEMS SOLVED
-        const problemsSolved = practiceRanks.reduce((total, r) => {
-            return total + r.keys.filter(k => localStorage.getItem(k)).length;
-        }, 0);
+            // ── RANK HERO
+            document.getElementById('rankOrb').textContent = rankLabel;
+            document.getElementById('rankName').textContent = 'Rank ' + RANKS[rankIndex];
+            document.getElementById('rankSubtitle').textContent = RANK_DESCS[rankIndex] || '';
+            document.getElementById('heroXP').textContent = xp;
+            document.getElementById('heroLessons').textContent = storage.getLessonsCompleted();
+            setTimeout(() => {
+                document.getElementById('xpFill').style.width = percent + '%';
+            }, 120);
+            document.getElementById('xpCurrent').textContent = xp + ' XP';
+            document.getElementById('xpNeeded').textContent = needed === Infinity ? 'MAX RANK' : needed + ' XP to next rank';
 
-        // POPULATE HERO STATS
-        document.getElementById('statXP').innerText = xp;
-        document.getElementById('statLessons').innerText = localStorage.getItem('lessonsCompleted') || 0;
-        document.getElementById('statBosses').innerText = bossesDefeated;
-        document.getElementById('statProblems').innerText = problemsSolved;
-
-        // POPULATE RANK
-        const rankLabel = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
-        document.getElementById('rankCircle').innerText = rankLabel;
-        document.getElementById('rankTitle').innerText = 'Rank ' + ranks[rankIndex];
-        document.getElementById('xpBar').style.width = percent + '%';
-        document.getElementById('xpCurrent').innerText = xp + ' XP';
-        document.getElementById('xpNeeded').innerText = currentRankXP === Infinity ? 'MAX RANK' : currentRankXP + ' XP to next rank';
-
-        // POPULATE BOSSES
-        const bossesRow = document.getElementById('bossesRow');
-        bosses.forEach(b => {
-            const defeated = localStorage.getItem(b.key);
-            const chip = document.createElement('div');
-            chip.className = 'boss-chip ' + (defeated ? 'defeated' : 'pending');
-            chip.innerHTML = `
-            <div class="boss-chip-portrait">
-                <img src="${b.img}" alt="${b.name}">
-            </div>
-            <div>
-                <div class="boss-chip-name">${b.name}</div>
-                <div class="boss-chip-status">${defeated ? '✓ Defeated' : 'Pending'}</div>
-            </div>
-        `;
-            bossesRow.appendChild(chip);
-        });
-
-        // POPULATE PRACTICE
-        const practiceGrid = document.getElementById('practiceGrid');
-        practiceRanks.forEach(r => {
-            const solved = r.keys.filter(k => localStorage.getItem(k)).length;
-            const card = document.createElement('div');
-            card.className = 'practice-rank-card' + (solved > 0 ? ' has-progress' : '');
-            card.innerHTML = `
-            <span class="practice-rank-letter">${r.letter}</span>
-            <div class="practice-solved">${solved} / 3 solved</div>
-        `;
-            practiceGrid.appendChild(card);
-        });
-
-        // POPULATE LESSONS
-        ['html', 'css', 'py'].forEach(course => {
-            const grid = document.getElementById(course + 'Lessons');
-            lessonGroups[course].forEach(l => {
-                const done = localStorage.getItem(l.key);
-                const chip = document.createElement('div');
-                chip.className = 'lesson-chip' + (done ? ' done' : '');
-                chip.innerHTML = `
-            <span class="lesson-chip-name">${l.name}</span>
-            <span class="lesson-chip-check">✓</span>
-        `;
-                grid.appendChild(chip);
+            // ── RANK JOURNEY
+            const track = document.getElementById('journeyTrack');
+            const JOURNEY_RANKS = ["E", "D", "C", "B", "A", "S", "N"];
+            JOURNEY_RANKS.forEach((r, i) => {
+                const node = document.createElement('div');
+                const isPast = i < rankIndex;
+                const isCurrent = i === rankIndex;
+                node.className = 'journey-node' + (isPast ? ' done' : isCurrent ? ' current' : '');
+                node.innerHTML = `<div class="journey-circle">${r}</div>`;
+                track.appendChild(node);
             });
+
+            // Line spans center-to-center of first and last circle (56px wide each).
+            // left offset in CSS is 28px (half of 56). Fill = rankIndex/6 of that span.
+            setTimeout(() => {
+                const inner = document.getElementById('journeyTrack');
+                const fullLineW = inner.offsetWidth - 56; // center-to-center
+                const fillW = rankIndex === 0 ? 0 : (rankIndex / 6) * fullLineW;
+                document.getElementById('journeyLineFill').style.width = fillW + 'px';
+            }, 200);
+
+            // ── STATS
+            const bossesDefeated = BOSSES.filter(b => storage.isBossDone(b.key)).length;
+            const problemsSolved = PRACTICE_RANKS.reduce((t, r) => t + r.keys.filter(k => storage.isPracticeDone(k)).length, 0);
+            document.getElementById('statXP').textContent = xp;
+            document.getElementById('statLessons').textContent = storage.getLessonsCompleted();
+            document.getElementById('statBosses').textContent = bossesDefeated;
+            document.getElementById('statProblems').textContent = problemsSolved;
+
+            // ── BOSSES
+            const bossesGrid = document.getElementById('bossesGrid');
+            BOSSES.forEach(b => {
+                const defeated = storage.isBossDone(b.key);
+                const card = document.createElement('div');
+                card.className = 'boss-card ' + (defeated ? 'defeated' : 'pending');
+                card.innerHTML = `
+                <div class="boss-portrait"><img src="${b.img}" alt="${b.name}"></div>
+                <div class="boss-name">${b.name}</div>
+                <div class="boss-status">${defeated ? '✓ Defeated' : 'Pending'}</div>
+            `;
+                bossesGrid.appendChild(card);
+            });
+
+            // ── PRACTICE
+            const practiceRow = document.getElementById('practiceRow');
+            PRACTICE_RANKS.forEach(r => {
+                const solved = r.keys.filter(k => storage.isPracticeDone(k)).length;
+                const all3 = solved === 3;
+                const card = document.createElement('div');
+                card.className = 'practice-card' + (all3 ? ' completed' : solved > 0 ? ' has-progress' : '');
+                const pips = r.keys.map((_, i) => `<div class="pip${i < solved ? ' filled' : ''}"></div>`).join('');
+                card.innerHTML = `
+                <span class="practice-rank-letter">${r.letter}</span>
+                <div class="practice-pips">${pips}</div>
+                <div class="practice-count">${solved} / 3</div>
+            `;
+                practiceRow.appendChild(card);
+            });
+
+            // ── LESSONS
+            ['html', 'css', 'py'].forEach(course => {
+                const grid = document.getElementById(course + 'Lessons');
+                const prog = document.getElementById(course + 'Progress');
+                const lessons = LESSON_GROUPS[course];
+                const doneCount = lessons.filter(l => storage.isLessonDone(l.key)).length;
+                prog.textContent = doneCount + ' / ' + lessons.length + ' done';
+                lessons.forEach(l => {
+                    const done = storage.isLessonDone(l.key);
+                    const chip = document.createElement('div');
+                    chip.className = 'lesson-chip' + (done ? ' done' : '');
+                    chip.innerHTML = `<span>${l.name}</span><span class="lesson-check">✓</span>`;
+                    grid.appendChild(chip);
+                });
+            });
+        }
+
+        storage.init().then(() => {
+            renderProgress();
+            hideLoadingScreen();
         });
     </script>
-
 </body>
 
 </html>

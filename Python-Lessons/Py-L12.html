@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 12 — Loops on Lists</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+    <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <link rel="stylesheet" href="../AI-Tutor/chat.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(255, 215, 0, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(100, 100, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0, 255, 150, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.03;
+            animation: drift 80s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-100px, -100px);
+            }
+        }
+
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 72px;
+            background: rgba(6, 6, 61, 0.6);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            font-size: 36px;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .material-symbols-outlined:hover {
+            transform: scale(1.1);
+        }
+
+        .toolbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .toolbar-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .toolbar-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .toolbar-btn-ghost {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all .2s;
+        }
+
+        .toolbar-btn-ghost:hover {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-link {
+            margin-left: auto;
+        }
+
+        .progress-bar {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ffaa00);
+            width: 84%;
+        }
+
+        .lesson-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .theory-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .lesson-badge {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            background: var(--accent);
+            color: #020223;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .lesson-title {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            line-height: 1.6;
+        }
+
+        .theory-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .theory-intro {
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .theory-intro strong {
+            color: var(--accent);
+        }
+
+        .concept-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .concept-block.gold {
+            border-color: rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.04);
+        }
+
+        .concept-block.green {
+            border-color: rgba(0, 255, 144, 0.15);
+            background: rgba(0, 255, 144, 0.03);
+        }
+
+        .concept-block.purple {
+            border-color: rgba(150, 100, 255, 0.2);
+            background: rgba(150, 100, 255, 0.04);
+        }
+
+        .concept-block.blue {
+            border-color: rgba(96, 165, 250, 0.15);
+            background: rgba(96, 165, 250, 0.03);
+        }
+
+        .concept-block.coral {
+            border-color: rgba(255, 120, 80, 0.2);
+            background: rgba(255, 120, 80, 0.04);
+        }
+
+        .concept-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .concept-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            margin-bottom: 6px;
+        }
+
+        .concept-block.gold .concept-label {
+            color: var(--accent);
+        }
+
+        .concept-block.green .concept-label {
+            color: #00ff90;
+        }
+
+        .concept-block.purple .concept-label {
+            color: #a78bfa;
+        }
+
+        .concept-block.blue .concept-label {
+            color: #60a5fa;
+        }
+
+        .concept-block.coral .concept-label {
+            color: #ff7c5c;
+        }
+
+        .concept-text {
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .concept-text code {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .patterns-box {
+            background: #0b0b1f;
+            border: var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .patterns-title {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .pattern-row {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pattern-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .pattern-name {
+            font-family: 'Press Start 2P';
+            font-size: 6px;
+            color: rgba(255, 215, 0, 0.7);
+            margin-bottom: 4px;
+        }
+
+        .pattern-code {
+            font-family: monospace;
+            font-size: 12px;
+            color: #c9d1d9;
+            line-height: 1.7;
+        }
+
+        .p-kw {
+            color: #ff79c6;
+        }
+
+        .p-fn {
+            color: #50fa7b;
+        }
+
+        .p-var {
+            color: #8be9fd;
+        }
+
+        .p-str {
+            color: #f1fa8c;
+        }
+
+        .p-num {
+            color: #bd93f9;
+        }
+
+        .chapter-complete {
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .chapter-complete-title {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .chapter-complete-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+        }
+
+        .analogy-box {
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.75;
+            color: rgba(255, 255, 255, 0.55);
+            font-style: italic;
+        }
+
+        .analogy-box strong {
+            color: var(--accent);
+            font-style: normal;
+        }
+
+        .panel-footer {
+            padding: 16px 24px;
+            border-top: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dot.done {
+            background: var(--accent);
+        }
+
+        .dot.current {
+            background: rgba(255, 215, 0, 0.4);
+            border: 1px solid var(--accent);
+        }
+
+        .next-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        #taskEditor {
+            height: 160px;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .code-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+            /* ← adaugă doar asta */
+        }
+
+        .editor-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .editor-header {
+            padding: 12px 18px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .editor-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .editor-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .editor-dot.r {
+            background: #ff5f57;
+        }
+
+        .editor-dot.y {
+            background: #febc2e;
+        }
+
+        .editor-dot.g {
+            background: #28c840;
+        }
+
+        .editor-filename {
+            font-family: monospace;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .run-btn {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 6px 14px;
+            background: rgba(0, 255, 144, 0.1);
+            color: #00ff90;
+            border: 1px solid rgba(0, 255, 144, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .run-btn:hover {
+            background: rgba(0, 255, 144, 0.2);
+        }
+
+        .code-example {
+            padding: 18px 20px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.9;
+            color: #c9d1d9;
+            background: #0b0b1f;
+        }
+
+        .kw {
+            color: #ff79c6;
+        }
+
+        .fn {
+            color: #50fa7b;
+        }
+
+        .str-c {
+            color: #f1fa8c;
+        }
+
+        .cm-s {
+            color: rgba(255, 255, 255, 0.25);
+            font-style: italic;
+        }
+
+        .num {
+            color: #bd93f9;
+        }
+
+        .var-c {
+            color: #8be9fd;
+        }
+
+        .ln {
+            display: inline-block;
+            width: 20px;
+            color: rgba(255, 255, 255, 0.18);
+            font-size: 11px;
+            margin-right: 14px;
+            text-align: right;
+            user-select: none;
+        }
+
+        .output-card {
+            background: #030315;
+            border: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .output-header {
+            padding: 10px 18px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .output-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff90;
+        }
+
+        .output-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .output-body {
+            padding: 14px 20px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #00ff90;
+            min-height: 70px;
+            line-height: 1.8;
+            white-space: pre;
+        }
+
+        .output-placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(0, 255, 144, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .task-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(0, 255, 144, 0.1);
+            background: rgba(0, 255, 144, 0.02);
+        }
+
+        .task-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: #00ff90;
+        }
+
+        .task-desc {
+            padding: 14px 20px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.75;
+        }
+
+        .task-desc code {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-family: monospace !important;
+            font-size: 13px !important;
+            background: #0b0b1f !important;
+            color: #c9d1d9 !important;
+            border-radius: 0 !important;
+            line-height: 1.8 !important;
+        }
+
+        .CodeMirror-scroll {
+            padding: 14px 4px;
+            overflow: auto !important;
+        }
+
+        .CodeMirror-gutters {
+            background: #0b0b1f !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .cm-keyword {
+            color: #ff79c6 !important;
+        }
+
+        .cm-builtin {
+            color: #50fa7b !important;
+        }
+
+        .cm-string {
+            color: #f1fa8c !important;
+        }
+
+        .cm-comment {
+            color: rgba(255, 255, 255, 0.28) !important;
+            font-style: italic !important;
+        }
+
+        .cm-number {
+            color: #bd93f9 !important;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--accent) !important;
+        }
+
+        .task-run-row {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(0, 255, 144, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .task-run-btn {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 8px 18px;
+            background: rgba(0, 255, 144, 0.08);
+            color: #00ff90;
+            border: 1px solid rgba(0, 255, 144, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .task-run-btn:hover {
+            background: rgba(0, 255, 144, 0.18);
+        }
+
+        .task-output {
+            font-family: monospace;
+            font-size: 12px;
+            color: #00ff90;
+            flex: 1;
+            white-space: pre;
+            line-height: 1.7;
+        }
+
+        .task-output.err {
+            color: #ff8080;
+        }
+
+        .funfact-card {
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .funfact-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .funfact-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+        }
+
+        .funfact-text strong {
+            color: var(--accent);
+        }
+
+        /* ===== TABLET (≤900px) ===== */
+        @media (max-width: 900px) {
+            .lesson-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 28px 16px 60px;
+            }
+
+            .toolbar-center {
+                display: none;
+            }
+        }
+
+        /* ===== MOBILE (≤600px) ===== */
+        @media (max-width: 600px) {
+            .toolbar {
+                height: 60px;
+                padding: 0 14px;
+            }
+
+            .material-symbols-outlined {
+                font-size: 30px;
+            }
+
+            .toolbar-btn-ghost {
+                font-size: 7px;
+                padding: 0 12px;
+                height: 34px;
+                line-height: 34px;
+            }
+
+            .lesson-wrapper {
+                padding: 20px 12px 50px;
+                gap: 16px;
+            }
+
+            /* Theory */
+            .panel-header {
+                padding: 16px;
+                gap: 10px;
+            }
+
+            .lesson-badge {
+                font-size: 8px;
+            }
+
+            .lesson-title {
+                font-size: 9px;
+            }
+
+            .theory-body {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .theory-intro,
+            .concept-text,
+            .analogy-box {
+                font-size: 13px;
+            }
+
+            /* Footer — dots wrap, buton full width */
+            .panel-footer {
+                flex-direction: column;
+                gap: 14px;
+                align-items: stretch;
+            }
+
+            .dots {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .next-btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            /* Code panel */
+            .editor-header {
+                padding: 10px 14px;
+            }
+
+            .code-example {
+                font-size: 12px;
+                padding: 14px;
+                overflow-x: auto;
+            }
+
+            .ln {
+                width: 16px;
+                margin-right: 10px;
+            }
+
+            .output-body {
+                font-size: 12px;
+                padding: 12px 14px;
+                overflow-x: auto;
+            }
+
+            /* Task */
+            .task-desc {
+                font-size: 13px;
+                padding: 12px 16px 0;
+            }
+
+            .CodeMirror {
+                font-size: 12px !important;
+            }
+
+            .task-run-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .task-run-btn {
+                width: 100%;
+            }
+
+            .task-output {
+                white-space: pre-wrap;
+            }
+
+            .funfact-text {
+                font-size: 12px;
+            }
+        }
+
+        /* ===== TELEFOANE MICI (≤380px) ===== */
+        @media (max-width: 380px) {
+            .lesson-title {
+                font-size: 8px;
+            }
+
+            .code-example {
+                font-size: 11px;
+            }
+
+            .toolbar-btn-ghost {
+                font-size: 6px;
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="toolbar">
+        <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
+        <div class="toolbar-center">
+            <a href="../Courses/Practice.html" class="toolbar-btn">Practice</a>
+            <a href="../AI-Tutor/Chat.html" class="toolbar-btn-ghost">Chat</a>
+        </div>
+        <a href="../Courses/Python.html" class="back-link toolbar-btn-ghost">Back to Course</a>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+
+    <div class="lesson-wrapper">
+
+        <div class="theory-panel">
+            <div class="panel-header">
+                <span class="lesson-badge">L12</span>
+                <span class="lesson-title">Loops on Lists</span>
+            </div>
+            <div class="theory-body">
+                <p class="theory-intro">
+                    Combining loops with lists unlocks real programming power. Most data processing problems boil down
+                    to <strong>iterating over a collection and doing something with each element</strong>.
+                </p>
+
+                <div class="concept-block gold">
+                    <div>
+                        <div class="concept-label">Iterating directly</div>
+                        <div class="concept-text">The cleanest way: <code>for item in my_list</code>. Python handles the
+                            index internally — you just get each value. Use this when you don't need the index.</div>
+                    </div>
+                </div>
+
+                <div class="concept-block green">
+                    <div>
+                        <div class="concept-label">When you need the index</div>
+                        <div class="concept-text">Use <code>enumerate()</code> — it gives you both index and value
+                            cleanly. Avoid <code>for i in range(len(list))</code> — it works but it's un-Pythonic and
+                            harder to read.</div>
+                    </div>
+                </div>
+
+                <div class="concept-block purple">
+                    <div>
+                        <div class="concept-label">Common patterns</div>
+                    </div>
+                </div>
+
+                <div class="patterns-box">
+                    <div class="patterns-title">Patterns you'll use constantly</div>
+
+                    <div class="pattern-row">
+                        <div class="pattern-name">Accumulator — build a total</div>
+                        <div class="pattern-code">
+                            <span class="p-var">total</span> = <span class="p-num">0</span><br>
+                            <span class="p-kw">for</span> <span class="p-var">n</span> <span class="p-kw">in</span>
+                            <span class="p-var">nums</span>: <span class="p-var">total</span> += <span
+                                class="p-var">n</span>
+                        </div>
+                    </div>
+
+                    <div class="pattern-row">
+                        <div class="pattern-name">Filter — collect matching items</div>
+                        <div class="pattern-code">
+                            <span class="p-var">result</span> = []<br>
+                            <span class="p-kw">for</span> <span class="p-var">x</span> <span class="p-kw">in</span>
+                            <span class="p-var">items</span>:<br>
+                            &nbsp;&nbsp;<span class="p-kw">if</span> <span class="p-var">x</span> > <span
+                                class="p-num">0</span>: <span class="p-var">result</span>.<span
+                                class="p-fn">append</span>(<span class="p-var">x</span>)
+                        </div>
+                    </div>
+
+                    <div class="pattern-row">
+                        <div class="pattern-name">Transform — build a new list</div>
+                        <div class="pattern-code">
+                            <span class="p-var">upper</span> = [<span class="p-var">s</span>.<span
+                                class="p-fn">upper</span>() <span class="p-kw">for</span> <span class="p-var">s</span>
+                            <span class="p-kw">in</span> <span class="p-var">words</span>]
+                        </div>
+                    </div>
+
+                    <div class="pattern-row">
+                        <div class="pattern-name">Search — find first match</div>
+                        <div class="pattern-code">
+                            <span class="p-kw">for</span> <span class="p-var">i</span>, <span class="p-var">x</span>
+                            <span class="p-kw">in</span> <span class="p-fn">enumerate</span>(<span
+                                class="p-var">items</span>):<br>
+                            &nbsp;&nbsp;<span class="p-kw">if</span> <span class="p-var">x</span> == <span
+                                class="p-var">target</span>: <span class="p-kw">break</span>
+                        </div>
+                    </div>
+
+                    <div class="pattern-row">
+                        <div class="pattern-name">Modify in place — update each item</div>
+                        <div class="pattern-code">
+                            <span class="p-kw">for</span> <span class="p-var">i</span> <span class="p-kw">in</span>
+                            <span class="p-fn">range</span>(<span class="p-fn">len</span>(<span
+                                class="p-var">nums</span>)):<br>
+                            &nbsp;&nbsp;<span class="p-var">nums</span>[<span class="p-var">i</span>] *= <span
+                                class="p-num">2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-block blue">
+                    <span class="concept-icon">⚠️</span>
+                    <div>
+                        <div class="concept-label">Don't modify while iterating</div>
+                        <div class="concept-text">Never add or remove items from a list while looping over it — it
+                            causes unpredictable behavior. Instead, loop over a copy (<code>for x in list[:]</code>) or
+                            build a new list.</div>
+                    </div>
+                </div>
+
+                <div class="concept-block coral">
+                    <span class="concept-icon">🏆</span>
+                    <div>
+                        <div class="concept-label">Choosing the right tool</div>
+                        <div class="concept-text">Simple transform/filter → <strong>list comprehension</strong>. Complex
+                            logic with multiple steps → <strong>for loop</strong>. Need index →
+                            <strong>enumerate</strong>. Two lists → <strong>zip</strong>. Know the tools and pick the
+                            right one.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chapter-complete">
+                    <div class="chapter-complete-title">🎉 Cap 4 Complete!</div>
+                    <div class="chapter-complete-text">You now know Lists inside out — indexing, methods,
+                        comprehensions, and all the loop patterns. Take the Chapter 4 Quiz to unlock Cap 5.</div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="dots">
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot current"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <button class="next-btn" onclick="goNext()">Finish Chapter →</button>
+            </div>
+        </div>
+
+        <div class="code-panel">
+            <div class="editor-card">
+                <div class="editor-header">
+                    <div class="editor-dots">
+                        <div class="editor-dot r"></div>
+                        <div class="editor-dot y"></div>
+                        <div class="editor-dot g"></div>
+                    </div>
+                    <span class="editor-filename">example.py</span>
+                    <button class="run-btn" onclick="runExample()">▶ Run</button>
+                </div>
+                <div class="code-example">
+                    <div><span class="ln">1</span><span class="var-c">scores</span> = [<span class="num">88</span>,
+                        <span class="num">45</span>, <span class="num">92</span>, <span class="num">61</span>, <span
+                            class="num">73</span>, <span class="num">55</span>, <span class="num">98</span>]
+                    </div>
+                    <div><span class="ln">2</span></div>
+                    <div><span class="ln">3</span><span class="cm-s"># Accumulator — sum of passing scores</span></div>
+                    <div><span class="ln">4</span><span class="var-c">total</span> = <span class="num">0</span></div>
+                    <div><span class="ln">5</span><span class="kw">for</span> <span class="var-c">s</span> <span
+                            class="kw">in</span> <span class="var-c">scores</span>:</div>
+                    <div><span class="ln">6</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span
+                            class="var-c">s</span> >= <span class="num">60</span>: <span class="var-c">total</span> +=
+                        <span class="var-c">s</span>
+                    </div>
+                    <div><span class="ln">7</span><span class="fn">print</span>(<span class="str-c">f"Passing total:
+                            {<span class="var-c">total</span>}"</span>)</div>
+                    <div><span class="ln">8</span></div>
+                    <div><span class="ln">9</span><span class="cm-s"># Filter — only failing scores</span></div>
+                    <div><span class="ln">10</span><span class="var-c">fails</span> = [<span class="var-c">s</span>
+                        <span class="kw">for</span> <span class="var-c">s</span> <span class="kw">in</span> <span
+                            class="var-c">scores</span> <span class="kw">if</span> <span class="var-c">s</span>
+                        < <span class="num">60</span>]
+                    </div>
+                    <div><span class="ln">11</span><span class="fn">print</span>(<span class="str-c">f"Failed: {<span
+                                class="var-c">fails</span>}"</span>)</div>
+                    <div><span class="ln">12</span></div>
+                    <div><span class="ln">13</span><span class="cm-s"># Search with enumerate</span></div>
+                    <div><span class="ln">14</span><span class="kw">for</span> <span class="var-c">i</span>, <span
+                            class="var-c">s</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span
+                            class="var-c">scores</span>):</div>
+                    <div><span class="ln">15</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span
+                            class="var-c">s</span> == <span class="fn">max</span>(<span class="var-c">scores</span>):
+                    </div>
+                    <div><span class="ln">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="fn">print</span>(<span class="str-c">f"Top score {<span class="var-c">s</span>} at
+                            index {<span class="var-c">i</span>}"</span>)</div>
+                    <div><span class="ln">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="kw">break</span></div>
+                    <div><span class="ln">18</span></div>
+                    <div><span class="ln">19</span><span class="cm-s"># Grade report with zip</span></div>
+                    <div><span class="ln">20</span><span class="var-c">names</span> = [<span
+                            class="str-c">"Alice"</span>, <span class="str-c">"Bob"</span>, <span
+                            class="str-c">"Carol"</span>]</div>
+                    <div><span class="ln">21</span><span class="var-c">grades</span> = [<span class="num">92</span>,
+                        <span class="num">45</span>, <span class="num">78</span>]
+                    </div>
+                    <div><span class="ln">22</span><span class="kw">for</span> <span class="var-c">name</span>, <span
+                            class="var-c">g</span> <span class="kw">in</span> <span class="fn">zip</span>(<span
+                            class="var-c">names</span>, <span class="var-c">grades</span>):</div>
+                    <div><span class="ln">23</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="var-c">status</span> = <span
+                            class="str-c">"Pass"</span> <span class="kw">if</span> <span class="var-c">g</span> >= <span
+                            class="num">60</span> <span class="kw">else</span> <span class="str-c">"Fail"</span></div>
+                    <div><span class="ln">24</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">print</span>(<span
+                            class="str-c">f"{<span class="var-c">name</span>}: {<span class="var-c">g</span>} — {<span
+                                class="var-c">status</span>}"</span>)</div>
+                </div>
+            </div>
+
+            <div class="output-card">
+                <div class="output-header">
+                    <div class="output-dot"></div>
+                    <span class="output-label">Output</span>
+                </div>
+                <div class="output-body" id="exampleOutput">
+                    <span class="output-placeholder">Press Run ▶ to see the output...</span>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header">
+                    <span class="task-label">Final Task — Put it all together</span>
+                </div>
+                <div class="task-desc">
+                    Given <code>students = [("Alice", 88), ("Bob", 45), ("Carol", 92), ("Dan", 60)]</code>. For each
+                    student, print <code>Name: Passed</code> if their score is 60+, otherwise <code>Name: Failed</code>.
+                    Then on a new line print <code>Total passed: N</code>.
+                </div>
+                <div id="taskEditor"></div>
+                <div class="task-run-row">
+                    <button class="task-run-btn" onclick="runTask()">▶ Run your code</button>
+                    <span class="task-output" id="taskOutput"></span>
+                </div>
+            </div>
+
+            <div class="funfact-card">
+                <span class="funfact-icon">⭐</span>
+                <div class="funfact-text">
+                    <strong>Fun fact:</strong> The accumulator, filter, and transform patterns are so fundamental they
+                    have names in functional programming: <strong>reduce</strong>, <strong>filter</strong>, and
+                    <strong>map</strong>. Python has built-in functions for all three, but list comprehensions are
+                    usually cleaner and more Pythonic.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+
+    <script>
+        let taskCM;
+        window.addEventListener('load', () => {
+            taskCM = CodeMirror(document.getElementById('taskEditor'), {
+                value: '# Write your code here\n',
+                mode: 'python', lineNumbers: true,
+                indentUnit: 4, tabSize: 4, indentWithTabs: false,
+                lineWrapping: false,
+            });
+            taskCM.setSize('100%', 160);
+            setTimeout(() => taskCM.refresh(), 0);
+        });
+
+        function runExample() {
+            const out = document.getElementById('exampleOutput');
+            out.innerHTML = '';
+            const lines = [
+                'Passing total: 412',
+                'Failed: [45, 55]',
+                'Top score 98 at index 6',
+                'Alice: 92 — Pass',
+                'Bob: 45 — Fail',
+                'Carol: 78 — Pass'
+            ];
+            lines.forEach((line, i) => {
+                setTimeout(() => { out.textContent += line + '\n'; }, i * 100);
+            });
+        }
+
+        async function runTask() {
+            const code = taskCM.getValue();
+            const outEl = document.getElementById('taskOutput');
+            outEl.textContent = 'Running...';
+            outEl.className = 'task-output';
+            try {
+                const runCode = firebase.functions().httpsCallable('runCode');
+                const result = await runCode({
+                    code,
+                    testCases: [{ stdin: "", expected: "Alice: Passed\nBob: Failed\nCarol: Passed\nDan: Passed\nTotal passed: 3" }]
+                });
+                if (result.data?.passed) {
+                    outEl.textContent = '✓ Correct!';
+                    outEl.className = 'task-output';
+                } else {
+                    const got = result.data?.results?.[0]?.actual || '(no output)';
+                    outEl.textContent = '✗ Got: ' + got;
+                    outEl.className = 'task-output err';
+                }
+            } catch (e) {
+                outEl.textContent = 'Error: ' + e.message;
+                outEl.className = 'task-output err';
+            }
+        }
+
+        async function goNext() {
+            if (!storage.isLessonDone('py_l12')) {
+                await storage.addLesson();
+                await storage.markLessonDone('py_l12');
+                const newRank = await storage.gainXP(10);
+                if (newRank) {
+                    showRankUpAnimation(newRank);
+                    setTimeout(() => { window.location.href = '../Python-Lessons/Py-L13.html'; }, 3500);
+                    return;
+                }
+            }
+            window.location.href = '../Python-Lessons/Py-L13.html';
+        }
+
+        storage.init().then(() => hideLoadingScreen());
+        window.LESSON_CONTEXT = "Python - Loops on Lists";
+    </script>
+
+    <script src="../AI-Tutor/chat.js"></script>
+</body>
+
+</html>

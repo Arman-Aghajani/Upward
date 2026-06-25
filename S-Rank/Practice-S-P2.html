@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="../AI-Tutor/chat.css">
 
@@ -328,8 +330,25 @@
         </div>
     </div>
     <script>
-        const PROBLEM_KEY = "practice_s_2";
-        if (localStorage.getItem(PROBLEM_KEY)) document.getElementById("doneBanner").style.display = "block";
+        // ─── NOTĂ DE ARHITECTURĂ ─────────────────────────────────────────────
+        // s_2 NU folosește Piston. Input-ul problemei este o listă nestate
+        // (ex: [1, [2, 3], [4, [5, 6]]]) care nu se reprezintă natural ca
+        // stdin text pentru Piston. Cele 3 căi luate în calcul:
+        //   1. ast.literal_eval pe un string — distrage de la lecția de recursie
+        //   2. format custom cu separatori de adâncime — enunț oribil
+        //   3. AI-only, ca aici — verdict mai puțin de încredere, dar enunț curat
+        // Decizie: Calea 3. Excepție documentată, NU bug. NU converti la Piston
+        // fără să reformulezi întâi problema.
+        // ─────────────────────────────────────────────────────────────────────
+
+        const PROBLEM_KEY = "s_2";
+
+        function renderProblem() {
+            if (storage.isPracticeDone(PROBLEM_KEY)) {
+                document.getElementById("doneBanner").style.display = "block";
+            }
+        }
+
         async function submitCode() {
             const code = document.getElementById("codeInput").value.trim();
             if (!code) return;
@@ -380,10 +399,19 @@ FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they d
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
 
-                if (passed && !localStorage.getItem(PROBLEM_KEY)) {
-                    localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
-                    localStorage.setItem(PROBLEM_KEY, "true");
-                    checkRankUp();
+                if (passed && !storage.isPracticeDone(PROBLEM_KEY)) {
+                    await storage.markPracticeDone(PROBLEM_KEY);
+                    await storage.addXP(10);
+                    const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                    const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                    let ri = storage.getRankIndex();
+                    let xp = storage.getXP();
+                    if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
+                        xp -= XP_NEEDED[ri]; ri++;
+                        await storage.setXP(xp);
+                        await storage.setRankIndex(ri);
+                        showRankUpAnimation(RANKS[ri]);
+                    }
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
@@ -395,6 +423,11 @@ FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they d
             }
             btn.disabled = false;
         }
+
+        storage.init().then(() => {
+            renderProblem();
+            hideLoadingScreen();
+        });
     </script>
 
     <script>
@@ -402,13 +435,12 @@ FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they d
     </script>
 
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
-
-    <!-- Init proiect + App Check -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="../firebase-init.js"></script>
-
     <script src="../AI-Tutor/chat.js"></script>
 </body>
 

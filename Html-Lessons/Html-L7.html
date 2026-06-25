@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 7 — Tables</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+    <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <link rel="stylesheet" href="../AI-Tutor/chat.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg-dark: #020223;
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7)
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(255, 215, 0, 0.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(100, 100, 255, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.03;
+            animation: drift 80s linear infinite;
+            pointer-events: none;
+            z-index: 0
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0)
+            }
+
+            to {
+                transform: translate(-100px, -100px)
+            }
+        }
+
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 72px;
+            background: rgba(6, 6, 61, 0.6);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 24px
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            font-size: 36px;
+            cursor: pointer;
+            transition: transform .2s
+        }
+
+        .material-symbols-outlined:hover {
+            transform: scale(1.1)
+        }
+
+        .toolbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px
+        }
+
+        .toolbar-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform .2s, box-shadow .2s
+        }
+
+        .toolbar-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4)
+        }
+
+        .toolbar-btn-ghost {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all .2s
+        }
+
+        .toolbar-btn-ghost:hover {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3)
+        }
+
+        .back-link {
+            margin-left: auto
+        }
+
+        .progress-bar {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            position: relative;
+            z-index: 1
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ffaa00);
+            width: 47%
+        }
+
+        .lesson-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 24px;
+            align-items: start
+        }
+
+        .theory-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow)
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.02)
+        }
+
+        .lesson-badge {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            background: var(--accent);
+            color: #020223;
+            padding: 6px 12px;
+            border-radius: 6px
+        }
+
+        .lesson-title {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            line-height: 1.6
+        }
+
+        .theory-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px
+        }
+
+        .theory-intro {
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.6)
+        }
+
+        .theory-intro strong {
+            color: var(--accent)
+        }
+
+        .concept-block {
+            border-radius: 10px;
+            padding: 14px 16px
+        }
+
+        .concept-block.gold {
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.04)
+        }
+
+        .concept-block.green {
+            border: 1px solid rgba(0, 255, 144, 0.15);
+            background: rgba(0, 255, 144, 0.03)
+        }
+
+        .concept-block.purple {
+            border: 1px solid rgba(150, 100, 255, 0.2);
+            background: rgba(150, 100, 255, 0.04)
+        }
+
+        .concept-block.blue {
+            border: 1px solid rgba(96, 165, 250, 0.15);
+            background: rgba(96, 165, 250, 0.03)
+        }
+
+        .concept-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            margin-bottom: 6px
+        }
+
+        .concept-block.gold .concept-label {
+            color: var(--accent)
+        }
+
+        .concept-block.green .concept-label {
+            color: #00ff90
+        }
+
+        .concept-block.purple .concept-label {
+            color: #a78bfa
+        }
+
+        .concept-block.blue .concept-label {
+            color: #60a5fa
+        }
+
+        .concept-text {
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.55)
+        }
+
+        .concept-text code {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: white
+        }
+
+        .analogy-box {
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.75;
+            color: rgba(255, 255, 255, 0.55);
+            font-style: italic
+        }
+
+        .analogy-box strong {
+            color: var(--accent);
+            font-style: normal
+        }
+
+        .panel-footer {
+            padding: 16px 24px;
+            border-top: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02)
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1)
+        }
+
+        .dot.done {
+            background: var(--accent)
+        }
+
+        .dot.current {
+            background: rgba(255, 215, 0, 0.4);
+            border: 1px solid var(--accent)
+        }
+
+        .next-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3)
+        }
+
+        .code-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+            overflow: hidden
+        }
+
+        .editor-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow)
+        }
+
+        .editor-header {
+            padding: 12px 18px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02)
+        }
+
+        .editor-dots {
+            display: flex;
+            gap: 6px
+        }
+
+        .editor-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%
+        }
+
+        .editor-dot.r {
+            background: #ff5f57
+        }
+
+        .editor-dot.y {
+            background: #febc2e
+        }
+
+        .editor-dot.g {
+            background: #28c840
+        }
+
+        .editor-filename {
+            font-family: monospace;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3)
+        }
+
+        .run-btn {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 6px 14px;
+            background: rgba(0, 255, 144, 0.1);
+            color: #00ff90;
+            border: 1px solid rgba(0, 255, 144, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .run-btn:hover {
+            background: rgba(0, 255, 144, 0.2)
+        }
+
+        .code-example {
+            padding: 18px 20px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.9;
+            color: #c9d1d9;
+            background: #0b0b1f
+        }
+
+        .ht {
+            color: #ff79c6
+        }
+
+        .ha {
+            color: #8be9fd
+        }
+
+        .hv {
+            color: #f1fa8c
+        }
+
+        .hb {
+            color: rgba(255, 255, 255, 0.45)
+        }
+
+        .hx {
+            color: #c9d1d9
+        }
+
+        .ln {
+            display: inline-block;
+            width: 20px;
+            color: rgba(255, 255, 255, 0.18);
+            font-size: 11px;
+            margin-right: 14px;
+            text-align: right;
+            user-select: none
+        }
+
+        .output-card {
+            background: #030315;
+            border: var(--border);
+            border-radius: 12px;
+            overflow: hidden
+        }
+
+        .output-header {
+            padding: 10px 18px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .output-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff90
+        }
+
+        .output-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.3)
+        }
+
+        .output-body {
+            min-height: 70px;
+            font-family: monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(0, 255, 144, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow)
+        }
+
+        .task-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(0, 255, 144, 0.1);
+            background: rgba(0, 255, 144, 0.02)
+        }
+
+        .task-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: #00ff90
+        }
+
+        .task-desc {
+            padding: 14px 20px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.75
+        }
+
+        .task-desc code {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: white
+        }
+
+        #taskEditor {
+            height: 160px;
+            overflow: hidden;
+            min-width: 0
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-family: monospace !important;
+            font-size: 13px !important;
+            background: #0b0b1f !important;
+            color: #c9d1d9 !important;
+            border-radius: 0 !important;
+            line-height: 1.8 !important
+        }
+
+        .CodeMirror-scroll {
+            padding: 14px 4px;
+            overflow: auto !important
+        }
+
+        .CodeMirror-gutters {
+            background: #0b0b1f !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06) !important
+        }
+
+        .CodeMirror-linenumber {
+            color: rgba(255, 255, 255, 0.2) !important
+        }
+
+        .cm-tag {
+            color: #ff79c6 !important
+        }
+
+        .cm-attribute {
+            color: #8be9fd !important
+        }
+
+        .cm-string {
+            color: #f1fa8c !important
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--accent) !important
+        }
+
+        .task-run-row {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(0, 255, 144, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .task-run-btn {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 8px 18px;
+            background: rgba(0, 255, 144, 0.08);
+            color: #00ff90;
+            border: 1px solid rgba(0, 255, 144, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .task-run-btn:hover {
+            background: rgba(0, 255, 144, 0.18)
+        }
+
+        .task-preview {
+            display: none;
+            background: white;
+            border-top: 1px solid rgba(0, 255, 144, 0.1)
+        }
+
+        .task-preview iframe {
+            width: 100%;
+            border: none;
+            display: block;
+            min-height: 120px
+        }
+
+        .funfact-card {
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .funfact-icon {
+            font-size: 20px;
+            flex-shrink: 0
+        }
+
+        .funfact-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7
+        }
+
+        .funfact-text strong {
+            color: var(--accent)
+        }
+
+        @media(max-width:900px) {
+            .lesson-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 28px 16px 60px
+            }
+
+            .toolbar-center {
+                display: none
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toolbar">
+        <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
+        <div class="toolbar-center">
+            <a href="../Courses/Practice.html" class="toolbar-btn">Practice</a>
+            <a href="../AI-Tutor/Chat.html" class="toolbar-btn-ghost">Chat</a>
+        </div>
+        <a href="../Courses/Html.html" class="back-link toolbar-btn-ghost">Back to Course</a>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+    <div class="lesson-wrapper">
+        <div class="theory-panel">
+            <div class="panel-header">
+                <span class="lesson-badge">L7</span>
+                <span class="lesson-title">Tables —<br>Rows &amp; Columns</span>
+            </div>
+            <div class="theory-body">
+                <p class="theory-intro">Tables organise data into <strong>rows and columns</strong>. They are perfect
+                    for schedules, price comparisons, leaderboards — any time information belongs in a grid.</p>
+                <div class="concept-block gold">
+                    <div class="concept-label">Table Structure</div>
+                    <div class="concept-text"><code>&lt;table&gt;</code> wraps everything. <code>&lt;tr&gt;</code> is a
+                        table row. <code>&lt;td&gt;</code> is a data cell. <code>&lt;th&gt;</code> is a header cell —
+                        bold and centred by default. Rows go inside the table; cells go inside rows.</div>
+                </div>
+                <div class="concept-block green">
+                    <div class="concept-label">thead, tbody, tfoot</div>
+                    <div class="concept-text">Wrap your header row in <code>&lt;thead&gt;</code>, data rows in
+                        <code>&lt;tbody&gt;</code>, and summary rows in <code>&lt;tfoot&gt;</code>. These semantic
+                        wrappers help screen readers, CSS styling, and let browsers repeat the header on printed pages.
+                    </div>
+                </div>
+                <div class="concept-block purple">
+                    <div class="concept-label">colspan and rowspan</div>
+                    <div class="concept-text"><code>colspan="2"</code> makes a cell span 2 columns.
+                        <code>rowspan="3"</code> makes it span 3 rows. Use these to merge cells — like a header that
+                        covers multiple columns.</div>
+                </div>
+                <div class="concept-block blue">
+                    <div class="concept-label">Tables vs Layout</div>
+                    <div class="concept-text">Tables are for <em>data</em>, not page layout. Using tables to arrange
+                        page sections was common in the 1990s but is now outdated. Use CSS Flexbox or Grid for layouts
+                        instead.</div>
+                </div>
+                <div class="analogy-box">
+                    <strong>Analogy:</strong> A table is like a spreadsheet embedded in your page.
+                    <code>&lt;tr&gt;</code> is a row, <code>&lt;td&gt;</code> is a cell, and <code>&lt;th&gt;</code> is
+                    the bold column header at the top.
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="dots">
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot current"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <button class="next-btn" onclick="goNext()">Next Lesson &rarr;</button>
+            </div>
+        </div>
+        <div class="code-panel">
+            <div class="editor-card">
+                <div class="editor-header">
+                    <div class="editor-dots">
+                        <div class="editor-dot r"></div>
+                        <div class="editor-dot y"></div>
+                        <div class="editor-dot g"></div>
+                    </div>
+                    <span class="editor-filename">table.html</span>
+                    <button class="run-btn" onclick="runExample()">&#9658; Render</button>
+                </div>
+                <div class="code-example">
+                    <div><span class="ln">1</span><span class="hb">&lt;</span><span class="ht">table</span> <span
+                            class="ha">border</span>=<span class="hv">"1"</span><span class="hb">&gt;</span></div>
+                    <div><span class="ln">2</span>&nbsp;&nbsp;<span class="hb">&lt;</span><span
+                            class="ht">thead</span><span class="hb">&gt;</span></div>
+                    <div><span class="ln">3</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="hb">&lt;</span><span
+                            class="ht">tr</span><span class="hb">&gt;</span></div>
+                    <div><span class="ln">4</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hb">&lt;</span><span
+                            class="ht">th</span><span class="hb">&gt;</span><span class="hx">Name</span><span
+                            class="hb">&lt;/</span><span class="ht">th</span><span class="hb">&gt;</span><span
+                            class="hb">&lt;</span><span class="ht">th</span><span class="hb">&gt;</span><span
+                            class="hx">Score</span><span class="hb">&lt;/</span><span class="ht">th</span><span
+                            class="hb">&gt;</span></div>
+                    <div><span class="ln">5</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="hb">&lt;/</span><span
+                            class="ht">tr</span><span class="hb">&gt;</span></div>
+                    <div><span class="ln">6</span>&nbsp;&nbsp;<span class="hb">&lt;/</span><span
+                            class="ht">thead</span><span class="hb">&gt;</span></div>
+                    <div><span class="ln">7</span>&nbsp;&nbsp;<span class="hb">&lt;</span><span
+                            class="ht">tbody</span><span class="hb">&gt;</span></div>
+                    <div><span class="ln">8</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="hb">&lt;</span><span
+                            class="ht">tr</span><span class="hb">&gt;</span><span class="hb">&lt;</span><span
+                            class="ht">td</span><span class="hb">&gt;</span><span class="hx">Alice</span><span
+                            class="hb">&lt;/</span><span class="ht">td</span><span class="hb">&gt;</span><span
+                            class="hb">&lt;</span><span class="ht">td</span><span class="hb">&gt;</span><span
+                            class="hx">1500</span><span class="hb">&lt;/</span><span class="ht">td</span><span
+                            class="hb">&gt;</span><span class="hb">&lt;/</span><span class="ht">tr</span><span
+                            class="hb">&gt;</span></div>
+                    <div><span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="hb">&lt;</span><span
+                            class="ht">tr</span><span class="hb">&gt;</span><span class="hb">&lt;</span><span
+                            class="ht">td</span><span class="hb">&gt;</span><span class="hx">Bob</span><span
+                            class="hb">&lt;/</span><span class="ht">td</span><span class="hb">&gt;</span><span
+                            class="hb">&lt;</span><span class="ht">td</span><span class="hb">&gt;</span><span
+                            class="hx">1200</span><span class="hb">&lt;/</span><span class="ht">td</span><span
+                            class="hb">&gt;</span><span class="hb">&lt;/</span><span class="ht">tr</span><span
+                            class="hb">&gt;</span></div>
+                    <div><span class="ln">10</span>&nbsp;&nbsp;<span class="hb">&lt;/</span><span
+                            class="ht">tbody</span><span class="hb">&gt;</span></div>
+                    <div><span class="ln">11</span><span class="hb">&lt;/</span><span class="ht">table</span><span
+                            class="hb">&gt;</span></div>
+                </div>
+            </div>
+            <div class="output-card">
+                <div class="output-header">
+                    <div class="output-dot"></div><span class="output-label">Preview</span>
+                </div>
+                <div class="output-body" id="exampleOutput">Press Render to see the output...</div>
+            </div>
+            <div class="task-card">
+                <div class="task-header"><span class="task-label">&#127919; Task — Build a leaderboard table</span>
+                </div>
+                <div class="task-desc">Create a table with columns: Rank, Player, Score. Add at least 3 rows of data.
+                    Use <code>&lt;thead&gt;</code> and <code>&lt;tbody&gt;</code>. Add a <code>&lt;tfoot&gt;</code> row
+                    showing "Total players: 3".</div>
+                <div id="taskEditor"></div>
+                <div class="task-run-row">
+                    <button class="task-run-btn" onclick="runTask()">&#9658; Preview your code</button>
+                </div>
+                <div class="task-preview" id="taskPreview"><iframe id="taskFrame"></iframe></div>
+            </div>
+            <div class="funfact-card">
+                <span class="funfact-icon">&#11088;</span>
+                <div class="funfact-text"><strong>Fun fact:</strong> In the late 1990s, web designers built entire page
+                    layouts using tables — nesting them 5 or 6 levels deep. Pages were slow, inaccessible, and a
+                    nightmare to maintain. CSS Grid finally made this unnecessary in 2017.</div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+    <script>
+        var taskCM;
+        window.addEventListener('load', function () {
+            taskCM = CodeMirror(document.getElementById('taskEditor'), {
+                value: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <title>Tables<\/title>\n<\/head>\n<body>\n\n<\/body>\n<\/html>',
+                mode: 'xml', lineNumbers: true, indentUnit: 2, tabSize: 2, lineWrapping: false
+            });
+            taskCM.setSize('100%', 160);
+            setTimeout(function () { taskCM.refresh(); }, 0);
+        });
+        function runExample() {
+            var out = document.getElementById('exampleOutput');
+            out.style.padding = '0';
+            out.innerHTML = '<iframe style="width:100%;border:none;display:block;min-height:140px;background:white;" srcdoc="<table border=\'1\' style=\'border-collapse:collapse;padding:4px\'><thead><tr><th style=\'padding:6px\'>Name<\/th><th style=\'padding:6px\'>Score<\/th><\/tr><\/thead><tbody><tr><td style=\'padding:6px\'>Alice<\/td><td style=\'padding:6px\'>1500<\/td><\/tr><tr><td style=\'padding:6px\'>Bob<\/td><td style=\'padding:6px\'>1200<\/td><\/tr><\/tbody><\/table>"></iframe>';
+        }
+        function runTask() {
+            document.getElementById('taskPreview').style.display = 'block';
+            document.getElementById('taskFrame').srcdoc = taskCM.getValue();
+        }
+        async function goNext() {
+            if (!storage.isLessonDone('html_l7')) {
+                await storage.addLesson();
+                await storage.markLessonDone('html_l7');
+                var newRank = await storage.gainXP(10);
+                if (newRank) { showRankUpAnimation(newRank); setTimeout(function () { window.location.href = '../Html-Lessons/Html-L8.html'; }, 3500); return; }
+            }
+            window.location.href = '../Html-Lessons/Html-L8.html';
+        }
+        storage.init().then(function () { hideLoadingScreen(); });
+        window.LESSON_CONTEXT = 'HTML - Tables: tr, td, th, thead, tbody, tfoot';
+    </script>
+    <script src="../AI-Tutor/chat.js"></script>
+</body>
+
+</html>

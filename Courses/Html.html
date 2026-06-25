@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         * {
@@ -18,6 +19,8 @@
         }
 
         :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
             --accent: #FFD700;
             --border: 1px solid rgba(255, 255, 255, 0.08);
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
@@ -26,64 +29,64 @@
         body {
             font-family: Arial, sans-serif;
             color: white;
-            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            background: var(--bg-dark);
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
         body::before {
             content: "";
             position: fixed;
-            width: 200%;
-            height: 200%;
-            background-image: radial-gradient(white 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.05;
-            animation: move 60s linear infinite;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(255, 215, 0, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(100, 100, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0, 255, 150, 0.03) 0%, transparent 50%);
             pointer-events: none;
+            z-index: 0;
         }
 
-        @keyframes move {
+        body::after {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.03;
+            animation: drift 80s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes drift {
             from {
                 transform: translate(0, 0);
             }
 
             to {
-                transform: translate(-200px, -200px);
+                transform: translate(-100px, -100px);
             }
         }
 
-        .Page-Wrapper {
-            display: grid;
-            row-gap: 50px;
-            padding-bottom: 80px;
-        }
-
-        .ToolBar {
+        /* TOOLBAR */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 72px;
             background: rgba(6, 6, 61, 0.7);
             border-bottom: var(--border);
             backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
-            padding: 14px 0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            padding: 0 24px;
             box-shadow: var(--shadow);
-            height: 70px;
-        }
-
-        .ToolButtons {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
         }
 
         .material-symbols-outlined {
             color: var(--accent);
-            margin-left: 20px;
-            font-size: 38px;
+            font-size: 36px;
             cursor: pointer;
             transition: transform .2s;
         }
@@ -92,34 +95,74 @@
             transform: scale(1.1);
         }
 
-        button {
-            border: none;
-            border-radius: 8px;
-            height: 38px;
-            padding: 0 16px;
-            background: var(--accent);
-            color: #020223;
-            font-family: 'Press Start 2P';
-            font-size: 9px;
-            position: relative;
-            overflow: hidden;
-            transition: transform .2s, box-shadow .2s;
-            cursor: pointer;
-            display: inline-block;
+        .toolbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
         }
 
-        button:hover {
+        .toolbar-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .toolbar-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
 
-        .First-Section,
-        .Second-Section,
-        .Third-Section,
-        .Fourth-Section {
+        .toolbar-btn-ghost {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all .2s;
+        }
+
+        .toolbar-btn-ghost:hover {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-link {
+            margin-left: auto;
+        }
+
+        /* PAGE WRAPPER */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
             max-width: 860px;
             margin: 0 auto;
-            width: calc(100% - 40px);
+            padding: 50px 20px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+        }
+
+        /* SECTION CARDS */
+        .section-card {
             text-align: center;
             padding: 40px;
             background: rgba(255, 255, 255, 0.02);
@@ -131,30 +174,15 @@
             overflow: hidden;
         }
 
-        .First-Section::before,
-        .Second-Section::before,
-        .Third-Section::before,
-        .Fourth-Section::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.04) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        .First-Section:hover,
-        .Second-Section:hover,
-        .Third-Section:hover,
-        .Fourth-Section:hover {
+        .section-card:hover {
             transform: translateY(-5px);
             border-color: rgba(255, 215, 0, 0.15);
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
         }
 
-        .course-icon-big {
-            font-size: 56px;
-            margin-bottom: 12px;
-            display: block;
+        .logo-image {
+            width: 200px;
+            margin-bottom: 4px;
         }
 
         .course-title {
@@ -203,6 +231,27 @@
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
+        .start-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 0 20px;
+            height: 40px;
+            line-height: 40px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
         .learn-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -247,18 +296,18 @@
             opacity: 0.7;
         }
 
+        /* TIMELINE */
         .course-timeline {
             position: relative;
-            max-width: 620px;
+            max-width: 580px;
             margin: 36px auto 0;
-            padding-left: 56px;
         }
 
         .course-timeline::before {
             content: "";
             position: absolute;
-            left: 28px;
-            top: 0;
+            left: 18px;
+            top: 1px;
             bottom: 0;
             width: 2px;
             background: linear-gradient(to bottom, var(--accent), transparent);
@@ -266,12 +315,14 @@
 
         .chapter {
             position: relative;
-            margin-bottom: 40px;
+            margin-bottom: 36px;
+            padding-left: 52px;
         }
 
         .chapter-number {
             position: absolute;
-            left: -44px;
+            left: 0;
+            top: 0;
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -284,15 +335,17 @@
             color: var(--accent);
             background: #06063d;
             box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+            flex-shrink: 0;
         }
 
         .chapter-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             font-family: 'Press Start 2P';
             font-size: 10px;
             margin-bottom: 12px;
+            min-height: 36px;
             opacity: 0.8;
         }
 
@@ -333,52 +386,49 @@
             opacity: 0.8;
         }
 
-        .lesson button {
-            height: 32px;
+        .lesson-btn {
+            font-family: 'Press Start 2P';
             font-size: 8px;
+            height: 32px;
             padding: 0 14px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
             flex-shrink: 0;
+            text-decoration: none;
+            display: inline-block;
+            line-height: 32px;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .lesson-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-btn.done {
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        .lesson-btn.done:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .locked-btn {
-            background: rgba(255, 255, 255, 0.05) !important;
-            color: rgba(255, 255, 255, 0.25) !important;
-            cursor: not-allowed;
-        }
-
-        .locked-btn:hover {
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        .quiz-row {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-left: 8px;
-            padding-right: 8px;
-        }
-
-        .quiz-row span {
-            font-size: 13px;
-            opacity: 0.8;
-        }
-
-        .quiz-btn {
-            height: 32px;
-            font-size: 8px;
-            padding: 0 14px;
-            background: linear-gradient(135deg, #9b59b6, #6c3483) !important;
-            color: white !important;
-        }
-
-        .quiz-done-badge {
-            font-size: 10px;
-            color: #00ff90;
             font-family: 'Press Start 2P';
+            font-size: 8px;
+            height: 32px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.25);
+            border: none;
+            border-radius: 8px;
+            cursor: not-allowed;
+            flex-shrink: 0;
         }
 
         .chapter-locked-overlay {
@@ -398,50 +448,53 @@
         a {
             text-decoration: none;
         }
-        .logo-image{
-            width:200px;
-        }
     </style>
 </head>
 
 <body>
-    <div class="Page-Wrapper">
 
-        <div class="ToolBar">
-            <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
-            <div class="ToolButtons">
-                <a href="../Courses/Practice.html"><button>Practice</button></a>
-                <a href="../AI-Tutor/Chat.html"><button
-                        style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:white;">Chat</button></a>
-            </div>
+    <div class="toolbar">
+        <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
+        <div class="toolbar-center">
+            <a href="../Courses/Practice.html" class="toolbar-btn">Practice</a>
+            <a href="../AI-Tutor/Chat.html" class="toolbar-btn-ghost">Chat</a>
         </div>
+        <a href="../Courses/CourseMap.html" class="back-link toolbar-btn-ghost">Back</a>
+    </div>
 
-        <div class="First-Section">
+    <div class="page-wrapper">
+
+        <!-- HERO -->
+        <div class="section-card">
             <img class="logo-image" src="../logos/HTML-Logo.png">
             <h1 class="course-title">HTML Course</h1>
             <p class="course-desc">Learn how to build the structure of websites using HTML — the foundation of
                 everything on the web.</p>
             <div class="course-meta">
                 <span class="meta-tag">⭐ Beginner</span>
-                <span class="meta-tag">📚 6 Lessons</span>
-                <span class="meta-tag">⚡ 2 Chapters</span>
+                <span class="meta-tag">📚 15 Lessons</span>
+                <span class="meta-tag">⚡ 5 Chapters</span>
             </div>
-            <a href="#roadmap"><button>Start Course</button></a>
+            <a href="#roadmap" class="start-btn">Start Course</a>
         </div>
 
-        <div class="Second-Section">
+        <!-- WHAT YOU LEARN -->
+        <div class="section-card">
             <h2 class="section-title">What You Will Learn</h2>
             <div class="learn-grid">
-                <div class="learn-item">HTML structure and document anatomy</div>
-                <div class="learn-item">Text elements and formatting</div>
+                <div class="learn-item">HTML document structure and anatomy</div>
+                <div class="learn-item">Headings, paragraphs and text formatting</div>
                 <div class="learn-item">Links and images</div>
-                <div class="learn-item">Lists, tables and forms</div>
-                <div class="learn-item">Semantic HTML</div>
-                <div class="learn-item">Accessibility basics</div>
+                <div class="learn-item">Lists and tables</div>
+                <div class="learn-item">Forms and inputs</div>
+                <div class="learn-item">Block vs inline elements</div>
+                <div class="learn-item">Semantic HTML5 elements</div>
+                <div class="learn-item">Multimedia and meta tags</div>
             </div>
         </div>
 
-        <div class="Third-Section">
+        <!-- REAL WORLD -->
+        <div class="section-card">
             <h2 class="section-title">Real World Usage</h2>
             <div class="usage-row">
                 <div class="usage-tag">Every website starts with HTML</div>
@@ -450,35 +503,75 @@
             </div>
         </div>
 
-        <div id="roadmap" class="Fourth-Section">
+        <!-- ROADMAP -->
+        <div id="roadmap" class="section-card">
             <h2 class="section-title">Course Roadmap</h2>
             <div class="course-timeline">
 
+                <!-- CHAPTER 1 -->
                 <div class="chapter">
                     <div class="chapter-number">1</div>
-                    <div class="chapter-header"><span>Introduction</span><span class="unlocked-label"
-                            id="ch1Status"></span></div>
+                    <div class="chapter-header">
+                        <span>Introduction</span>
+                        <span class="unlocked-label" id="ch1Status"></span>
+                    </div>
                     <div class="lesson-list">
-                        <div class="lesson"><span>Lesson 1 — Structure</span><a
-                                href="../Html-Lessons/Html-Structure.html"><button id="l1btn">Start</button></a></div>
-                        <div class="lesson"><span>Lesson 2 — Text</span><a href="../Html-Lessons/Html-Text.html"><button
-                                    id="l2btn">Start</button></a></div>
-                        <div class="lesson"><span>Lesson 3 — Links & Images</span><a
-                                href="../Html-Lessons/Html-Lings&Img.html"><button id="l3btn">Start</button></a></div>
-                        <div class="quiz-row">
-                            <span>📝 Chapter 1 Quiz</span>
-                            <span id="ch1QuizDone" class="quiz-done-badge" style="display:none;">✓ Passed</span>
-                            <a href="../Tests/HtmlC1-Test.html" id="ch1QuizLink"><button class="quiz-btn">Take
-                                    Quiz</button></a>
+                        <div class="lesson">
+                            <span>Lesson 1 — What is HTML & Document Structure</span>
+                            <a href="../Html-Lessons/Html-L1.html"><button class="lesson-btn"
+                                    id="l1btn">Start</button></a>
+                        </div>
+                        <div class="lesson">
+                            <span>Lesson 2 — Headings & Paragraphs</span>
+                            <a href="../Html-Lessons/Html-L2.html"><button class="lesson-btn"
+                                    id="l2btn">Start</button></a>
+                        </div>
+                        <div class="lesson">
+                            <span>Lesson 3 — Text Formatting</span>
+                            <a href="../Html-Lessons/Html-L3.html"><button class="lesson-btn"
+                                    id="l3btn">Start</button></a>
                         </div>
                     </div>
                 </div>
 
+                <!-- CHAPTER 2 -->
                 <div class="chapter">
                     <div class="chapter-number">2</div>
-                    <div class="chapter-header"><span>Core Structure</span><span id="ch2Label"
-                            class="locked-label">LOCKED</span></div>
+                    <div class="chapter-header">
+                        <span>Links, Images & Lists</span>
+                        <span id="ch2Label" class="locked-label">LOCKED</span>
+                    </div>
                     <div id="ch2Content"></div>
+                </div>
+
+                <!-- CHAPTER 3 -->
+                <div class="chapter">
+                    <div class="chapter-number">3</div>
+                    <div class="chapter-header">
+                        <span>Tables & Forms</span>
+                        <span id="ch3Label" class="locked-label">LOCKED</span>
+                    </div>
+                    <div id="ch3Content"></div>
+                </div>
+
+                <!-- CHAPTER 4 -->
+                <div class="chapter">
+                    <div class="chapter-number">4</div>
+                    <div class="chapter-header">
+                        <span>Structure & Attributes</span>
+                        <span id="ch4Label" class="locked-label">LOCKED</span>
+                    </div>
+                    <div id="ch4Content"></div>
+                </div>
+
+                <!-- CHAPTER 5 -->
+                <div class="chapter">
+                    <div class="chapter-number">5</div>
+                    <div class="chapter-header">
+                        <span>Semantic & HTML5</span>
+                        <span id="ch5Label" class="locked-label">LOCKED</span>
+                    </div>
+                    <div id="ch5Content"></div>
                 </div>
 
             </div>
@@ -486,49 +579,117 @@
 
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+
     <script>
-        const l1 = localStorage.getItem('lesson_html_structure');
-        const l2 = localStorage.getItem('lesson_html_text');
-        const l3 = localStorage.getItem('lesson_html_links');
-        const quizDone = localStorage.getItem('html_quiz_done');
-
-        if (l1) document.getElementById('l1btn').innerText = '✓ Done';
-        if (l2) document.getElementById('l2btn').innerText = '✓ Done';
-        if (l3) document.getElementById('l3btn').innerText = '✓ Done';
-        if (l1 && l2 && l3) document.getElementById('ch1Status').innerText = '✓ Complete';
-
-        if (quizDone) {
-            document.getElementById('ch1QuizDone').style.display = 'inline';
-            document.getElementById('ch1QuizLink').style.display = 'none';
+        function lessonRow(text, href, key) {
+            const done = storage.isLessonDone(key);
+            return `<div class="lesson">
+                <span>${text}</span>
+                <a href="${href}"><button class="lesson-btn${done ? ' done' : ''}">${done ? '✓ Done' : 'Start'}</button></a>
+            </div>`;
         }
 
-        const ch2 = document.getElementById('ch2Content');
-        const ch2Label = document.getElementById('ch2Label');
-
-        if (quizDone) {
-            ch2Label.className = 'unlocked-label';
-            ch2Label.innerText = 'Unlocked';
-            ch2.innerHTML = `
-            <div class="lesson-list">
-                <div class="lesson"><span>Lesson 4 — Lists & Tables</span><a href="../Html-Lessons/Html-Lists&Tables.html"><button>${localStorage.getItem('lesson_html_lists') ? '✓ Done' : 'Start'}</button></a></div>
-                <div class="lesson"><span>Lesson 5 — Forms & Inputs</span><a href="../Html-Lessons/Html-Forms.html"><button>${localStorage.getItem('lesson_html_forms') ? '✓ Done' : 'Start'}</button></a></div>
-                <div class="lesson"><span>Lesson 6 — Semantic HTML</span><a href="../Html-Lessons/Html-Semantic.html"><button>${localStorage.getItem('lesson_html_semantic') ? '✓ Done' : 'Start'}</button></a></div>
-                <div class="quiz-row">
-                    <span>📝 Chapter 2 Quiz</span>
-                    ${localStorage.getItem('html_quiz2_done')
-                    ? '<span class="quiz-done-badge">✓ Passed</span>'
-                    : '<a href="../Tests/HtmlC2-Test.html"><button class="quiz-btn">Take Quiz</button></a>'}
-                </div>
-            </div>
-        `;
-        } else {
-            ch2.innerHTML = `
-            <div class="chapter-locked-overlay">
-                <p>Complete all Chapter 1 lessons and pass the quiz to unlock.</p>
-                <button class="locked-btn" style="height:32px;font-size:8px;">🔒 Locked</button>
-            </div>
-        `;
+        function lockedOverlay(text) {
+            return `<div class="chapter-locked-overlay">
+                <p>${text}</p>
+                <button class="locked-btn">🔒 Locked</button>
+            </div>`;
         }
+
+        function renderCourse() {
+            const l1 = storage.isLessonDone('html_l1');
+            const l2 = storage.isLessonDone('html_l2');
+            const l3 = storage.isLessonDone('html_l3');
+            const l4 = storage.isLessonDone('html_l4');
+            const l5 = storage.isLessonDone('html_l5');
+            const l6 = storage.isLessonDone('html_l6');
+            const l7 = storage.isLessonDone('html_l7');
+            const l8 = storage.isLessonDone('html_l8');
+            const l9 = storage.isLessonDone('html_l9');
+            const l10 = storage.isLessonDone('html_l10');
+            const l11 = storage.isLessonDone('html_l11');
+            const l12 = storage.isLessonDone('html_l12');
+            const l13 = storage.isLessonDone('html_l13');
+            const l14 = storage.isLessonDone('html_l14');
+            const l15 = storage.isLessonDone('html_l15');
+
+            // CAP 1 — always unlocked
+            if (l1) { const b = document.getElementById('l1btn'); b.innerText = '✓ Done'; b.classList.add('done'); }
+            if (l2) { const b = document.getElementById('l2btn'); b.innerText = '✓ Done'; b.classList.add('done'); }
+            if (l3) { const b = document.getElementById('l3btn'); b.innerText = '✓ Done'; b.classList.add('done'); }
+            if (l1 && l2 && l3) document.getElementById('ch1Status').innerText = '✓ Complete';
+
+            // CAP 2 — unlocks after all cap1 done
+            const ch2 = document.getElementById('ch2Content');
+            const ch2Label = document.getElementById('ch2Label');
+            if (l1 && l2 && l3) {
+                ch2Label.className = 'unlocked-label';
+                ch2Label.innerText = (l4 && l5 && l6) ? '✓ Complete' : 'Unlocked';
+                ch2.innerHTML = `<div class="lesson-list">
+                    ${lessonRow('Lesson 4 — Links', '../Html-Lessons/Html-L4.html', 'html_l4')}
+                    ${lessonRow('Lesson 5 — Images', '../Html-Lessons/Html-L5.html', 'html_l5')}
+                    ${lessonRow('Lesson 6 — Lists', '../Html-Lessons/Html-L6.html', 'html_l6')}
+                </div>`;
+            } else {
+                ch2.innerHTML = lockedOverlay('Complete all Chapter 1 lessons to unlock.');
+            }
+
+            // CAP 3 — unlocks after all cap2 done
+            const ch3 = document.getElementById('ch3Content');
+            const ch3Label = document.getElementById('ch3Label');
+            if (l4 && l5 && l6) {
+                ch3Label.className = 'unlocked-label';
+                ch3Label.innerText = (l7 && l8 && l9) ? '✓ Complete' : 'Unlocked';
+                ch3.innerHTML = `<div class="lesson-list">
+                    ${lessonRow('Lesson 7 — Tables', '../Html-Lessons/Html-L7.html', 'html_l7')}
+                    ${lessonRow('Lesson 8 — Forms I', '../Html-Lessons/Html-L8.html', 'html_l8')}
+                    ${lessonRow('Lesson 9 — Forms II', '../Html-Lessons/Html-L9.html', 'html_l9')}
+                </div>`;
+            } else {
+                ch3.innerHTML = lockedOverlay('Complete all Chapter 2 lessons to unlock.');
+            }
+
+            // CAP 4 — unlocks after all cap3 done
+            const ch4 = document.getElementById('ch4Content');
+            const ch4Label = document.getElementById('ch4Label');
+            if (l7 && l8 && l9) {
+                ch4Label.className = 'unlocked-label';
+                ch4Label.innerText = (l10 && l11 && l12) ? '✓ Complete' : 'Unlocked';
+                ch4.innerHTML = `<div class="lesson-list">
+                    ${lessonRow('Lesson 10 — Block vs Inline', '../Html-Lessons/Html-L10.html', 'html_l10')}
+                    ${lessonRow('Lesson 11 — Global Attributes', '../Html-Lessons/Html-L11.html', 'html_l11')}
+                    ${lessonRow('Lesson 12 — Head & Meta Tags', '../Html-Lessons/Html-L12.html', 'html_l12')}
+                </div>`;
+            } else {
+                ch4.innerHTML = lockedOverlay('Complete all Chapter 3 lessons to unlock.');
+            }
+
+            // CAP 5 — unlocks after all cap4 done
+            const ch5 = document.getElementById('ch5Content');
+            const ch5Label = document.getElementById('ch5Label');
+            if (l10 && l11 && l12) {
+                ch5Label.className = 'unlocked-label';
+                ch5Label.innerText = (l13 && l14 && l15) ? '✓ Complete' : 'Unlocked';
+                ch5.innerHTML = `<div class="lesson-list">
+                    ${lessonRow('Lesson 13 — Semantic HTML', '../Html-Lessons/Html-L13.html', 'html_l13')}
+                    ${lessonRow('Lesson 14 — Multimedia', '../Html-Lessons/Html-L14.html', 'html_l14')}
+                    ${lessonRow('Lesson 15 — HTML5 Modern Elements', '../Html-Lessons/Html-L15.html', 'html_l15')}
+                </div>`;
+            } else {
+                ch5.innerHTML = lockedOverlay('Complete all Chapter 4 lessons to unlock.');
+            }
+        }
+
+        storage.init().then(() => {
+            try { renderCourse(); } catch (e) { console.error(e); }
+            hideLoadingScreen();
+        });
     </script>
 </body>
 

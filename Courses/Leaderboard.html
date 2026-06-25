@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard — Upward</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../storage.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(6, 6, 61, 0.7);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            height: 70px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 38px;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .material-symbols-outlined:hover {
+            transform: scale(1.1);
+        }
+
+        .toolbar-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P';
+            font-size: 13px;
+            color: var(--accent);
+        }
+
+        .page-content {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 40px 80px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-title {
+            font-family: 'Press Start 2P';
+            font-size: 22px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            opacity: 0.5;
+            line-height: 1.7;
+        }
+
+        /* PODIUM */
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .podium-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .podium-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P';
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .podium-slot:nth-child(1) .podium-avatar {
+            width: 52px;
+            height: 52px;
+            font-size: 14px;
+            border-color: #C0C0C0;
+            background: rgba(192, 192, 192, 0.1);
+            color: #C0C0C0;
+        }
+
+        .podium-slot:nth-child(2) .podium-avatar {
+            width: 64px;
+            height: 64px;
+            font-size: 18px;
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+            color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+        }
+
+        .podium-slot:nth-child(3) .podium-avatar {
+            width: 48px;
+            height: 48px;
+            font-size: 13px;
+            border-color: #cd7f32;
+            background: rgba(205, 127, 50, 0.1);
+            color: #cd7f32;
+        }
+
+
+        .podium-name {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: white;
+            text-align: center;
+            max-width: 80px;
+            line-height: 1.6;
+            opacity: 0.85;
+        }
+
+        .podium-xp {
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        .podium-block {
+            border-radius: 8px 8px 0 0;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .podium-slot:nth-child(1) .podium-block {
+            height: 76px;
+            background: rgba(192, 192, 192, 0.1);
+            border: 1px solid rgba(192, 192, 192, 0.25);
+            color: #C0C0C0;
+        }
+
+        .podium-slot:nth-child(2) .podium-block {
+            height: 100px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #FFD700;
+        }
+
+        .podium-slot:nth-child(3) .podium-block {
+            height: 60px;
+            background: rgba(205, 127, 50, 0.15);
+            border: 1px solid rgba(205, 127, 50, 0.3);
+            color: #cd7f32;
+        }
+
+        .podium-medal {
+            font-family: 'Press Start 2P';
+            font-size: 18px;
+        }
+
+        /* YOUR RANK BANNER */
+        .your-rank-banner {
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .your-rank-banner .position-num {
+            font-family: 'Press Start 2P';
+            font-size: 16px;
+            color: var(--accent);
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .your-rank-banner .player-name {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--accent);
+            flex: 1;
+        }
+
+        .your-rank-banner .player-xp {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--accent);
+        }
+
+        .your-rank-banner .rank-badge-pill {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 5px 10px;
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        .you-label {
+            font-family: 'Press Start 2P';
+            font-size: 6px;
+            padding: 4px 8px;
+            background: var(--accent);
+            color: #020223;
+            border-radius: 6px;
+        }
+
+        /* LEADERBOARD TABLE */
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .leaderboard-row {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color .2s, background .2s;
+        }
+
+        .leaderboard-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .leaderboard-row.is-you {
+            background: rgba(255, 215, 0, 0.04);
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        .position-num {
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .position-num.top3 {
+            font-size: 14px;
+        }
+
+        .pos-1 {
+            color: #FFD700;
+        }
+
+        .pos-2 {
+            color: #C0C0C0;
+        }
+
+        .pos-3 {
+            color: #cd7f32;
+        }
+
+        .player-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+        }
+
+        .player-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .player-name {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: white;
+        }
+
+        .player-rank-label {
+            font-size: 11px;
+            opacity: 0.35;
+        }
+
+        .player-xp {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: right;
+        }
+
+        .rank-badge-pill {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .rank-E {
+            background: rgba(100, 200, 100, 0.1);
+            border: 1px solid rgba(100, 200, 100, 0.25);
+            color: #6dc86d;
+        }
+
+        .rank-D {
+            background: rgba(100, 180, 255, 0.1);
+            border: 1px solid rgba(100, 180, 255, 0.25);
+            color: #6db4ff;
+        }
+
+        .rank-C {
+            background: rgba(180, 100, 255, 0.1);
+            border: 1px solid rgba(180, 100, 255, 0.25);
+            color: #b464ff;
+        }
+
+        .rank-B {
+            background: rgba(255, 160, 50, 0.1);
+            border: 1px solid rgba(255, 160, 50, 0.25);
+            color: #ffa032;
+        }
+
+        .rank-A {
+            background: rgba(255, 80, 80, 0.1);
+            border: 1px solid rgba(255, 80, 80, 0.25);
+            color: #ff5050;
+        }
+
+        .rank-S {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #FFD700;
+        }
+
+        .rank-National {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            color: #FFD700;
+        }
+
+        /* LOADING / EMPTY */
+        .state-msg {
+            text-align: center;
+            padding: 60px 0;
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.2);
+            line-height: 2;
+        }
+
+        /* DIVIDER */
+        .list-divider {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        @media (max-width: 768px) {
+            .page-content {
+                margin: 20px auto;
+                padding: 0 16px 40px;
+            }
+
+            .page-title {
+                font-size: 14px;
+            }
+
+            .podium {
+                gap: 8px;
+            }
+
+            .podium-slot:nth-child(2) .podium-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 14px;
+            }
+
+            .podium-block {
+                width: 60px;
+            }
+
+            .your-rank-banner {
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .your-rank-banner .position-num {
+                font-size: 12px;
+                min-width: 30px;
+            }
+
+            .leaderboard-row {
+                padding: 10px 12px;
+                gap: 10px;
+            }
+
+            .player-name {
+                font-size: 7px;
+            }
+
+            .player-xp {
+                font-size: 7px;
+            }
+
+            .rank-badge-pill {
+                font-size: 6px;
+                padding: 4px 7px;
+            }
+
+            .ToolBar {
+                height: 56px;
+            }
+
+            .toolbar-title {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ToolBar">
+        <a href="../Courses/CourseMap.html">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <div class="toolbar-title">🏆 Leaderboard</div>
+    </div>
+
+    <div class="page-content">
+        <div class="page-header">
+            <h1 class="page-title">Global Leaderboard</h1>
+            <p class="page-subtitle">Top 100 players ranked by XP. Climb the ranks and prove your skills.</p>
+        </div>
+
+        <div id="podiumSection" style="display:none;">
+            <div class="podium" id="podium"></div>
+        </div>
+
+        <div id="yourBanner" style="display:none;" class="your-rank-banner">
+            <div class="position-num" id="yourPosition">—</div>
+            <div class="player-avatar-small" id="yourAvatar" style="border-color:rgba(255,215,0,0.3);">?</div>
+            <div class="player-info">
+                <div class="player-name" style="color:var(--accent);" id="yourName">You</div>
+                <div class="player-rank-label" id="yourRankLabel">Rank E</div>
+            </div>
+            <span class="rank-badge-pill rank-E" id="yourRankBadge">E</span>
+            <div class="player-xp" style="color:var(--accent);" id="yourXP">0 XP</div>
+            <span class="you-label">YOU</span>
+        </div>
+
+        <div id="leaderboardList" class="leaderboard-list">
+            <div class="state-msg">Loading leaderboard...</div>
+        </div>
+    </div>
+
+    <script>
+        const ranks = ["E", "D", "C", "B", "A", "S", "National"];
+
+        function getInitials(name) {
+            if (!name) return "?";
+            const parts = name.trim().split(" ");
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        function rankClass(rankIndex) {
+            const r = ranks[rankIndex] || "E";
+            return "rank-" + r;
+        }
+
+        function rankLabel(rankIndex) {
+            return "Rank " + (ranks[rankIndex] || "E");
+        }
+
+        function renderPodium(top3, myUID) {
+            const order = [
+                { player: top3[1], medal: "🥈" },
+                { player: top3[0], medal: "🥇" },
+                { player: top3[2], medal: "🥉" }
+            ].filter(p => p.player);
+
+            const podium = document.getElementById("podium");
+            podium.innerHTML = "";
+
+            order.forEach(({ player, medal }) => {
+                const slot = document.createElement("div");
+                slot.className = "podium-slot";
+                const isYou = player.uid === myUID;
+                slot.innerHTML = `
+            <div class="podium-avatar">${getInitials(player.name)}</div>
+            <div class="podium-name">${isYou ? "YOU" : player.name}</div>
+            <div class="podium-xp">${player.xp} XP</div>
+            <div class="podium-block"><span class="podium-medal">${medal}</span></div>
+        `;
+                podium.appendChild(slot);
+            });
+
+            document.getElementById("podiumSection").style.display = "block";
+        }
+
+        function renderYourBanner(player, position) {
+            const ri = player.rankIndex ?? 0;
+            document.getElementById("yourPosition").textContent = "#" + position;
+            document.getElementById("yourAvatar").textContent = getInitials(player.name);
+            document.getElementById("yourName").textContent = player.name || "You";
+            document.getElementById("yourRankLabel").textContent = rankLabel(ri);
+            document.getElementById("yourXP").textContent = player.xp + " XP";
+            const badge = document.getElementById("yourRankBadge");
+            badge.textContent = ranks[ri] || "E";
+            badge.className = "rank-badge-pill " + rankClass(ri);
+            document.getElementById("yourBanner").style.display = "flex";
+        }
+
+        function renderList(players, myUID, myPosition) {
+            const list = document.getElementById("leaderboardList");
+            list.innerHTML = "";
+
+            if (players.length === 0) {
+                list.innerHTML = '<div class="state-msg">No players yet.<br>Be the first!</div>';
+                return;
+            }
+
+            let youInTop = false;
+
+            players.forEach((player, i) => {
+                const pos = i + 1;
+                const isYou = player.uid === myUID;
+                if (isYou) youInTop = true;
+
+                const row = document.createElement("div");
+                row.className = "leaderboard-row" + (isYou ? " is-you" : "");
+
+                let posHTML = "";
+                if (pos === 1) posHTML = `<div class="position-num top3 pos-1">1</div>`;
+                else if (pos === 2) posHTML = `<div class="position-num top3 pos-2">2</div>`;
+                else if (pos === 3) posHTML = `<div class="position-num top3 pos-3">3</div>`;
+                else posHTML = `<div class="position-num">${pos}</div>`;
+
+                const ri = player.rankIndex ?? 0;
+
+                row.innerHTML = `
+                    ${posHTML}
+                    <div class="player-avatar-small" style="${isYou ? 'border-color:rgba(255,215,0,0.4);color:var(--accent);' : ''}">${getInitials(player.name)}</div>
+                    <div class="player-info">
+                        <div class="player-name" style="${isYou ? 'color:var(--accent);' : ''}">${player.name || "Player"}${isYou ? ' <span style="font-size:6px;opacity:0.6;">◀ YOU</span>' : ''}</div>
+                        <div class="player-rank-label">${rankLabel(ri)}</div>
+                    </div>
+                    <span class="rank-badge-pill ${rankClass(ri)}">${ranks[ri] || "E"}</span>
+                    <div class="player-xp">${player.xp} XP</div>
+                `;
+
+                list.appendChild(row);
+            });
+
+            // Dacă userul nu e în top 100, afișăm banner-ul cu poziția lui
+            if (!youInTop && myPosition) {
+                const divider = document.createElement("div");
+                divider.className = "list-divider";
+                divider.textContent = "· · ·";
+                list.appendChild(divider);
+            }
+        }
+
+        async function loadLeaderboard() {
+            const myUID = storage.getUserID();
+            const myData = {
+                name: storage.getUserName(),
+                xp: storage.getXP(),
+                rankIndex: storage.getRankIndex(),
+                uid: myUID
+            };
+
+            try {
+                const db = firebase.firestore();
+                const snap = await db.collection("leaderboard")
+                    .orderBy("rankIndex", "desc")
+                    .orderBy("xp", "desc")
+                    .limit(100)
+                    .get();
+
+                const players = [];
+                snap.forEach(doc => {
+                    players.push({ uid: doc.id, ...doc.data() });
+                });
+
+                // Găsim poziția userului curent
+                let myPosition = players.findIndex(p => p.uid === myUID) + 1;
+                const myInList = players.find(p => p.uid === myUID);
+
+                // Dacă userul nu e în leaderboard deloc, adăugăm datele locale
+                const displayMe = myInList || myData;
+
+                if (myPosition === 0) {
+                    // Nu e în top 100 — calculăm poziția aproximativă
+                    myPosition = null;
+                }
+
+                //Podium
+                if (players.length >= 3) renderPodium(players.slice(0, 3), myUID);
+
+                // Banner-ul userului curent — doar dacă nu e în top 100
+                if (myPosition === null) {
+                    renderYourBanner(displayMe, "100+");
+                }
+
+                renderList(players, myUID, myPosition);
+
+            } catch (err) {
+                console.error("Leaderboard error:", err);
+                document.getElementById("leaderboardList").innerHTML =
+                    '<div class="state-msg">Could not load leaderboard.<br>Try again later.</div>';
+            }
+        }
+    </script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+    <script>
+        storage.init().then(() => {
+            loadLeaderboard();
+            hideLoadingScreen();
+        });
+    </script>
+
+</body>
+
+</html>

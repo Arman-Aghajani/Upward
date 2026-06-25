@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 15 — Error Handling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+    <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <link rel="stylesheet" href="../AI-Tutor/chat.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(255, 215, 0, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(100, 100, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0, 255, 150, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.03;
+            animation: drift 80s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-100px, -100px);
+            }
+        }
+
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 72px;
+            background: rgba(6, 6, 61, 0.6);
+            border-bottom: var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            font-size: 36px;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .material-symbols-outlined:hover {
+            transform: scale(1.1);
+        }
+
+        .toolbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .toolbar-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .toolbar-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .toolbar-btn-ghost {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 0 18px;
+            height: 38px;
+            line-height: 38px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all .2s;
+        }
+
+        .toolbar-btn-ghost:hover {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-link {
+            margin-left: auto;
+        }
+
+        .progress-bar {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ffaa00);
+            width: 100%;
+        }
+
+        .lesson-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .theory-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .lesson-badge {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            background: var(--accent);
+            color: #020223;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .lesson-title {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            line-height: 1.6;
+        }
+
+        .theory-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .theory-intro {
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .theory-intro strong {
+            color: var(--accent);
+        }
+
+        .concept-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .concept-block.gold {
+            border-color: rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.04);
+        }
+
+        .concept-block.green {
+            border-color: rgba(0, 255, 144, 0.15);
+            background: rgba(0, 255, 144, 0.03);
+        }
+
+        .concept-block.purple {
+            border-color: rgba(150, 100, 255, 0.2);
+            background: rgba(150, 100, 255, 0.04);
+        }
+
+        .concept-block.blue {
+            border-color: rgba(96, 165, 250, 0.15);
+            background: rgba(96, 165, 250, 0.03);
+        }
+
+        .concept-block.coral {
+            border-color: rgba(255, 120, 80, 0.2);
+            background: rgba(255, 120, 80, 0.04);
+        }
+
+        .concept-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .concept-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            margin-bottom: 6px;
+        }
+
+        .concept-block.gold .concept-label {
+            color: var(--accent);
+        }
+
+        .concept-block.green .concept-label {
+            color: #00ff90;
+        }
+
+        .concept-block.purple .concept-label {
+            color: #a78bfa;
+        }
+
+        .concept-block.blue .concept-label {
+            color: #60a5fa;
+        }
+
+        .concept-block.coral .concept-label {
+            color: #ff7c5c;
+        }
+
+        .concept-text {
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .concept-text code {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .try-anatomy {
+            background: #0b0b1f;
+            border: var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 2;
+        }
+
+        .try-title {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .t-kw {
+            color: #ff79c6;
+        }
+
+        .t-err {
+            color: #f1fa8c;
+        }
+
+        .t-var {
+            color: #8be9fd;
+        }
+
+        .t-fn {
+            color: #50fa7b;
+        }
+
+        .t-str {
+            color: #f1fa8c;
+        }
+
+        .t-ann {
+            color: rgba(255, 255, 255, 0.22);
+            font-style: italic;
+            font-family: Arial;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .errors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .error-pill {
+            background: rgba(255, 80, 80, 0.05);
+            border: 1px solid rgba(255, 80, 80, 0.15);
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+
+        .error-name {
+            font-family: monospace;
+            font-size: 11px;
+            color: #ff8080;
+            margin-bottom: 3px;
+        }
+
+        .error-when {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .analogy-box {
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.75;
+            color: rgba(255, 255, 255, 0.55);
+            font-style: italic;
+        }
+
+        .analogy-box strong {
+            color: var(--accent);
+            font-style: normal;
+        }
+
+        .course-complete {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.03));
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .cc-title {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .cc-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.7;
+        }
+
+        .cc-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 14px;
+        }
+
+        .cc-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cc-stat-num {
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .cc-stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .panel-footer {
+            padding: 16px 24px;
+            border-top: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dot.done {
+            background: var(--accent);
+        }
+
+        .next-btn {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #020223;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        #taskEditor {
+            height: 160px;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .code-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+            /* ← adaugă doar asta */
+        }
+
+        .editor-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .editor-header {
+            padding: 12px 18px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .editor-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .editor-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .editor-dot.r {
+            background: #ff5f57;
+        }
+
+        .editor-dot.y {
+            background: #febc2e;
+        }
+
+        .editor-dot.g {
+            background: #28c840;
+        }
+
+        .editor-filename {
+            font-family: monospace;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .run-btn {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 6px 14px;
+            background: rgba(0, 255, 144, 0.1);
+            color: #00ff90;
+            border: 1px solid rgba(0, 255, 144, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .run-btn:hover {
+            background: rgba(0, 255, 144, 0.2);
+        }
+
+        .code-example {
+            padding: 18px 20px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.9;
+            color: #c9d1d9;
+            background: #0b0b1f;
+        }
+
+        .kw {
+            color: #ff79c6;
+        }
+
+        .fn {
+            color: #50fa7b;
+        }
+
+        .str-c {
+            color: #f1fa8c;
+        }
+
+        .cm-s {
+            color: rgba(255, 255, 255, 0.25);
+            font-style: italic;
+        }
+
+        .num {
+            color: #bd93f9;
+        }
+
+        .var-c {
+            color: #8be9fd;
+        }
+
+        .ln {
+            display: inline-block;
+            width: 20px;
+            color: rgba(255, 255, 255, 0.18);
+            font-size: 11px;
+            margin-right: 14px;
+            text-align: right;
+            user-select: none;
+        }
+
+        .output-card {
+            background: #030315;
+            border: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .output-header {
+            padding: 10px 18px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .output-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff90;
+        }
+
+        .output-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .output-body {
+            padding: 14px 20px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #00ff90;
+            min-height: 70px;
+            line-height: 1.8;
+            white-space: pre;
+        }
+
+        .output-placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(0, 255, 144, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .task-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(0, 255, 144, 0.1);
+            background: rgba(0, 255, 144, 0.02);
+        }
+
+        .task-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            color: #00ff90;
+        }
+
+        .task-desc {
+            padding: 14px 20px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.75;
+        }
+
+        .task-desc code {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            /* ← în asta */
+            font-family: monospace !important;
+            font-size: 13px !important;
+            background: #0b0b1f !important;
+            color: #c9d1d9 !important;
+            border-radius: 0 !important;
+            line-height: 1.8 !important;
+        }
+
+        .CodeMirror-scroll {
+            padding: 14px 4px;
+            overflow: auto !important;
+        }
+
+        .CodeMirror-gutters {
+            background: #0b0b1f !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .cm-keyword {
+            color: #ff79c6 !important;
+        }
+
+        .cm-builtin {
+            color: #50fa7b !important;
+        }
+
+        .cm-string {
+            color: #f1fa8c !important;
+        }
+
+        .cm-comment {
+            color: rgba(255, 255, 255, 0.28) !important;
+            font-style: italic !important;
+        }
+
+        .cm-number {
+            color: #bd93f9 !important;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--accent) !important;
+        }
+
+        .task-run-row {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(0, 255, 144, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .task-run-btn {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 8px 18px;
+            background: rgba(0, 255, 144, 0.08);
+            color: #00ff90;
+            border: 1px solid rgba(0, 255, 144, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .task-run-btn:hover {
+            background: rgba(0, 255, 144, 0.18);
+        }
+
+        .task-output {
+            font-family: monospace;
+            font-size: 12px;
+            color: #00ff90;
+            flex: 1;
+            white-space: pre;
+            line-height: 1.7;
+        }
+
+        .task-output.err {
+            color: #ff8080;
+        }
+
+        .funfact-card {
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .funfact-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .funfact-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+        }
+
+        .funfact-text strong {
+            color: var(--accent);
+        }
+
+        /* ===== TABLET (≤900px) ===== */
+        @media (max-width: 900px) {
+            .lesson-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 28px 16px 60px;
+            }
+
+            .toolbar-center {
+                display: none;
+            }
+        }
+
+        /* ===== MOBILE (≤600px) ===== */
+        @media (max-width: 600px) {
+            .toolbar {
+                height: 60px;
+                padding: 0 14px;
+            }
+
+            .material-symbols-outlined {
+                font-size: 30px;
+            }
+
+            .toolbar-btn-ghost {
+                font-size: 7px;
+                padding: 0 12px;
+                height: 34px;
+                line-height: 34px;
+            }
+
+            .lesson-wrapper {
+                padding: 20px 12px 50px;
+                gap: 16px;
+            }
+
+            /* Theory */
+            .panel-header {
+                padding: 16px;
+                gap: 10px;
+            }
+
+            .lesson-badge {
+                font-size: 8px;
+            }
+
+            .lesson-title {
+                font-size: 9px;
+            }
+
+            .theory-body {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .theory-intro,
+            .concept-text,
+            .analogy-box {
+                font-size: 13px;
+            }
+
+            /* Footer — dots wrap, buton full width */
+            .panel-footer {
+                flex-direction: column;
+                gap: 14px;
+                align-items: stretch;
+            }
+
+            .dots {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .next-btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            /* Code panel */
+            .editor-header {
+                padding: 10px 14px;
+            }
+
+            .code-example {
+                font-size: 12px;
+                padding: 14px;
+                overflow-x: auto;
+            }
+
+            .ln {
+                width: 16px;
+                margin-right: 10px;
+            }
+
+            .output-body {
+                font-size: 12px;
+                padding: 12px 14px;
+                overflow-x: auto;
+            }
+
+            /* Task */
+            .task-desc {
+                font-size: 13px;
+                padding: 12px 16px 0;
+            }
+
+            .CodeMirror {
+                font-size: 12px !important;
+            }
+
+            .task-run-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .task-run-btn {
+                width: 100%;
+            }
+
+            .task-output {
+                white-space: pre-wrap;
+            }
+
+            .funfact-text {
+                font-size: 12px;
+            }
+        }
+
+        /* ===== TELEFOANE MICI (≤380px) ===== */
+        @media (max-width: 380px) {
+            .lesson-title {
+                font-size: 8px;
+            }
+
+            .code-example {
+                font-size: 11px;
+            }
+
+            .toolbar-btn-ghost {
+                font-size: 6px;
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="toolbar">
+        <a href="../Courses/CourseMap.html"><span class="material-symbols-outlined">home</span></a>
+        <div class="toolbar-center">
+            <a href="../Courses/Practice.html" class="toolbar-btn">Practice</a>
+            <a href="../AI-Tutor/Chat.html" class="toolbar-btn-ghost">Chat</a>
+        </div>
+        <a href="../Courses/Python.html" class="back-link toolbar-btn-ghost">Back to Course</a>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+
+    <div class="lesson-wrapper">
+
+        <div class="theory-panel">
+            <div class="panel-header">
+                <span class="lesson-badge">L15</span>
+                <span class="lesson-title">Error Handling</span>
+            </div>
+            <div class="theory-body">
+                <p class="theory-intro">
+                    Errors happen. A user enters text where you expected a number, a file doesn't exist, a network
+                    request fails. <strong>Error handling</strong> lets your program recover gracefully instead of
+                    crashing.
+                </p>
+
+                <div class="concept-block gold">
+                    <span class="concept-icon">🛡️</span>
+                    <div>
+                        <div class="concept-label">try / except</div>
+                        <div class="concept-text">Wrap risky code in a <code>try</code> block. If it raises an error,
+                            the <code>except</code> block runs instead of crashing. The program continues normally
+                            after.</div>
+                    </div>
+                </div>
+
+                <div class="try-anatomy">
+                    <div class="try-title">Full try/except anatomy</div>
+                    <span class="t-kw">try</span>:<span class="t-ann">← risky code goes here</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="t-var">result</span> = <span class="t-fn">int</span>(<span
+                        class="t-fn">input</span>(<span class="t-str">"Enter number: "</span>))<br>
+                    <span class="t-kw">except</span> <span class="t-err">ValueError</span>:<span class="t-ann">← catches
+                        specific error</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="t-fn">print</span>(<span class="t-str">"Not a
+                        number!"</span>)<br>
+                    <span class="t-kw">except</span> <span class="t-err">Exception</span> <span class="t-kw">as</span>
+                    <span class="t-var">e</span>:<span class="t-ann">← catches anything else</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="t-fn">print</span>(<span class="t-str">f"Error: {<span
+                            class="t-var">e</span>}"</span>)<br>
+                    <span class="t-kw">else</span>:<span class="t-ann">← runs if NO error occurred</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="t-fn">print</span>(<span class="t-str">f"Got: {<span
+                            class="t-var">result</span>}"</span>)<br>
+                    <span class="t-kw">finally</span>:<span class="t-ann">← ALWAYS runs, error or not</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="t-fn">print</span>(<span class="t-str">"Done."</span>)
+                </div>
+
+                <div class="concept-block green">
+                    <div>
+                        <div class="concept-label">Catch specific errors</div>
+                        <div class="concept-text">Always catch the most specific exception you can. Using bare
+                            <code>except:</code> or <code>except Exception:</code> everywhere hides bugs. Catch what you
+                            expect and let the rest crash — a visible crash is better than silent wrong behavior.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-block purple">
+                    <div>
+                        <div class="concept-label">Common exceptions</div>
+                    </div>
+                </div>
+
+                <div class="errors-grid">
+                    <div class="error-pill">
+                        <div class="error-name">ValueError</div>
+                        <div class="error-when">wrong type/value: int("abc")</div>
+                    </div>
+                    <div class="error-pill">
+                        <div class="error-name">TypeError</div>
+                        <div class="error-when">wrong type: "a" + 1</div>
+                    </div>
+                    <div class="error-pill">
+                        <div class="error-name">KeyError</div>
+                        <div class="error-when">dict key missing</div>
+                    </div>
+                    <div class="error-pill">
+                        <div class="error-name">IndexError</div>
+                        <div class="error-when">list index out of range</div>
+                    </div>
+                    <div class="error-pill">
+                        <div class="error-name">ZeroDivisionError</div>
+                        <div class="error-when">dividing by zero</div>
+                    </div>
+                    <div class="error-pill">
+                        <div class="error-name">FileNotFoundError</div>
+                        <div class="error-when">file doesn't exist</div>
+                    </div>
+                </div>
+
+                <div class="concept-block blue">
+                    <div>
+                        <div class="concept-label">raise — throw your own errors</div>
+                        <div class="concept-text">You can raise errors yourself with
+                            <code>raise ValueError("message")</code>. Use this to enforce rules in your functions — if a
+                            caller passes invalid data, raise an error immediately rather than letting it silently cause
+                            problems later.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-block coral">
+                    <div>
+                        <div class="concept-label">EAFP vs LBYL</div>
+                        <div class="concept-text">Python favors <strong>EAFP</strong> (Easier to Ask Forgiveness than
+                            Permission) — just try it and handle errors. The alternative is <strong>LBYL</strong> (Look
+                            Before You Leap) — check everything upfront. EAFP is more Pythonic and often cleaner.</div>
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <strong>Analogy:</strong> Error handling is like a seatbelt. You don't expect to crash, but when you
+                    do, it keeps the damage controlled. <code>finally</code> is like turning off the engine after — it
+                    happens no matter what.
+                </div>
+
+                <div class="course-complete">
+                    <div class="cc-title">🏆 Python Beginner Complete!</div>
+                    <div class="cc-text">You've mastered the foundations of Python. Take the final quiz to unlock the
+                        Intermediate track.</div>
+                    <div class="cc-stats">
+                        <div class="cc-stat">
+                            <div class="cc-stat-num">15</div>
+                            <div class="cc-stat-label">Lessons</div>
+                        </div>
+                        <div class="cc-stat">
+                            <div class="cc-stat-num">150</div>
+                            <div class="cc-stat-label">XP Earned</div>
+                        </div>
+                        <div class="cc-stat">
+                            <div class="cc-stat-num">5</div>
+                            <div class="cc-stat-label">Chapters</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="dots">
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                    <div class="dot done"></div>
+                </div>
+                <button class="next-btn" onclick="goNext()">Finish Course →</button>
+            </div>
+        </div>
+
+        <div class="code-panel">
+            <div class="editor-card">
+                <div class="editor-header">
+                    <div class="editor-dots">
+                        <div class="editor-dot r"></div>
+                        <div class="editor-dot y"></div>
+                        <div class="editor-dot g"></div>
+                    </div>
+                    <span class="editor-filename">example.py</span>
+                    <button class="run-btn" onclick="runExample()">▶ Run</button>
+                </div>
+                <div class="code-example">
+                    <div><span class="ln">1</span><span class="cm-s"># Basic try/except</span></div>
+                    <div><span class="ln">2</span><span class="kw">try</span>:</div>
+                    <div><span class="ln">3</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="var-c">x</span> = <span
+                            class="fn">int</span>(<span class="str-c">"abc"</span>)</div>
+                    <div><span class="ln">4</span><span class="kw">except</span> <span class="fn">ValueError</span>:
+                    </div>
+                    <div><span class="ln">5</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">print</span>(<span
+                            class="str-c">"Not a valid number!"</span>)</div>
+                    <div><span class="ln">6</span></div>
+                    <div><span class="ln">7</span><span class="cm-s"># Multiple except + else + finally</span></div>
+                    <div><span class="ln">8</span><span class="kw">def</span> <span class="fn">safe_divide</span>(<span
+                            class="var-c">a</span>, <span class="var-c">b</span>):</div>
+                    <div><span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span>:</div>
+                    <div><span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="var-c">result</span> = <span class="var-c">a</span> / <span class="var-c">b</span>
+                    </div>
+                    <div><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">except</span> <span
+                            class="fn">ZeroDivisionError</span>:</div>
+                    <div><span class="ln">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="fn">print</span>(<span class="str-c">"Cannot divide by zero"</span>)</div>
+                    <div><span class="ln">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="kw">return</span> <span class="kw">None</span></div>
+                    <div><span class="ln">14</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>:</div>
+                    <div><span class="ln">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="fn">print</span>(<span class="str-c">f"Result: {<span
+                                class="var-c">result</span>}"</span>)</div>
+                    <div><span class="ln">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="kw">return</span> <span class="var-c">result</span></div>
+                    <div><span class="ln">17</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">finally</span>:</div>
+                    <div><span class="ln">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="fn">print</span>(<span class="str-c">"Division attempted."</span>)</div>
+                    <div><span class="ln">19</span></div>
+                    <div><span class="ln">20</span><span class="fn">safe_divide</span>(<span class="num">10</span>,
+                        <span class="num">2</span>)
+                    </div>
+                    <div><span class="ln">21</span><span class="fn">safe_divide</span>(<span class="num">5</span>, <span
+                            class="num">0</span>)</div>
+                    <div><span class="ln">22</span></div>
+                    <div><span class="ln">23</span><span class="cm-s"># raise your own error</span></div>
+                    <div><span class="ln">24</span><span class="kw">def</span> <span class="fn">set_age</span>(<span
+                            class="var-c">age</span>):</div>
+                    <div><span class="ln">25</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span
+                            class="var-c">age</span>
+                        < <span class="num">0</span>:
+                    </div>
+                    <div><span class="ln">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                            class="kw">raise</span> <span class="fn">ValueError</span>(<span class="str-c">"Age cannot
+                            be negative"</span>)</div>
+                    <div><span class="ln">27</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span
+                            class="var-c">age</span></div>
+                    <div><span class="ln">28</span></div>
+                    <div><span class="ln">29</span><span class="kw">try</span>:</div>
+                    <div><span class="ln">30</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">set_age</span>(-<span
+                            class="num">5</span>)</div>
+                    <div><span class="ln">31</span><span class="kw">except</span> <span class="fn">ValueError</span>
+                        <span class="kw">as</span> <span class="var-c">e</span>:
+                    </div>
+                    <div><span class="ln">32</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">print</span>(<span
+                            class="str-c">f"Error: {<span class="var-c">e</span>}"</span>)</div>
+                </div>
+            </div>
+
+            <div class="output-card">
+                <div class="output-header">
+                    <div class="output-dot"></div>
+                    <span class="output-label">Output</span>
+                </div>
+                <div class="output-body" id="exampleOutput">
+                    <span class="output-placeholder">Press Run ▶ to see the output...</span>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header">
+                    <span class="task-label">Final Task — Error-safe calculator</span>
+                </div>
+                <div class="task-desc">
+                    Write a function <code>calculator(a, b, op)</code> where <code>op</code> is <code>"+"</code>,
+                    <code>"-"</code>, <code>"*"</code>, or <code>"/"</code>. Use <code>try/except</code> to handle
+                    division by zero and invalid operators. Test it with at least 3 different calls including one that
+                    triggers an error.
+                </div>
+                <div id="taskEditor"></div>
+                <div class="task-run-row">
+                    <button class="task-run-btn" onclick="runTask()">▶ Run your code</button>
+                    <span class="task-output" id="taskOutput"></span>
+                </div>
+            </div>
+
+            <div class="funfact-card">
+                <span class="funfact-icon">⭐</span>
+                <div class="funfact-text">
+                    <strong>Fun fact:</strong> Python exceptions are classes that inherit from
+                    <code>BaseException</code>. You can create your own custom exceptions by subclassing
+                    <code>Exception</code>. This is standard practice in large codebases — e.g.
+                    <code>class InsufficientXPError(Exception): pass</code>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+
+    <script>
+        let taskCM;
+        window.addEventListener('load', () => {
+            taskCM = CodeMirror(document.getElementById('taskEditor'), {
+                value: '# Write your code here\n',
+                mode: 'python', lineNumbers: true,
+                indentUnit: 4, tabSize: 4, indentWithTabs: false,
+                lineWrapping: false,
+            });
+            taskCM.setSize('100%', 160);
+            setTimeout(() => taskCM.refresh(), 0);
+        });
+
+        function runExample() {
+            const out = document.getElementById('exampleOutput');
+            out.innerHTML = '';
+            const lines = [
+                'Not a valid number!',
+                'Result: 5.0',
+                'Division attempted.',
+                'Cannot divide by zero',
+                'Division attempted.',
+                'Error: Age cannot be negative'
+            ];
+            lines.forEach((line, i) => {
+                setTimeout(() => { out.textContent += line + '\n'; }, i * 110);
+            });
+        }
+
+        async function runTask() {
+            const code = taskCM.getValue();
+            const outEl = document.getElementById('taskOutput');
+            outEl.textContent = 'Running...';
+            outEl.className = 'task-output';
+            try {
+                const runCode = firebase.functions().httpsCallable('runCode');
+                const result = await runCode({ code });
+                const out = (result.data?.output ?? '').trim();
+                outEl.textContent = out || '(no output)';
+                outEl.className = result.data?.error ? 'task-output err' : 'task-output';
+            } catch (e) {
+                outEl.textContent = 'Error: ' + e.message;
+                outEl.className = 'task-output err';
+            }
+        }
+
+        async function goNext() {
+            if (!storage.isLessonDone('py_l15')) {
+                await storage.addLesson();
+                await storage.markLessonDone('py_l15');
+                const newRank = await storage.gainXP(10);
+                if (newRank) {
+                    showRankUpAnimation(newRank);
+                    setTimeout(() => { window.location.href = '../Courses/Python.html'; }, 3500);
+                    return;
+                }
+            }
+            window.location.href = '../Courses/Python.html';
+        }
+
+        storage.init().then(() => hideLoadingScreen());
+        window.LESSON_CONTEXT = "Python - Error Handling";
+    </script>
+
+    <script src="../AI-Tutor/chat.js"></script>
+</body>
+
+</html>

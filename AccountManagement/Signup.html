@@ -289,25 +289,17 @@
             <div class="login-link">Already have an account? <a href="Login.html">Log in</a></div>
         </div>
     </div>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDug8Iz8FkYck24-E8bFHyW-nt-PgXfvew",
-            authDomain: "upward-44313.firebaseapp.com",
-            projectId: "upward-44313",
-            storageBucket: "upward-44313.firebasestorage.app",
-            messagingSenderId: "101564287746",
-            appId: "1:101564287746:web:a5b50c89520fadc006d01b"
-        };
+    <!-- Firebase SDK-uri -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        window.checkStrength = function (val) {
+    <script>
+        function checkStrength(val) {
             const fill = document.getElementById('strengthFill');
             const label = document.getElementById('strengthLabel');
             let strength = 0;
@@ -329,7 +321,7 @@
             }
         }
 
-        window.handleSignup = async function () {
+        async function handleSignup() {
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -354,24 +346,43 @@
             }
 
             try {
-                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
                 const uid = userCred.user.uid;
 
-                await setDoc(doc(db, 'users', uid), {
+                // Creăm documentul user — schemă identică cu _defaultData din storage.js
+                await firebase.firestore().collection('users').doc(uid).set({
                     name: name,
                     email: email,
                     xp: 0,
                     rankIndex: 0,
                     lessonsCompleted: 0,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    bosses: {
+                        e: false, d: false, c: false,
+                        b: false, a: false, s: false, national: false
+                    },
+                    practice: {
+                        e_1: false, e_2: false, e_3: false,
+                        d_1: false, d_2: false, d_3: false,
+                        c_1: false, c_2: false, c_3: false,
+                        b_1: false, b_2: false, b_3: false,
+                        a_1: false, a_2: false, a_3: false,
+                        s_1: false, s_2: false, s_3: false,
+                        national_1: false, national_2: false, national_3: false
+                    },
+                    lessons: {
+                        html_l1: false, html_l2: false, html_l3: false, html_l4: false, html_l5: false,
+                        html_l6: false, html_l7: false, html_l8: false, html_l9: false, html_l10: false,
+                        html_l11: false, html_l12: false, html_l13: false, html_l14: false, html_l15: false,
+                        css_l1: false, css_l2: false, css_l3: false, css_l4: false, css_l5: false,
+                        css_l6: false, css_l7: false, css_l8: false, css_l9: false, css_l10: false,
+                        css_l11: false, css_l12: false, css_l13: false, css_l14: false, css_l15: false,
+                        py_l1: false, py_l2: false, py_l3: false, py_l4: false, py_l5: false,
+                        py_l6: false, py_l7: false, py_l8: false, py_l9: false, py_l10: false,
+                        py_l11: false, py_l12: false, py_l13: false, py_l14: false, py_l15: false
+                    },
+                    dailyDone: {}
                 });
-
-                localStorage.setItem('current_user', uid);
-                localStorage.setItem('user_name', name);
-                localStorage.setItem('user_email', email);
-                localStorage.setItem('xp', 0);
-                localStorage.setItem('rankIndex', 0);
-                localStorage.setItem('lessonsCompleted', 0);
 
                 window.location.href = '../Courses/CourseMap.html';
             } catch (err) {

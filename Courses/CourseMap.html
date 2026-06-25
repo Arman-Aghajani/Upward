@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <script src="../rankup.js"></script>
+  <script src="../storage.js"></script>
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
   <style>
     * {
@@ -613,12 +614,14 @@
         <a href="Practice.html" class="toolbar-btn">Practice</a>
         <a href="../AI-Tutor/Chat.html" class="toolbar-btn-ghost">Chat</a>
         <a href="../Courses/Progress.html" class="toolbar-btn-ghost">Progress</a>
+        <a href="Leaderboard.html" class="toolbar-btn-ghost">Leaderboard</a>
       </div>
 
       <a href="../AccountManagement/Account.html" class="account-icon">
         <span class="material-symbols-outlined" style="font-size:34px; margin-right:4px;">account_circle</span>
       </a>
 
+     
     </div>
 
     <!-- MAIN -->
@@ -646,7 +649,7 @@
             <h3 class="course-title">HTML</h3>
             <p class="course-desc">Build the structure of websites. Learn tags, elements and semantic HTML.</p>
             <div class="course-meta">
-              <span class="course-lessons">6 lessons</span>
+              <span class="course-lessons">15 lessons</span>
               <span class="course-arrow">→</span>
             </div>
           </a>
@@ -656,7 +659,7 @@
             <h3 class="course-title">CSS</h3>
             <p class="course-desc">Style and design beautiful interfaces with colors, layouts and animations.</p>
             <div class="course-meta">
-              <span class="course-lessons">6 lessons</span>
+              <span class="course-lessons">15 lessons</span>
               <span class="course-arrow">→</span>
             </div>
           </a>
@@ -666,7 +669,7 @@
             <h3 class="course-title">Python</h3>
             <p class="course-desc">Write real programs, automate tasks and learn core programming logic.</p>
             <div class="course-meta">
-              <span class="course-lessons">6 lessons</span>
+              <span class="course-lessons">15 lessons</span>
               <span class="course-arrow">→</span>
             </div>
           </a>
@@ -680,7 +683,7 @@
         <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:stretch;">
 
           <a href="../maps/mapBuildingWeb.html" class="map-card" style="flex:1; min-width:280px;">
-            <img class="map-thumb" src="../logos/Map4-Repair.png" alt="World Map">
+            <img class="map-thumb" src="../logos/map5.png" alt="World Map">
             <div class="map-info">
               <h3>Building Websites</h3>
               <p>Explore the interactive learning map. Navigate through lessons and unlock new territories as you
@@ -761,9 +764,7 @@
       <a href="../AI-Tutor/Chat.html" class="quick-btn">💬 Open AI Tutor</a>
       <a href="../AccountManagement/Account.html" class="quick-btn">👤 My Account</a>
 
-      <img class="sidebar-img"
-        src="../logos/mountain.png"
-        alt="pixel landscape">
+      <img class="sidebar-img" src="../logos/mountain.png" alt="pixel landscape">
 
     </div>
 
@@ -773,33 +774,39 @@
     const ranks = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
     const xpNeeded = [100, 150, 200, 250, 300, 400, Infinity];
 
-    let rankIndex = Number(localStorage.getItem("rankIndex")) || 0;
-    let xp = Number(localStorage.getItem("xp")) || 0;
+    function renderCourseMap() {
+      const rankIndex = storage.getRankIndex();
+      const xp = storage.getXP();
+      const currentRankXP = xpNeeded[rankIndex];
+      const percent = currentRankXP === Infinity ? 100 : Math.min((xp / currentRankXP) * 100, 100);
+      const userName = storage.getUserName();
+      const nextRank = ranks[rankIndex + 1] || "MAX";
 
-    while (rankIndex < ranks.length - 1 && xp >= xpNeeded[rankIndex]) {
-      xp -= xpNeeded[rankIndex];
-      rankIndex++;
-      localStorage.setItem("rankIndex", rankIndex);
-      localStorage.setItem("xp", xp);
+      document.getElementById("welcomeText").innerText = "Hey, " + userName + "!";
+      document.getElementById("welcomeRankCircle").innerText = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
+      document.getElementById("rankCircle").innerText = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
+      document.getElementById("rankDisplay").innerText = "Rank " + ranks[rankIndex];
+      document.getElementById("xpBar").style.width = percent + "%";
+      document.getElementById("xpCurrent").innerText = xp + " XP";
+      document.getElementById("xpNeeded").innerText = currentRankXP === Infinity ? "MAX" : currentRankXP + " XP";
+      document.getElementById("nextRankDisplay").innerText = nextRank;
+      document.getElementById("lessonsDisplay").innerText = storage.getLessonsCompleted();
     }
-
-    const currentRankXP = xpNeeded[rankIndex];
-    const percent = Math.min((xp / currentRankXP) * 100, 100);
-    const userName = localStorage.getItem("user_name") || "Adventurer";
-    const nextRank = ranks[rankIndex + 1] || "MAX";
-
-    document.getElementById("welcomeText").innerText = "Hey, " + userName + "!";
-    document.getElementById("welcomeRankCircle").innerText = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
-    document.getElementById("rankCircle").innerText = ranks[rankIndex] === "National" ? "N" : ranks[rankIndex];
-    document.getElementById("rankDisplay").innerText = "Rank " + ranks[rankIndex];
-    document.getElementById("xpBar").style.width = percent + "%";
-    document.getElementById("xpCurrent").innerText = xp + " XP";
-    document.getElementById("xpNeeded").innerText = currentRankXP === Infinity ? "MAX" : currentRankXP + " XP";
-    document.getElementById("nextRankDisplay").innerText = nextRank;
-    document.getElementById("lessonsDisplay").innerText = localStorage.getItem("lessonsCompleted") || 0;
   </script>
 
-  <script type="module" src="../firebase-sync.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../firebase-init.js"></script>
+  <script>
+    storage.init().then(() => {
+      renderCourseMap();
+      hideLoadingScreen();
+    });
+  </script>
 </body>
 
 </html>

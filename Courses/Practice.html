@@ -9,7 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script src="../rankup.js"></script>
+    <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
 
     <style>
@@ -131,7 +133,7 @@
             overflow: hidden;
             width: 200px;
             flex: 0 0 200px;
-        }   
+        }
 
 
         .rank-card:hover:not(.locked) {
@@ -283,6 +285,14 @@
         <div class="ranks-grid" id="ranksGrid"></div>
     </div>
 
+    <!-- Firebase SDK-uri -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+
     <script>
         const ranks = [
             { letter: "E", label: "Rank E", desc: "3 problems · Beginner", page: "../E-Rank/Practice-E.html" },
@@ -294,40 +304,45 @@
             { letter: "National", label: "National", desc: "3 problems · Elite", page: "../National-Rank/Practice-National.html" },
         ];
 
-        const rankOrder = ["E", "D", "C", "B", "A", "S", "National"];
-        const currentRankIndex = Number(localStorage.getItem("rankIndex")) || 0;
+        function renderRanks() {
+            const currentRankIndex = storage.getRankIndex();
+            const grid = document.getElementById("ranksGrid");
 
-        const grid = document.getElementById("ranksGrid");
+            ranks.forEach((r, i) => {
+                const isLocked = i > currentRankIndex;
+                const isCurrent = i === currentRankIndex;
 
-        ranks.forEach((r, i) => {
-            const isLocked = i > currentRankIndex;
-            const isCurrent = i === currentRankIndex;
+                const card = document.createElement("div");
+                card.className = "rank-card" + (isLocked ? " locked" : "");
 
-            const card = document.createElement("div");
-            card.className = "rank-card" + (isLocked ? " locked" : "");
+                const isNational = r.letter === "National";
 
-            const isNational = r.letter === "National";
+                card.innerHTML = `
+                    ${isCurrent ? '<span class="your-rank-badge">YOUR RANK</span>' : ""}
+                    <div class="rank-circle">
+                        ${isLocked
+                        ? '<span class="lock-symbol">🔒</span>'
+                        : `<span class="rank-letter ${isNational ? 'national' : ''}">${r.letter}</span>`
+                    }
+                    </div>
+                    <span class="rank-label">${r.label}</span>
+                    <p class="rank-info">${r.desc}</p>
+                    <span class="rank-btn">${isLocked ? "LOCKED" : "START"}</span>
+                `;
 
-            card.innerHTML = `
-                ${isCurrent ? '<span class="your-rank-badge">YOUR RANK</span>' : ""}
-                <div class="rank-circle">
-                    ${isLocked
-                    ? '<span class="lock-symbol">🔒</span>'
-                    : `<span class="rank-letter ${isNational ? 'national' : ''}">${r.letter}</span>`
+                if (!isLocked) {
+                    card.addEventListener("click", () => {
+                        window.location.href = r.page;
+                    });
                 }
-                </div>
-                <span class="rank-label">${r.label}</span>
-                <p class="rank-info">${r.desc}</p>
-                <span class="rank-btn">${isLocked ? "LOCKED" : "START"}</span>
-            `;
 
-            if (!isLocked) {
-                card.addEventListener("click", () => {
-                    window.location.href = r.page;
-                });
-            }
+                grid.appendChild(card);
+            });
+        }
 
-            grid.appendChild(card);
+        storage.init().then(() => {
+            renderRanks();
+            hideLoadingScreen();
         });
     </script>
 

@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="../AI-Tutor/chat.css">
 
@@ -311,12 +313,14 @@
             <p class="problem-desc">Write a function called <strong>caesar</strong> that takes a string and a shift
                 number, and returns the encrypted string by shifting each letter forward by that amount. Non-letter
                 characters stay unchanged. The cipher wraps around — z shifted by 1 becomes a.</p>
-            <div class="example-box">caesar("hello", 3) → "khoor"<br>caesar("xyz", 2) → "zab"<br>caesar("Hello, World!",
-                1) → "Ifmmp, Xpsme!"</div>
+            <div class="example-box">Input:<br>hello<br>3<br>Output:<br>khoor</div>
             <p class="problem-desc">Preserve the case of each letter — uppercase stays uppercase, lowercase stays
-                lowercase.</p>
-            <div class="hint-box">💡 Hint: Look into how Python handles character codes with ord() and chr(), and think
-                about how the modulo operator can help with wrapping around the alphabet.</div>
+                lowercase. Then read the text on the first line and the shift on the second line with
+                <strong>input()</strong>, call your function, and <strong>print</strong> the result.
+            </p>
+            <div class="hint-box">💡 Hint: Use ord() and chr() for character codes, and the modulo operator to wrap
+                around the alphabet. Remember input() returns text — convert the shift with <strong>int()</strong>.
+            </div>
             <p class="xp-info">Reward: +10 XP (first solve only)</p>
         </div>
         <div class="code-panel">
@@ -328,56 +332,136 @@
             <button class="submit-btn" id="submitBtn" onclick="submitCode()">Submit Solution</button>
         </div>
     </div>
+
     <script>
-        const PROBLEM_KEY = "practice_a_2";
-        if (localStorage.getItem(PROBLEM_KEY)) document.getElementById("doneBanner").style.display = "block";
+        const PROBLEM_KEY = "a_2";
+
+        const PROBLEM_DESC = `Write a function called caesar that takes a string and a shift number, and returns the encrypted string by shifting each letter forward by that amount. Non-letter characters stay unchanged. The cipher wraps around (z shifted by 1 becomes a). Preserve case — uppercase stays uppercase, lowercase stays lowercase.
+
+Then read the text on the first input() line and the shift number on the second line, call your function, and print the result.`;
+
+        const TEST_CASES = [
+            { stdin: "hello\n3", expected: "khoor" },
+            { stdin: "xyz\n2", expected: "zab" },
+            { stdin: "Hello, World!\n1", expected: "Ifmmp, Xpsme!" },
+            { stdin: "abc\n0", expected: "abc" },
+            { stdin: "abc\n25", expected: "zab" },
+            { stdin: "Zebra-99\n5", expected: "Ejgwf-99" }
+        ];
+
+        // null = fara restrictie de algoritm. String = constrangerea de verificat.
+        const ALGO_CHECK = null;
+
+        function renderProblem() {
+            if (storage.isPracticeDone(PROBLEM_KEY)) {
+                document.getElementById("doneBanner").style.display = "block";
+            }
+        }
+
         async function submitCode() {
             const code = document.getElementById("codeInput").value.trim();
             if (!code) return;
+
             const btn = document.getElementById("submitBtn");
             const loading = document.getElementById("loadingText");
             const feedback = document.getElementById("feedbackBox");
-            btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
-            try {
-                const callApi = firebase.functions().httpsCallable('api');
-                const result = await callApi({
-                    model: "claude-haiku-4-5-20251001",
-                    max_tokens: 1000,
-                    messages: [{
-                        role: "user",
-                        content: `You are a Python tutor evaluating an advanced student's solution.
 
-PROBLEM: Write a function called caesar that takes a string and a shift number, and returns the encrypted string by shifting each letter forward by that amount. Non-letter characters stay unchanged. The cipher wraps around (z + 1 = a). Preserve case — uppercase stays uppercase, lowercase stays lowercase.
+            btn.disabled = true;
+            loading.style.display = "block";
+            feedback.style.display = "none";
+
+            try {
+                // PASUL 1: rulam codul real prin Piston — verdict pe corectitudine
+                const runCode = firebase.functions().httpsCallable('runCode');
+                const runResult = await runCode({ code, testCases: TEST_CASES });
+                let { passed, results } = runResult.data;
+
+                // PASUL 2: construim promptul AI in functie de verdictul Piston
+                let prompt;
+                const checkAlgo = passed && ALGO_CHECK;
+
+                if (!passed) {
+                    // Piston a picat: AI explica greseala, NU verifica algoritmul
+                    prompt = `You are a Python tutor giving feedback to a student.
+
+PROBLEM:
+${PROBLEM_DESC}
 
 STUDENT CODE:
 ${code}
 
-Test mentally:
-- caesar("hello", 3) should return "khoor"
-- caesar("xyz", 2) should return "zab"
-- caesar("Hello, World!", 1) should return "Ifmmp, Xpsme!"
+TEST RESULTS (the code was actually executed — this verdict is final):
+${JSON.stringify(results, null, 2)}
 
-The function must use ord/chr or equivalent logic, handle wrap-around with modulo, preserve case, and leave non-letters unchanged.
+The solution FAILED one or more tests. Write 2-3 sentences of encouraging feedback in English, pointing to what went wrong using the test results (wrong output, or a runtime error) WITHOUT writing the correct code for them. Reply with feedback text only, no labels.`;
+                } else if (checkAlgo) {
+                    // Piston a trecut SI exista restrictie de algoritm: AI verifica abordarea + da feedback
+                    prompt = `You are a Python tutor evaluating an advanced student's solution.
 
-Respond in this exact format:
-RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
-                    }]
+PROBLEM:
+${PROBLEM_DESC}
+
+STUDENT CODE:
+${code}
+
+The code already PASSED all correctness tests (verified by real execution). Your job is to check whether it respects this required approach:
+
+${ALGO_CHECK}
+
+Be STRICT: if you cannot clearly confirm the required approach was used, treat it as a violation.
+
+Reply in EXACTLY this format:
+- First line: "ALGO: OK" if the approach is respected, or "ALGO: VIOLATION" if it is not.
+- Then 2-3 sentences of feedback in English. If OK, say what they did well. If VIOLATION, explain which required approach is missing WITHOUT writing the correct code for them.`;
+                } else {
+                    // Piston a trecut, fara restrictie de algoritm: doar feedback de laudă
+                    prompt = `You are a Python tutor giving feedback to a student.
+
+PROBLEM:
+${PROBLEM_DESC}
+
+STUDENT CODE:
+${code}
+
+The solution PASSED all tests (verified by real execution). Write 2-3 sentences of encouraging feedback in English saying what they did well. Reply with feedback text only, no labels.`;
+                }
+
+                const callApi = firebase.functions().httpsCallable('api');
+                const aiResult = await callApi({
+                    model: "claude-haiku-4-5-20251001",
+                    max_tokens: 600,
+                    messages: [{ role: "user", content: prompt }]
                 });
 
-                const text = result.data.content[0].text;
-                const passed = text.includes("RESULT: PASS");
-                const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
+                let feedbackText = aiResult.data.content[0].text.trim();
+
+                // PASUL 3: daca am verificat algoritmul, parsam prima linie si poate suprascriem verdictul
+                if (checkAlgo) {
+                    const firstLine = feedbackText.split("\n")[0].trim();
+                    if (firstLine.includes("ALGO: VIOLATION")) {
+                        passed = false;
+                    }
+                    feedbackText = feedbackText.replace(/^ALGO:.*$/m, "").trim();
+                }
 
                 loading.style.display = "none";
                 feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
 
-                if (passed && !localStorage.getItem(PROBLEM_KEY)) {
-                    localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
-                    localStorage.setItem(PROBLEM_KEY, "true");
-                    checkRankUp();
+                if (passed && !storage.isPracticeDone(PROBLEM_KEY)) {
+                    await storage.markPracticeDone(PROBLEM_KEY);
+                    await storage.addXP(10);
+                    const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                    const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                    let ri = storage.getRankIndex();
+                    let xp = storage.getXP();
+                    if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
+                        xp -= XP_NEEDED[ri]; ri++;
+                        await storage.setXP(xp);
+                        await storage.setRankIndex(ri);
+                        showRankUpAnimation(RANKS[ri]);
+                    }
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
@@ -387,22 +471,29 @@ FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they d
                 feedback.innerText = "Error: " + err.message;
                 console.error(err);
             }
+
             btn.disabled = false;
         }
+
+        storage.init().then(() => {
+            renderProblem();
+            hideLoadingScreen();
+        });
     </script>
 
     <script>
-        window.LESSON_CONTEXT = "Practice Problem: Caesar Cipher (Rank A) — Encrypt a message by shifting each letter forward by a given number. Related lesson: Strings. Mode: HINT_ONLY — explain how ord() and chr() work and discuss modular arithmetic for wrapping, but do not assemble the full encrypt function for them.";
+        window.LESSON_CONTEXT =
+            "Practice Problem (Rank A). " + PROBLEM_DESC +
+            " Mode: HINT_ONLY — explain concepts and debug their code, but do not write the solution for them.";
     </script>
 
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
-
-    <!-- Init proiect + App Check -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="../firebase-init.js"></script>
-
     <script src="../AI-Tutor/chat.js"></script>
 </body>
 

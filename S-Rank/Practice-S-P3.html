@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="../AI-Tutor/chat.css">
 
@@ -348,11 +350,17 @@
         </div>
     </div>
     <script>
-        const PROBLEM_KEY = "practice_s_3";
+        const PROBLEM_KEY = "s_3";
         const CORRECT = "b";
         let selected = null;
         let submitted = false;
-        if (localStorage.getItem(PROBLEM_KEY)) document.getElementById("doneBanner").style.display = "block";
+
+        function renderProblem() {
+            if (storage.isPracticeDone(PROBLEM_KEY)) {
+                document.getElementById("doneBanner").style.display = "block";
+            }
+        }
+
         document.querySelectorAll(".answer-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 if (submitted) return;
@@ -361,7 +369,8 @@
                 selected = btn.dataset.option;
             });
         });
-        function checkAnswer() {
+
+        async function checkAnswer() {
             if (!selected || submitted) return;
             submitted = true;
             document.querySelectorAll(".answer-btn").forEach(btn => {
@@ -376,10 +385,19 @@
             if (selected === CORRECT) {
                 result.className = "result-box success";
                 result.innerText = "Correct! This is the Fibonacci sequence. mystery(7) = mystery(6) + mystery(5) = 8 + 5 = 13. The sequence goes: 0,1,1,2,3,5,8,13 — so the 7th value (0-indexed) is 13.";
-                if (!localStorage.getItem(PROBLEM_KEY)) {
-                    localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
-                    localStorage.setItem(PROBLEM_KEY, "true");
-                    checkRankUp();
+                if (!storage.isPracticeDone(PROBLEM_KEY)) {
+                    await storage.markPracticeDone(PROBLEM_KEY);
+                    await storage.addXP(10);
+                    const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                    const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                    let ri = storage.getRankIndex();
+                    let xp = storage.getXP();
+                    if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
+                        xp -= XP_NEEDED[ri]; ri++;
+                        await storage.setXP(xp);
+                        await storage.setRankIndex(ri);
+                        showRankUpAnimation(RANKS[ri]);
+                    }
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } else {
@@ -387,6 +405,11 @@
                 result.innerText = "Not quite. This is the Fibonacci sequence in disguise. Trace it: mystery(0)=0, mystery(1)=1, mystery(2)=1, mystery(3)=2, mystery(4)=3, mystery(5)=5, mystery(6)=8, mystery(7)=13. Answer is B.";
             }
         }
+
+        storage.init().then(() => {
+            renderProblem();
+            hideLoadingScreen();
+        });
     </script>
 
     <script>
@@ -394,13 +417,12 @@
     </script>
 
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
-
-    <!-- Init proiect + App Check -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="../firebase-init.js"></script>
-
     <script src="../AI-Tutor/chat.js"></script>
 </body>
 

@@ -233,9 +233,10 @@
             justify-content: center;
             padding: 40px 20px;
         }
-        .material-symbols-outlined{
+
+        .material-symbols-outlined {
             color: #FFD700;
-            font-size:40px;
+            font-size: 40px;
         }
     </style>
 </head>
@@ -271,25 +272,16 @@
             </div>
         </div>
     </div>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    <!-- Firebase SDK-uri -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDug8Iz8FkYck24-E8bFHyW-nt-PgXfvew",
-            authDomain: "upward-44313.firebaseapp.com",
-            projectId: "upward-44313",
-            storageBucket: "upward-44313.firebasestorage.app",
-            messagingSenderId: "101564287746",
-            appId: "1:101564287746:web:a5b50c89520fadc006d01b"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        window.handleLogin = async function () {
+    <script>
+        async function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('errorMsg');
@@ -302,25 +294,9 @@
             }
 
             try {
-                const userCred = await signInWithEmailAndPassword(auth, email, password);
-                const uid = userCred.user.uid;
-
-                // Load user data from Firestore
-                const userDoc = await getDoc(doc(db, 'users', uid));
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    localStorage.setItem('current_user', uid);
-                    localStorage.setItem('user_name', data.name || email.split('@')[0]);
-                    localStorage.setItem('user_email', email);
-                    localStorage.setItem('xp', data.xp || 0);
-                    localStorage.setItem('rankIndex', data.rankIndex || 0);
-                    localStorage.setItem('lessonsCompleted', data.lessonsCompleted || 0);
-                } else {
-                    localStorage.setItem('current_user', uid);
-                    localStorage.setItem('user_name', email.split('@')[0]);
-                    localStorage.setItem('user_email', email);
-                }
-
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                // Sesiunea e ținută de firebase.auth(); storage.init() pe pagina
+                // următoare încarcă tot progresul din Firestore.
                 window.location.href = '../Courses/CourseMap.html';
             } catch (err) {
                 errorMsg.style.display = 'block';
@@ -336,7 +312,6 @@
 
         // Allow Enter key
         document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-
     </script>
 </body>
 

@@ -17,7 +17,6 @@
             height: 100%;
         }
 
-        /* viewportul care rămâne full screen */
         .map-viewport {
             width: 100vw;
             height: 100vh;
@@ -25,12 +24,8 @@
             position: relative;
             background: #020223;
             cursor: grab;
-            justify-items: center;
-            align-items: center;
-
         }
 
-        /* elementul care se scalează */
         .map {
             position: absolute;
             left: 0;
@@ -39,95 +34,278 @@
             user-select: none;
         }
 
-        /* imaginea hărții */
         .map img {
             display: block;
             width: 2000px;
-            /* dimensiunea hărții tale */
             height: auto;
             pointer-events: none;
-
         }
 
-        .lesson {
-            position: absolute;
-            background-color: #FFD700;
-            border: 2px solid gray;
-            border-radius: 8px;
-            padding: 12px 16px;
-            height: 60px;
-            color: black;
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-            transition: transform 0.15s, opacity .2s;
-            flex: 0 0 auto;
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-
-        .lesson:hover {
-            transform: scale(1.1);
-        }
-
-
-        /* poziții pe hartă (procentele sunt relative la dimensiunea hărții) */
-        .l1 {
-            top: 60%;
-            left: 40%;
-        }
-
-        .l2 {
-            top: 40%;
-            left: 35%;
-        }
-
-        .l3 {
-            top: 40%;
-            left: 60%;
-        }
-
-        .material-symbols-outlined {
+        /* HOME BUTTON */
+        .home-btn {
             position: absolute;
             top: 20px;
             left: 20px;
-            z-index: 10;
-            font-size: 40px;
+            z-index: 100;
+            width: 48px;
+            height: 48px;
             background: #FFD700;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        button {
-            border: 1px solid gray;
             border-radius: 10px;
-            height: 40px;
-            padding: 0 16px;
-            background-color: var(--accent);
-            font-family: 'Press Start 2P';
-            position: relative;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
             transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
-        button:hover {
+        .home-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
 
-        button::after {
+        .home-btn .material-symbols-outlined {
+            font-size: 28px;
+            color: #020223;
+        }
+
+        /* ── MARKER BASE ── */
+        .marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* COURSE MARKER — gold */
+        .marker-ring {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid #FFD700;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse-gold 2s ease-out infinite;
+            pointer-events: none;
+        }
+
+        .marker-ring-2 {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes pulse-gold {
+            0% {
+                width: 36px;
+                height: 36px;
+                opacity: 0.8;
+            }
+
+            100% {
+                width: 72px;
+                height: 72px;
+                opacity: 0;
+            }
+        }
+
+        .marker-dot {
+            width: 20px;
+            height: 20px;
+            background: #FFD700;
+            border-radius: 50%;
+            border: 3px solid #020223;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+            position: relative;
+            z-index: 2;
+            transition: transform .2s;
+        }
+
+        .marker:hover .marker-dot {
+            transform: scale(1.3);
+        }
+
+        /* DAILY MARKER — violet */
+        .marker-daily .marker-ring {
+            border-color: #b464ff;
+            animation: pulse-violet 1.4s ease-out infinite;
+        }
+
+        .marker-daily .marker-ring-2 {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse-violet {
+            0% {
+                width: 32px;
+                height: 32px;
+                opacity: 0.9;
+            }
+
+            100% {
+                width: 64px;
+                height: 64px;
+                opacity: 0;
+            }
+        }
+
+        .marker-daily .marker-dot {
+            width: 22px;
+            height: 22px;
+            background: #020223;
+            border: 3px solid #b464ff;
+            box-shadow: 0 0 14px rgba(180, 100, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            border-radius: 50%;
+        }
+
+        .marker-daily:hover .marker-dot {
+            transform: scale(1.3);
+        }
+
+        /* ── POPUP BASE ── */
+        .popup {
+            position: absolute;
+            background: rgba(2, 2, 35, 0.97);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 14px;
+            padding: 20px 22px;
+            width: 220px;
+            transform: translateX(-50%) translateY(-110%);
+            top: -12px;
+            left: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .2s, transform .2s;
+            z-index: 50;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .popup::after {
             content: "";
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-            transition: 0.4s;
+            bottom: -8px;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            background: rgba(2, 2, 35, 0.97);
+            border-right: 1px solid rgba(255, 215, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.4);
+            transform: translateX(-50%) rotate(45deg);
         }
 
-        button:hover::after {
-            left: 100%;
+        .marker.active .popup {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(-50%) translateY(-115%);
+        }
+
+        /* DAILY POPUP — violet border */
+        .marker-daily .popup {
+            border-color: rgba(180, 100, 255, 0.5);
+        }
+
+        .marker-daily .popup::after {
+            border-color: rgba(180, 100, 255, 0.5);
+        }
+
+        .popup-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .popup-title {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: #FFD700;
+            margin-bottom: 6px;
+        }
+
+        .marker-daily .popup-title {
+            color: #c97fff;
+        }
+
+        .popup-tag {
+            font-family: 'Press Start 2P';
+            font-size: 6px;
+            padding: 3px 8px;
+            background: rgba(180, 100, 255, 0.15);
+            border: 1px solid rgba(180, 100, 255, 0.3);
+            border-radius: 20px;
+            color: #c97fff;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .popup-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+            margin-bottom: 14px;
+            font-family: Arial, sans-serif;
+        }
+
+        .popup-btn {
+            display: block;
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            padding: 10px;
+            background: #FFD700;
+            color: #020223;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        .popup-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+        }
+
+        .popup-btn-daily {
+            background: linear-gradient(135deg, #8a2be2, #b464ff);
+            color: white;
+        }
+
+        .popup-btn-daily:hover {
+            box-shadow: 0 0 14px rgba(180, 100, 255, 0.5);
+        }
+
+        /* POZITII */
+        .m-html {
+            top: 67%;
+            left: 53%;
+        }
+
+        .m-css {
+            top: 48%;
+            left: 28%;
+        }
+
+        .m-python {
+            top: 42%;
+            left: 70%;
+        }
+
+        /* daily markers — offset putin fata de cursuri */
+        .m-html-daily {
+            top: 75%;
+            left: 50%;
+        }
+
+        .m-css-daily {
+            top: 39%;
+            left: 29%;
+        }
+
+        .m-python-daily {
+            top: 24%;
+            left: 70%;
         }
     </style>
 </head>
@@ -135,21 +313,99 @@
 <body>
 
     <div class="map-viewport" id="viewport">
-        <a href="../Courses/CourseMap.html">
-            <button class="material-symbols-outlined">home</button>
+
+        <a href="../Courses/CourseMap.html" class="home-btn">
+            <span class="material-symbols-outlined">home</span>
         </a>
 
         <div class="map" id="map">
-            <img src="../logos/Map4-Repair.png" alt="map">
-            <a href="../Courses/Html.html">
-                <button class="lesson l1">Start Html</button>
-            </a>
-            <a href="../Courses/CSS.html">
-                <button class="lesson l2">Start CSS</button>
-            </a>
-            <a href="../Courses/Python.html">
-                <button class="lesson l3">Start Python</button>
-            </a>
+            <img src="../logos/map5.png" alt="map">
+
+            <!-- ── COURSE MARKERS ── -->
+
+            <!-- HTML -->
+            <div class="marker m-html" id="m-html">
+                <div class="marker-ring"></div>
+                <div class="marker-ring marker-ring-2"></div>
+                <div class="marker-dot"></div>
+                <div class="popup">
+                    <span class="popup-icon">🏗️</span>
+                    <div class="popup-title">HTML Village</div>
+                    <p class="popup-desc">Build the structure of websites. Learn tags, elements and semantic HTML.</p>
+                    <a href="../Courses/Html.html" class="popup-btn">Enter Village →</a>
+                </div>
+            </div>
+
+            <!-- CSS -->
+            <div class="marker m-css" id="m-css">
+                <div class="marker-ring"></div>
+                <div class="marker-ring marker-ring-2"></div>
+                <div class="marker-dot"></div>
+                <div class="popup">
+                    <span class="popup-icon">🎨</span>
+                    <div class="popup-title">CSS Citadel</div>
+                    <p class="popup-desc">Style and design beautiful interfaces with colors, layouts and animations.</p>
+                    <a href="../Courses/CSS.html" class="popup-btn">Enter Citadel →</a>
+                </div>
+            </div>
+
+            <!-- Python -->
+            <div class="marker m-python" id="m-python">
+                <div class="marker-ring"></div>
+                <div class="marker-ring marker-ring-2"></div>
+                <div class="marker-dot"></div>
+                <div class="popup">
+                    <span class="popup-icon">🐍</span>
+                    <div class="popup-title">Python Stronghold</div>
+                    <p class="popup-desc">Write real programs, automate tasks and learn core programming logic.</p>
+                    <a href="../Courses/Python.html" class="popup-btn">Enter Stronghold →</a>
+                </div>
+            </div>
+
+            <!-- ── DAILY QUEST MARKERS ── -->
+
+            <!-- HTML Daily -->
+            <div class="marker marker-daily m-html-daily" id="m-html-daily">
+                <div class="marker-ring"></div>
+                <div class="marker-ring marker-ring-2"></div>
+                <div class="marker-dot">📜</div>
+                <div class="popup">
+                    <span class="popup-icon">📜</span>
+                    <span class="popup-tag">⚡ DAILY QUEST</span>
+                    <div class="popup-title">Village Quest</div>
+                    <p class="popup-desc">A new HTML challenge awaits. Complete it to earn +20 XP today.</p>
+                    <a href="../Courses/DailyChallenge.html?type=html" class="popup-btn popup-btn-daily">Accept Quest →</a>
+                </div>
+            </div>
+
+            <!-- CSS Daily -->
+            <div class="marker marker-daily m-css-daily" id="m-css-daily">
+                <div class="marker-ring"></div>
+                <div class="marker-ring marker-ring-2"></div>
+                <div class="marker-dot">📜</div>
+                <div class="popup">
+                    <span class="popup-icon">📜</span>
+                    <span class="popup-tag">⚡ DAILY QUEST</span>
+                    <div class="popup-title">Citadel Quest</div>
+                    <p class="popup-desc">A new CSS challenge awaits. Complete it to earn +20 XP today.</p>
+                    <a href="../Courses/DailyChallenge.html?type=css" class="popup-btn popup-btn-daily">Accept Quest →</a>
+                </div>
+            </div>
+
+            <!-- Python Daily -->
+            <div class="marker marker-daily m-python-daily" id="m-python-daily">
+                <div class="marker-ring"></div>
+                <div class="marker-ring marker-ring-2"></div>
+                <div class="marker-dot">📜</div>
+                <div class="popup">
+                    <span class="popup-icon">📜</span>
+                    <span class="popup-tag">⚡ DAILY QUEST</span>
+                    <div class="popup-title">Stronghold Quest</div>
+                    <p class="popup-desc">A new Python challenge awaits. Complete it to earn +20 XP today.</p>
+                    <a href="../Courses/DailyChallenge.html?type=python" class="popup-btn popup-btn-daily">Accept Quest →</a>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -158,62 +414,44 @@
         const map = document.getElementById("map")
         const mapImg = map.querySelector("img")
 
-        let scale = 1
-        let posX = 0
-        let posY = 0
-        let isDragging = false
-        let startX
-        let startY
+        let scale = 1, posX = 0, posY = 0
+        let isDragging = false, hasDragged = false
+        let startX, startY
         const mapWidth = 2000
-        let mapHeight = 1200  // valoare temporară până se încarcă imaginea
+        let mapHeight = 1200
 
         function getMinScale() {
-            const scaleX = viewport.clientWidth / mapWidth
-            const scaleY = viewport.clientHeight / mapHeight
-            return Math.max(scaleX, scaleY)
+            return Math.max(viewport.clientWidth / mapWidth, viewport.clientHeight / mapHeight)
         }
 
         function updateTransform() {
-            const viewportWidth = viewport.clientWidth
-            const viewportHeight = viewport.clientHeight
-
             const scaledWidth = mapWidth * scale
             const scaledHeight = mapHeight * scale
-
-            let minX = viewportWidth - scaledWidth
-            let minY = viewportHeight - scaledHeight
-
-            posX = Math.min(0, Math.max(minX, posX))
-            posY = Math.min(0, Math.max(minY, posY))
-
-            map.style.transform =
-                `translate(${posX}px, ${posY}px) scale(${scale})`
+            posX = Math.min(0, Math.max(viewport.clientWidth - scaledWidth, posX))
+            posY = Math.min(0, Math.max(viewport.clientHeight - scaledHeight, posY))
+            map.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`
         }
 
-        /* citește dimensiunea reală a imaginii când se încarcă */
         function initMap() {
             mapHeight = mapImg.naturalHeight * (mapWidth / mapImg.naturalWidth)
             scale = getMinScale()
             updateTransform()
         }
 
-        if (mapImg.complete) {
-            initMap()
-        } else {
-            mapImg.addEventListener("load", initMap)
-        }
+        if (mapImg.complete) initMap()
+        else mapImg.addEventListener("load", initMap)
 
         viewport.addEventListener("wheel", e => {
             e.preventDefault()
-            const zoomSpeed = 0.001
             const minScale = getMinScale()
-            scale += -e.deltaY * zoomSpeed
+            scale += -e.deltaY * 0.001
             scale = Math.min(Math.max(minScale, scale), 3)
             updateTransform()
         })
 
         viewport.addEventListener("mousedown", e => {
             isDragging = true
+            hasDragged = false
             startX = e.clientX - posX
             startY = e.clientY - posY
             viewport.style.cursor = "grabbing"
@@ -221,6 +459,9 @@
 
         window.addEventListener("mousemove", e => {
             if (!isDragging) return
+            const dx = Math.abs(e.clientX - (startX + posX))
+            const dy = Math.abs(e.clientY - (startY + posY))
+            if (dx > 4 || dy > 4) hasDragged = true
             posX = e.clientX - startX
             posY = e.clientY - startY
             updateTransform()
@@ -232,13 +473,25 @@
         })
 
         window.addEventListener("resize", () => {
-            mapHeight = mapImg.naturalHeight * (mapWidth / mapImg.naturalWidth);
-            const minScale = getMinScale();
-            scale = minScale;
-            posX = 0;
-            posY = 0;
-            updateTransform();
-        });
+            mapHeight = mapImg.naturalHeight * (mapWidth / mapImg.naturalWidth)
+            scale = getMinScale()
+            posX = 0; posY = 0
+            updateTransform()
+        })
+
+        document.querySelectorAll(".marker").forEach(marker => {
+            marker.addEventListener("click", e => {
+                if (hasDragged) return
+                const isActive = marker.classList.contains("active")
+                document.querySelectorAll(".marker").forEach(m => m.classList.remove("active"))
+                if (!isActive) marker.classList.add("active")
+                e.stopPropagation()
+            })
+        })
+
+        viewport.addEventListener("click", () => {
+            document.querySelectorAll(".marker").forEach(m => m.classList.remove("active"))
+        })
     </script>
 
 </body>

@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         * {
@@ -959,7 +961,7 @@
             document.getElementById('tab' + n).classList.add('active');
         }
 
-        function dealDamage(amount, problemIndex) {
+        async function dealDamage(amount, problemIndex) {
             hp = Math.max(0, hp - amount);
             document.getElementById('hpBar').style.width = hp + '%';
             document.getElementById('hpNumbers').innerText = hp + ' / 100';
@@ -971,17 +973,26 @@
             popup.style.opacity = '1';
             setTimeout(() => { popup.style.opacity = '0'; }, 1000);
             solved[problemIndex - 1] = true;
-            const tab = document.getElementById('tab' + problemIndex);
-            tab.classList.remove('active');
-            tab.classList.add('solved');
+            document.getElementById('tab' + problemIndex).classList.remove('active');
+            document.getElementById('tab' + problemIndex).classList.add('solved');
             if (hp <= 0) {
                 clearInterval(timerInterval);
                 bossDefeated = true;
-                setTimeout(() => {
-                    if (!localStorage.getItem(BOSS_KEY)) {
-                        localStorage.setItem('xp', Number(localStorage.getItem('xp') || 0) + 50);
-                        localStorage.setItem(BOSS_KEY, 'true');
+                if (!storage.isBossDone('d')) {
+                    await storage.addXP(50);
+                    const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                    const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                    let ri = storage.getRankIndex();
+                    let xp = storage.getXP();
+                    if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
+                        xp -= XP_NEEDED[ri]; ri++;
+                        await storage.setXP(xp);
+                        await storage.setRankIndex(ri);
+                        showRankUpAnimation(RANKS[ri]);
                     }
+                    await storage.markBossDone('d');
+                }
+                setTimeout(() => {
                     document.getElementById('victoryOverlay').classList.add('show');
                 }, 800);
             } else {
@@ -1080,7 +1091,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="../firebase-init.js"></script>
+    <script>
+        storage.init().then(() => hideLoadingScreen());
+    </script>
 </body>
 
 </html>

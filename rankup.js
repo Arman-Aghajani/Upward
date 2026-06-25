@@ -1,35 +1,21 @@
-// ===== RANK UP ANIMATION SYSTEM =====
-// Include this script in CourseMap.html and any page that awards XP
-// Call checkRankUp() after any XP award
-
-const RANK_NAMES = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
-const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
-
-function checkRankUp() {
-    let rankIndex = Number(localStorage.getItem("rankIndex")) || 0;
-    let xp = Number(localStorage.getItem("xp")) || 0;
-
-    let ranked = false;
-
-    while (rankIndex < RANK_NAMES.length - 1 && xp >= XP_NEEDED[rankIndex]) {
-        xp -= XP_NEEDED[rankIndex];
-        rankIndex++;
-        ranked = true;
-    }
-
-    if (ranked) {
-        localStorage.setItem("rankIndex", rankIndex);
-        localStorage.setItem("xp", xp);
-        showRankUpAnimation(RANK_NAMES[rankIndex]);
-    }
-}
+// ===== RANK UP ANIMATION (UI ONLY) =====
+// Logica de XP + rankup trăiește EXCLUSIV în storage.js (gainXP).
+// Acest fișier conține DOAR animația. Nu mai citește/scrie localStorage.
+//
+// Folosire (din lecții, boss-uri, practice, daily):
+//   const newRank = await storage.gainXP(10);
+//   if (newRank) showRankUpAnimation(newRank);
 
 function showRankUpAnimation(newRank) {
     // Remove existing overlay if any
     const existing = document.getElementById('rankUpOverlay');
     if (existing) existing.remove();
 
-    const displayRank = newRank === "National" ? "N" : newRank;
+    const isMax = newRank === "MAX RANK";
+    const displayRank = newRank === "National" ? "N" : (isMax ? "★" : newRank);
+    const nameLine = newRank === "National"
+        ? "National"
+        : (isMax ? "MAX RANK" : "Rank " + newRank);
 
     const overlay = document.createElement('div');
     overlay.id = 'rankUpOverlay';
@@ -41,7 +27,7 @@ function showRankUpAnimation(newRank) {
             <div class="rankup-circle">
                 <span class="rankup-letter">${displayRank}</span>
             </div>
-            <div class="rankup-name">${newRank === "National" ? "National" : "Rank " + newRank}</div>
+            <div class="rankup-name">${nameLine}</div>
             <div class="rankup-subtitle">You have ascended. Keep climbing.</div>
             <button class="rankup-btn" onclick="closeRankUp()">Continue ⚔</button>
         </div>

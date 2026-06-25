@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="../AI-Tutor/chat.css">
 
@@ -345,65 +347,134 @@
         </div>
     </div>
     <script>
-        const PROBLEM_KEY = "practice_s_1";
-        if (localStorage.getItem(PROBLEM_KEY)) document.getElementById("doneBanner").style.display = "block";
+        const PROBLEM_KEY = "s_1";
+
+        const PROBLEM_DESC = `Write a function called factorial that takes a non-negative integer and returns its factorial using recursion only. No loops of any kind (no for, no while) are allowed. The function must call itself and have a correct base case (n == 0 or n <= 1 returns 1).
+
+Read a single non-negative integer N with input(), call factorial(N), and print the result.`;
+
+        const TEST_CASES = [
+            { stdin: "0", expected: "1" },
+            { stdin: "1", expected: "1" },
+            { stdin: "5", expected: "120" },
+            { stdin: "10", expected: "3628800" },
+            { stdin: "7", expected: "5040" },
+            { stdin: "3", expected: "6" }
+        ];
+
+        // null = fara restrictie de algoritm. String = constrangerea de verificat.
+        const ALGO_CHECK = "The solution must compute the factorial using recursion: the factorial function must call itself with a smaller argument, and must have a base case (such as n == 0 or n <= 1 returning 1). Any recursive solution is acceptable regardless of variable names or exact base-case style. The following are NOT allowed: any loop (for or while), math.factorial or other built-in factorial functions, or iterative accumulation without self-calls. A function that calls itself with a correct base case is the required approach.";
+
+        function renderProblem() {
+            if (storage.isPracticeDone(PROBLEM_KEY)) {
+                document.getElementById("doneBanner").style.display = "block";
+            }
+        }
+
         async function submitCode() {
             const code = document.getElementById("codeInput").value.trim();
             if (!code) return;
+
             const btn = document.getElementById("submitBtn");
             const loading = document.getElementById("loadingText");
             const feedback = document.getElementById("feedbackBox");
-            btn.disabled = true; loading.style.display = "block"; feedback.style.display = "none";
-            try {
-                const callApi = firebase.functions().httpsCallable('api');
-                const result = await callApi({
-                    model: "claude-haiku-4-5-20251001",
-                    max_tokens: 1000,
-                    messages: [{
-                        role: "user",
-                        content: `You are a Python tutor evaluating a student's solution.
 
-PROBLEM: Write a function called factorial that takes a non-negative integer and returns its factorial using RECURSION ONLY. No loops of any kind (no for, no while) are allowed.
+            btn.disabled = true;
+            loading.style.display = "block";
+            feedback.style.display = "none";
+
+            try {
+                // PASUL 1: rulam codul real prin Piston — verdict pe corectitudine
+                const runCode = firebase.functions().httpsCallable('runCode');
+                const runResult = await runCode({ code, testCases: TEST_CASES });
+                let { passed, results } = runResult.data;
+
+                // PASUL 2: construim promptul AI in functie de verdictul Piston
+                let prompt;
+                const checkAlgo = passed && ALGO_CHECK;
+
+                if (!passed) {
+                    // Piston a picat: AI explica greseala, NU verifica algoritmul
+                    prompt = `You are a Python tutor giving feedback to a student.
+
+PROBLEM:
+${PROBLEM_DESC}
 
 STUDENT CODE:
 ${code}
 
-Test mentally:
-- factorial(0) should return 1
-- factorial(1) should return 1
-- factorial(5) should return 120
-- factorial(10) should return 3628800
+TEST RESULTS (the code was actually executed — this verdict is final):
+${JSON.stringify(results, null, 2)}
 
-The solution MUST:
-- Call itself recursively
-- Have a base case (typically n == 0 or n <= 1) that returns 1, otherwise it will loop forever
-- Correctly multiply n by factorial(n-1)
+The solution FAILED one or more tests. Write 2-3 sentences of encouraging feedback in English, pointing to what went wrong using the test results (wrong output, or a runtime error) WITHOUT writing the correct code for them. Reply with feedback text only, no labels.`;
+                } else if (checkAlgo) {
+                    // Piston a trecut SI exista restrictie de algoritm: AI verifica abordarea + da feedback
+                    prompt = `You are a Python tutor evaluating an advanced student's solution.
 
-FAIL the solution if:
-- It uses any loop (for or while)
-- It uses math.factorial or similar built-ins
-- It is missing a base case or has a broken base case
-- It does not actually call itself (not recursive)
+PROBLEM:
+${PROBLEM_DESC}
 
-Respond in this exact format:
-RESULT: PASS or FAIL
-FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they did well. If failed, point to the flaw without giving the answer.)`
-                    }]
+STUDENT CODE:
+${code}
+
+The code already PASSED all correctness tests (verified by real execution). Your job is to check whether it respects this required approach:
+
+${ALGO_CHECK}
+
+Be STRICT: if you cannot clearly confirm the required approach was used, treat it as a violation.
+
+Reply in EXACTLY this format:
+- First line: "ALGO: OK" if the approach is respected, or "ALGO: VIOLATION" if it is not.
+- Then 2-3 sentences of feedback in English. If OK, say what they did well. If VIOLATION, explain which required approach is missing WITHOUT writing the correct code for them.`;
+                } else {
+                    // Piston a trecut, fara restrictie de algoritm: doar feedback de laudă
+                    prompt = `You are a Python tutor giving feedback to a student.
+
+PROBLEM:
+${PROBLEM_DESC}
+
+STUDENT CODE:
+${code}
+
+The solution PASSED all tests (verified by real execution). Write 2-3 sentences of encouraging feedback in English saying what they did well. Reply with feedback text only, no labels.`;
+                }
+
+                const callApi = firebase.functions().httpsCallable('api');
+                const aiResult = await callApi({
+                    model: "claude-haiku-4-5-20251001",
+                    max_tokens: 600,
+                    messages: [{ role: "user", content: prompt }]
                 });
 
-                const text = result.data.content[0].text;
-                const passed = text.includes("RESULT: PASS");
-                const feedbackText = text.split("FEEDBACK:")[1]?.trim() || "Could not get feedback.";
+                let feedbackText = aiResult.data.content[0].text.trim();
+
+                // PASUL 3: daca am verificat algoritmul, parsam prima linie si poate suprascriem verdictul
+                if (checkAlgo) {
+                    const firstLine = feedbackText.split("\n")[0].trim();
+                    if (firstLine.includes("ALGO: VIOLATION")) {
+                        passed = false;
+                    }
+                    feedbackText = feedbackText.replace(/^ALGO:.*$/m, "").trim();
+                }
 
                 loading.style.display = "none";
                 feedback.style.display = "block";
                 feedback.className = "feedback-box " + (passed ? "success" : "error");
                 feedback.innerText = feedbackText;
 
-                if (passed && !localStorage.getItem(PROBLEM_KEY)) {
-                    localStorage.setItem("xp", Number(localStorage.getItem("xp") || 0) + 10);
-                    localStorage.setItem(PROBLEM_KEY, "true");
-                    checkRankUp();
+                if (passed && !storage.isPracticeDone(PROBLEM_KEY)) {
+                    await storage.markPracticeDone(PROBLEM_KEY);
+                    await storage.addXP(10);
+                    const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                    const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                    let ri = storage.getRankIndex();
+                    let xp = storage.getXP();
+                    if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
+                        xp -= XP_NEEDED[ri]; ri++;
+                        await storage.setXP(xp);
+                        await storage.setRankIndex(ri);
+                        showRankUpAnimation(RANKS[ri]);
+                    }
                     document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
@@ -413,22 +484,29 @@ FEEDBACK: (2-3 sentences of encouraging feedback. If passed, explain what they d
                 feedback.innerText = "Error: " + err.message;
                 console.error(err);
             }
+
             btn.disabled = false;
         }
+
+        storage.init().then(() => {
+            renderProblem();
+            hideLoadingScreen();
+        });
     </script>
 
     <script>
-        window.LESSON_CONTEXT = "Practice Problem: Recursive Factorial (Rank S) — Implement factorial using recursion. No loops allowed. Mode: HINT_ONLY — explain what recursion is, the idea of a base case and a recursive case, and help debug their code, but do not write the full solution for them.";
+        window.LESSON_CONTEXT =
+            "Practice Problem (Rank S). " + PROBLEM_DESC +
+            " Mode: HINT_ONLY — explain concepts and debug their code, but do not write the solution for them.";
     </script>
 
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
-
-    <!-- Init proiect + App Check -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="../firebase-init.js"></script>
-
     <script src="../AI-Tutor/chat.js"></script>
 </body>
 

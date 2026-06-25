@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         * {
@@ -360,29 +362,45 @@
     </div>
     <script>
         const problems = [
-            { id: "practice_b_1", number: "01", title: "List Filter", desc: "Write a function that filters even numbers out of a list.", type: "coding", page: "Practice-B-P1.html" },
-            { id: "practice_b_2", number: "02", title: "Second Largest", desc: "Find the second largest number in a list without sorting.", type: "coding", page: "Practice-B-P2.html" },
-            { id: "practice_b_3", number: "03", title: "What Does This Print?", desc: "Trace list operations and slicing to find the correct output.", type: "multiple", page: "Practice-B-P3.html" }
+            { id: "b_1", number: "01", title: "List Filter", desc: "Write a function that filters even numbers out of a list.", type: "coding", page: "Practice-B-P1.html" },
+            { id: "b_2", number: "02", title: "Second Largest", desc: "Find the second largest number in a list without sorting.", type: "coding", page: "Practice-B-P2.html" },
+            { id: "b_3", number: "03", title: "What Does This Print?", desc: "Trace list operations and slicing to find the correct output.", type: "multiple", page: "Practice-B-P3.html" }
         ];
-        const list = document.getElementById("problemsList");
-        problems.forEach(p => {
-            const done = localStorage.getItem(p.id);
-            const card = document.createElement("div");
-            card.className = "problem-card";
-            card.innerHTML = `
-            <div class="problem-left">
-                <span class="problem-number">${p.number}</span>
-                <div class="problem-info"><h3>${p.title}</h3><p>${p.desc}</p></div>
-            </div>
-            <div class="problem-meta">
-                <span class="type-tag ${p.type}">${p.type === "coding" ? "Coding" : "Multiple Choice"}</span>
-                ${done ? '<span class="done-badge">✓ Done</span>' : '<span class="xp-tag">+10 XP</span>'}
-            </div>
-            <span class="arrow">→</span>`;
-            card.addEventListener("click", () => { window.location.href = p.page; });
-            list.appendChild(card);
+
+        function renderProblems() {
+            const list = document.getElementById("problemsList");
+            problems.forEach(p => {
+                const done = storage.isPracticeDone(p.id);
+                const card = document.createElement("div");
+                card.className = "problem-card";
+                card.innerHTML = `
+                <div class="problem-left">
+                    <span class="problem-number">${p.number}</span>
+                    <div class="problem-info"><h3>${p.title}</h3><p>${p.desc}</p></div>
+                </div>
+                <div class="problem-meta">
+                    <span class="type-tag ${p.type}">${p.type === "coding" ? "Coding" : "Multiple Choice"}</span>
+                    ${done ? '<span class="done-badge">✓ Done</span>' : '<span class="xp-tag">+10 XP</span>'}
+                </div>
+                <span class="arrow">→</span>`;
+                card.addEventListener("click", () => { window.location.href = p.page; });
+                list.appendChild(card);
+            });
+        }
+
+        storage.init().then(() => {
+            renderProblems();
+            hideLoadingScreen();
         });
     </script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
 </body>
 
 </html>

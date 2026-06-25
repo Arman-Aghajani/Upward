@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../storage.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         * {
@@ -434,86 +436,84 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-        import { getAuth, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    <!-- Firebase SDK-uri -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDug8Iz8FkYck24-E8bFHyW-nt-PgXfvew",
-            authDomain: "upward-44313.firebaseapp.com",
-            projectId: "upward-44313",
-            storageBucket: "upward-44313.firebasestorage.app",
-            messagingSenderId: "101564287746",
-            appId: "1:101564287746:web:a5b50c89520fadc006d01b"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
+    <script>
         const ranks = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
         const xpNeeded = [100, 150, 200, 250, 300, 400, Infinity];
 
-        const uid = localStorage.getItem('current_user');
-        if (!uid) { window.location.href = '../AccountManagement/Login.html'; }
+        function renderAccount() {
+            const userName = storage.getUserName();
+            const userEmail = storage.getUserEmail();
+            const rankIndex = storage.getRankIndex();
+            const xp = storage.getXP();
+            const lessons = storage.getLessonsCompleted();
 
-        const userName = localStorage.getItem('user_name') || 'Adventurer';
-        const userEmail = localStorage.getItem('user_email') || '';
-        let rankIndex = Number(localStorage.getItem('rankIndex')) || 0;
-        let xp = Number(localStorage.getItem('xp')) || 0;
-        const lessons = Number(localStorage.getItem('lessonsCompleted')) || 0;
+            const currentRankXP = xpNeeded[rankIndex];
+            const percent = currentRankXP === Infinity ? 100 : Math.min((xp / currentRankXP) * 100, 100);
+            const rankLabel = ranks[rankIndex] === 'National' ? 'N' : ranks[rankIndex];
 
-        const currentRankXP = xpNeeded[rankIndex];
-        const percent = currentRankXP === Infinity ? 100 : Math.min((xp / currentRankXP) * 100, 100);
-        const rankLabel = ranks[rankIndex] === 'National' ? 'N' : ranks[rankIndex];
+            document.getElementById('avatarEl').innerText = userName.charAt(0).toUpperCase();
+            document.getElementById('profileName').innerText = userName;
+            document.getElementById('profileEmail').innerText = userEmail;
+            document.getElementById('profileRank').innerText = 'Rank ' + ranks[rankIndex];
+            document.getElementById('statXP').innerText = xp;
+            document.getElementById('statLessons').innerText = lessons;
+            document.getElementById('statRank').innerText = rankLabel;
+            document.getElementById('xpBarFill').style.width = percent + '%';
+            document.getElementById('xpCurrent').innerText = xp + ' XP';
+            document.getElementById('xpNeeded').innerText = currentRankXP === Infinity ? 'MAX RANK' : currentRankXP + ' XP to next rank';
+            document.getElementById('editName').value = userName;
+            document.getElementById('editEmail').value = userEmail;
+        }
 
-        document.getElementById('avatarEl').innerText = userName.charAt(0).toUpperCase();
-        document.getElementById('profileName').innerText = userName;
-        document.getElementById('profileEmail').innerText = userEmail;
-        document.getElementById('profileRank').innerText = 'Rank ' + ranks[rankIndex];
-        document.getElementById('statXP').innerText = xp;
-        document.getElementById('statLessons').innerText = lessons;
-        document.getElementById('statRank').innerText = rankLabel;
-        document.getElementById('xpBarFill').style.width = percent + '%';
-        document.getElementById('xpCurrent').innerText = xp + ' XP';
-        document.getElementById('xpNeeded').innerText = currentRankXP === Infinity ? 'MAX RANK' : currentRankXP + ' XP to next rank';
-        document.getElementById('editName').value = userName;
-        document.getElementById('editEmail').value = userEmail;
-
-        window.saveName = async function () {
+        async function saveName() {
             const newName = document.getElementById('editName').value.trim();
             if (!newName) return;
             try {
-                await updateDoc(doc(db, 'users', uid), { name: newName });
-                localStorage.setItem('user_name', newName);
+                await storage.setUserName(newName);
                 document.getElementById('profileName').innerText = newName;
                 document.getElementById('avatarEl').innerText = newName.charAt(0).toUpperCase();
                 const msg = document.getElementById('successMsg');
                 msg.style.display = 'block';
                 setTimeout(() => msg.style.display = 'none', 3000);
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error(err);
+            }
         }
 
-        window.logout = async function () {
-            await signOut(auth);
+        async function logout() {
+            await firebase.auth().signOut();
             localStorage.clear();
             window.location.href = '../AccountManagement/Login.html';
         }
 
-        window.deleteAccount = async function () {
+        async function deleteAccount() {
             if (!confirm('Are you sure? All your progress will be permanently deleted. This cannot be undone.')) return;
             try {
-                await deleteDoc(doc(db, 'users', uid));
-                await deleteUser(auth.currentUser);
+                const uid = storage.getUserID();
+                await firebase.firestore().collection('users').doc(uid).delete();
+                await firebase.auth().currentUser.delete();
                 localStorage.clear();
                 window.location.href = '../AccountManagement/Signup.html';
             } catch (err) {
+                console.error(err);
                 if (err.code === 'auth/requires-recent-login') {
                     alert('Please log out and log back in before deleting your account.');
                 }
             }
         }
+
+        storage.init().then(() => {
+            renderAccount();
+            hideLoadingScreen();
+        });
     </script>
 </body>
 

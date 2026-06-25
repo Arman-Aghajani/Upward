@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Challenge — Upward</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="../rankup.js"></script>
+    <script src="../storage.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=home" />
+    <link rel="stylesheet" href="../AI-Tutor/chat.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #020223;
+            --bg-mid: #06063d;
+            --accent: #FFD700;
+            --border: 2px solid rgba(255, 255, 255, 0.15);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            background: radial-gradient(circle at 30% 20%, #0a0a4a, #020223);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: move 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-200px, -200px);
+            }
+        }
+
+        .ToolBar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: var(--bg-mid);
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 20px;
+        }
+
+        .material-symbols-outlined {
+            color: var(--accent);
+            margin-left: 20px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .toolbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toolbar-title {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .toolbar-date {
+            font-size: 10px;
+            opacity: 0.4;
+            font-family: Arial, sans-serif;
+        }
+
+        .daily-badge {
+            position: absolute;
+            right: 24px;
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 6px 12px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        /* LOADING STATE */
+        .generating-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 24px;
+        }
+
+        .generating-icon {
+            font-size: 48px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .generating-text {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--accent);
+            opacity: 0.7;
+            text-align: center;
+            line-height: 2;
+        }
+
+        /* MAIN CONTENT */
+        .page-content {
+            max-width: 960px;
+            margin: 50px auto;
+            padding: 0 40px 80px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        .page-content.hidden {
+            display: none;
+        }
+
+        /* PROBLEM PANEL */
+        .problem-panel {
+            background: linear-gradient(180deg, #0a0a4a, #06063d);
+            border: var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .quest-icon {
+            font-size: 28px;
+        }
+
+        .panel-title {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: var(--accent);
+            line-height: 1.6;
+        }
+
+        .type-badge {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .type-python {
+            background: rgba(53, 120, 57, 0.2);
+            border: 1px solid rgba(53, 200, 57, 0.3);
+            color: #4caf50;
+        }
+
+        .type-html {
+            background: rgba(255, 90, 0, 0.15);
+            border: 1px solid rgba(255, 90, 0, 0.3);
+            color: #ff6b35;
+        }
+
+        .type-css {
+            background: rgba(100, 100, 255, 0.15);
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            color: #7b7bff;
+        }
+
+        .problem-desc {
+            line-height: 1.8;
+            opacity: 0.85;
+            font-size: 14px;
+        }
+
+        .example-box {
+            background: #0d0d1f;
+            border-left: 3px solid var(--accent);
+            border-radius: 6px;
+            padding: 14px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #00ff90;
+            line-height: 1.6;
+        }
+
+        .hint-box {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 13px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .xp-info {
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: var(--accent);
+            opacity: 0.6;
+            margin-top: auto;
+        }
+
+        /* CODE PANEL */
+        .code-panel {
+            background: #0b0b1f;
+            border: var(--border);
+            border-radius: 14px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 500px;
+        }
+
+        .code-label {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            color: var(--accent);
+        }
+
+        .code-panel textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 220px;
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #00ff90;
+            font-family: monospace;
+            font-size: 14px;
+            padding: 14px;
+            resize: vertical;
+            outline: none;
+            line-height: 1.6;
+        }
+
+        .code-panel textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .submit-btn {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            padding: 12px 20px;
+            background: var(--accent);
+            color: black;
+            border: 1px solid gray;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback-box {
+            background: #111;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.7;
+            min-height: 80px;
+            border-left: 3px solid #444;
+            display: none;
+        }
+
+        .feedback-box.success {
+            border-left-color: #00ff90;
+        }
+
+        .feedback-box.error {
+            border-left-color: #ff4d4d;
+        }
+
+        .loading-text {
+            opacity: 0.5;
+            font-style: italic;
+            font-size: 13px;
+            display: none;
+        }
+
+        .done-banner {
+            background: rgba(0, 255, 144, 0.1);
+            border: 1px solid #00ff90;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            color: #00ff90;
+            text-align: center;
+            display: none;
+        }
+
+        /* STREAK BANNER */
+        .streak-banner {
+            grid-column: 1 / -1;
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .streak-fire {
+            font-size: 28px;
+        }
+
+        .streak-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .streak-count {
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .streak-label {
+            font-size: 12px;
+            opacity: 0.4;
+        }
+
+        /* ERROR STATE */
+        .error-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .error-screen p {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: #ff4d4d;
+            opacity: 0.7;
+            line-height: 2;
+        }
+
+        @media (max-width: 768px) {
+            .page-content {
+                grid-template-columns: 1fr;
+                margin: 20px auto;
+                padding: 0 16px 40px;
+            }
+
+            .streak-banner {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ToolBar">
+        <a href="../maps/mapBuildingWeb.html">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <div class="toolbar-center">
+            <div class="toolbar-title" id="toolbarTitle">⚔ Daily Quest</div>
+            <div class="toolbar-date" id="toolbarDate"></div>
+        </div>
+        <div class="daily-badge" id="dailyBadge">+20 XP</div>
+    </div>
+
+    <!-- GENERATING SCREEN -->
+    <div class="generating-screen" id="generatingScreen">
+        <div class="generating-icon">⚙️</div>
+        <div class="generating-text">The Oracle is forging<br>your quest for today...</div>
+    </div>
+
+    <!-- ERROR SCREEN -->
+    <div class="error-screen" id="errorScreen">
+        <div style="font-size:48px;">⚠️</div>
+        <p>The Oracle is unavailable.<br>Try again later.</p>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="page-content hidden" id="pageContent">
+
+        <div class="streak-banner" id="streakBanner" style="display:none;">
+            <div class="streak-fire">🔥</div>
+            <div class="streak-info">
+                <div class="streak-count" id="streakCount">3 Day Streak</div>
+                <div class="streak-label">Keep it up! Come back tomorrow for another quest.</div>
+            </div>
+        </div>
+
+        <div class="problem-panel">
+            <div class="panel-header">
+                <span class="quest-icon" id="questIcon">⚔️</span>
+                <h2 class="panel-title" id="problemTitle">Loading...</h2>
+                <span class="type-badge" id="typeBadge">PYTHON</span>
+            </div>
+            <p class="problem-desc" id="problemDesc"></p>
+            <div class="hint-box" id="hintBox"></div>
+            <p class="xp-info">⚡ Daily Reward: +20 XP</p>
+        </div>
+
+        <div class="code-panel">
+            <span class="code-label">Your Solution</span>
+            <div class="done-banner" id="doneBanner">✓ Quest completed today — come back tomorrow!</div>
+            <textarea id="codeInput" placeholder="Write your solution here..." spellcheck="false"></textarea>
+            <p class="loading-text" id="loadingText">Checking your solution...</p>
+            <div class="feedback-box" id="feedbackBox"></div>
+            <button class="submit-btn" id="submitBtn" onclick="submitCode()">Submit Solution</button>
+        </div>
+
+    </div>
+
+    <script>
+
+        const typeIcons = { python: "⚔️", html: "🏗️", css: "🎨" };
+        const typeLabels = { python: "PYTHON", html: "HTML", css: "CSS" };
+
+        // Obținem tipul din URL: ?type=python / html / css
+        const urlParams = new URLSearchParams(window.location.search);
+        const challengeType = urlParams.get("type") || "python";
+
+        // Data de azi în format YYYY-MM-DD
+        function getToday() {
+            return new Date().toISOString().split("T")[0];
+        }
+
+        let currentProblem = null;
+        let todayKey = null;
+
+        function getTodayDoneKey() {
+            return `daily_${challengeType}_${getToday()}`;
+        }
+
+        function isCompletedToday() {
+            return storage._data?.dailyDone?.[getTodayDoneKey()] === true;
+        }
+
+        async function markCompletedToday() {
+            const key = getTodayDoneKey();
+            if (!storage._data.dailyDone) storage._data.dailyDone = {};
+            storage._data.dailyDone[key] = true;
+            await storage._save("dailyDone." + key, true);
+        }
+
+        function showGenerating() {
+            document.getElementById("generatingScreen").style.display = "flex";
+            document.getElementById("pageContent").classList.add("hidden");
+            document.getElementById("errorScreen").style.display = "none";
+        }
+
+        function showError() {
+            document.getElementById("generatingScreen").style.display = "none";
+            document.getElementById("pageContent").classList.add("hidden");
+            document.getElementById("errorScreen").style.display = "flex";
+        }
+
+        function showContent() {
+            document.getElementById("generatingScreen").style.display = "none";
+            document.getElementById("errorScreen").style.display = "none";
+            document.getElementById("pageContent").classList.remove("hidden");
+        }
+
+        function renderProblem(problem) {
+            currentProblem = problem;
+
+            // toolbar
+            const today = new Date();
+            document.getElementById("toolbarDate").textContent =
+                today.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+
+            // type badge
+            const badge = document.getElementById("typeBadge");
+            badge.textContent = typeLabels[challengeType] || "PYTHON";
+            badge.className = "type-badge type-" + challengeType;
+
+            // quest icon
+            document.getElementById("questIcon").textContent = typeIcons[challengeType] || "⚔️";
+
+            // problem content
+            document.getElementById("problemTitle").textContent = problem.title;
+            document.getElementById("problemDesc").textContent = problem.description;
+            document.getElementById("hintBox").textContent = "💡 " + problem.hint;
+
+            // done banner
+            if (isCompletedToday()) {
+                document.getElementById("doneBanner").style.display = "block";
+                document.getElementById("submitBtn").disabled = true;
+                document.getElementById("codeInput").disabled = true;
+            }
+
+            // streak
+            renderStreak();
+
+            // AI context
+            window.LESSON_CONTEXT = `Daily Challenge (${challengeType.toUpperCase()}, Rank ${storage.RANKS[storage.getRankIndex()]})...`
+            showContent();
+        }
+
+        function renderStreak() {
+            // streak simplu: câte zile consecutive a rezolvat daily challenge
+            // verificăm ultimele 7 zile în dailyDone
+            const dailyDone = storage._data?.dailyDone || {};
+            let streak = 0;
+            const today = new Date();
+            for (let i = 0; i < 30; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = `daily_${challengeType}_${d.toISOString().split("T")[0]}`;
+                if (dailyDone[key]) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            if (streak > 0) {
+                document.getElementById("streakCount").textContent = streak + " Day Streak";
+                document.getElementById("streakBanner").style.display = "flex";
+            }
+        }
+
+        async function loadOrGenerate() {
+            showGenerating();
+            const today = getToday();
+            const uid = storage.getUserID();
+            const db = storage._db;
+
+            // Verificăm cache Firestore
+            const docRef = db.collection("dailyChallenge").doc(uid)
+                .collection(challengeType).doc(today);
+
+            try {
+                const snap = await docRef.get();
+                if (snap.exists) {
+                    renderProblem(snap.data());
+                    return;
+                }
+            } catch (e) {
+                console.warn("Cache read failed, generating...", e);
+            }
+
+            // Nu există — generăm
+            try {
+                const generateDaily = firebase.functions().httpsCallable("generateDaily");
+                const result = await generateDaily({
+                    rankIndex: storage.getRankIndex(),
+                    type: challengeType,
+                    date: today,
+                });
+
+                const problem = result.data.problem;
+
+                // Salvăm în Firestore pentru refresh
+                try {
+                    await docRef.set(problem);
+                } catch (e) {
+                    console.warn("Cache write failed:", e);
+                }
+
+                renderProblem(problem);
+            } catch (err) {
+                console.error("Generate error:", err);
+                showError();
+            }
+        }
+
+        async function submitCode() {
+            if (!currentProblem) return;
+            const code = document.getElementById("codeInput").value.trim();
+            if (!code) return;
+
+            const btn = document.getElementById("submitBtn");
+            const loading = document.getElementById("loadingText");
+            const feedback = document.getElementById("feedbackBox");
+
+            btn.disabled = true;
+            loading.style.display = "block";
+            feedback.style.display = "none";
+
+            try {
+                let passed = false;
+                let feedbackText = "";
+
+                if (challengeType === "python") {
+                    const runCode = firebase.functions().httpsCallable("runCode");
+                    const runResult = await runCode({ code, testCases: currentProblem.testCases });
+                    passed = runResult.data.passed;
+                    const results = runResult.data.results;
+
+                    const prompt = passed
+                        ? `You are a Python tutor. The student solved today's daily challenge successfully.
+PROBLEM: ${currentProblem.description}
+CODE: ${code}
+Write 2-3 sentences of encouraging feedback in English saying what they did well. No labels, no code.`
+                        : `You are a Python tutor giving feedback on a daily challenge.
+PROBLEM: ${currentProblem.description}
+CODE: ${code}
+TEST RESULTS: ${JSON.stringify(results, null, 2)}
+The solution FAILED. Write 2-3 sentences of encouraging feedback in English pointing to what went wrong, without writing the correct code. No labels.`;
+
+                    const callApi = firebase.functions().httpsCallable("api");
+                    const aiResult = await callApi({
+                        model: "claude-haiku-4-5-20251001",
+                        max_tokens: 600,
+                        messages: [{ role: "user", content: prompt }],
+                    });
+                    feedbackText = aiResult.data.content[0].text.trim();
+
+                } else {
+                    const type = challengeType.toUpperCase();
+                    const prompt = `You are a ${type} tutor evaluating a student's daily challenge submission.
+
+PROBLEM: ${currentProblem.description}
+STUDENT CODE:
+${code}
+
+Evaluate if the solution correctly solves the problem. 
+Reply in EXACTLY this format:
+- First line: "VERDICT: PASS" if correct, or "VERDICT: FAIL" if incorrect.
+- Then 2-3 sentences of feedback in English. If PASS, say what they did well. If FAIL, explain what's missing or wrong without giving the solution.`;
+
+                    const callApi = firebase.functions().httpsCallable("api");
+                    const aiResult = await callApi({
+                        model: "claude-haiku-4-5-20251001",
+                        max_tokens: 600,
+                        messages: [{ role: "user", content: prompt }],
+                    });
+
+                    const raw = aiResult.data.content[0].text.trim();
+                    const firstLine = raw.split("\n")[0].trim();
+                    passed = firstLine.includes("VERDICT: PASS");
+                    feedbackText = raw.replace(/^VERDICT:.*$/m, "").trim();
+                }
+
+                loading.style.display = "none";
+                feedback.style.display = "block";
+                feedback.className = "feedback-box " + (passed ? "success" : "error");
+                feedback.innerText = feedbackText;
+
+                if (passed && !isCompletedToday()) {
+                    await markCompletedToday();
+                    const newRank = await storage.gainXP(20);
+                    if (newRank) showRankUpAnimation(newRank);
+                    document.getElementById("doneBanner").style.display = "block";
+                    document.getElementById("codeInput").disabled = true;
+                    renderStreak();
+                }
+
+            } catch (err) {
+                loading.style.display = "none";
+                feedback.style.display = "block";
+                feedback.className = "feedback-box error";
+                feedback.innerText = "Error: " + err.message;
+                console.error(err);
+            }
+
+            btn.disabled = false;
+        }
+
+        storage.init().then(() => {
+            loadOrGenerate();
+            hideLoadingScreen();
+        });
+    </script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+    <script src="../AI-Tutor/chat.js"></script>
+</body>
+
+</html>
