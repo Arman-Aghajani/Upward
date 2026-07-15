@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="../rankup.js"></script>
     <script src="../storage.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="../AI-Tutor/chat.css">
@@ -172,26 +173,85 @@
             flex-direction: column;
             gap: 16px;
             min-height: 500px;
+            min-width: 0;
         }
 
-        .code-panel textarea {
-            width: 100%;
-            flex: 1;
-            min-height: 200px;
-            background: #111;
+        /* EDITOR CARD — bordered box wrapping CodeMirror (no header/dots) */
+        .editor-card {
+            background: #0b0b1f;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #00ff90;
-            font-family: monospace;
-            font-size: 14px;
-            padding: 14px;
-            resize: vertical;
-            outline: none;
-            line-height: 1.6;
+            border-radius: 10px;
+            overflow: hidden;
+            min-width: 0;
         }
 
-        .code-panel textarea:focus {
-            border-color: var(--accent);
+        #codeEditor {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* CodeMirror — same theme/colors as the lessons (CodeMirror 5) */
+        .CodeMirror {
+            height: 200px !important;
+            max-width: 100%;
+            font-family: monospace !important;
+            font-size: 14px !important;
+            background: #0b0b1f !important;
+            color: #c9d1d9 !important;
+            border-radius: 0 !important;
+            line-height: 1.8 !important;
+        }
+
+        .CodeMirror-scroll {
+            padding: 14px 4px;
+            overflow: auto !important;
+        }
+
+        .CodeMirror-gutters {
+            background: #0b0b1f !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--accent) !important;
+        }
+
+        .CodeMirror-placeholder {
+            color: rgba(255, 255, 255, 0.25) !important;
+            font-style: italic;
+        }
+
+        .cm-keyword {
+            color: #ff79c6 !important;
+        }
+
+        .cm-builtin,
+        .cm-def {
+            color: #50fa7b !important;
+        }
+
+        .cm-string,
+        .cm-string-2 {
+            color: #f1fa8c !important;
+        }
+
+        .cm-comment {
+            color: rgba(255, 255, 255, 0.28) !important;
+            font-style: italic !important;
+        }
+
+        .cm-number,
+        .cm-atom {
+            color: #bd93f9 !important;
+        }
+
+        .cm-variable-2,
+        .cm-property {
+            color: #8be9fd !important;
         }
 
         .submit-btn {
@@ -287,9 +347,9 @@
                 padding: 20px;
             }
 
-            .code-panel textarea {
-                min-height: 160px;
-                font-size: 13px;
+            .CodeMirror {
+                font-size: 13px !important;
+                height: 160px !important;
             }
 
             .submit-btn {
@@ -322,7 +382,9 @@
         <div class="code-panel">
             <span class="code-label">Your Solution</span>
             <div class="done-banner" id="doneBanner">✓ Already completed — XP awarded</div>
-            <textarea id="codeInput" placeholder="Write your Python code here..." spellcheck="false"></textarea>
+            <div class="editor-card">
+                <div id="codeEditor"></div>
+            </div>
             <p class="loading-text" id="loadingText">AI is checking your solution...</p>
             <div class="feedback-box" id="feedbackBox"></div>
             <button class="submit-btn" id="submitBtn" onclick="submitCode()">Submit Solution</button>
@@ -344,14 +406,37 @@
         // null = fara restrictie de algoritm. String = constrangerea de verificat.
         const ALGO_CHECK = null;
 
+        let editorCM = null;
+
+        function initEditor() {
+            if (editorCM) {
+                editorCM.refresh();
+                return;
+            }
+            editorCM = CodeMirror(document.getElementById("codeEditor"), {
+                value: "",
+                mode: "python",
+                lineNumbers: true,
+                indentUnit: 4,
+                tabSize: 4,
+                indentWithTabs: false,
+                lineWrapping: false,
+                placeholder: "Write your Python code here...",
+            });
+            editorCM.setSize("100%", 200);
+            setTimeout(() => editorCM.refresh(), 0);
+        }
+
         function renderProblem() {
+            initEditor();
             if (storage.isPracticeDone(PROBLEM_KEY)) {
                 document.getElementById("doneBanner").style.display = "block";
+                editorCM.setOption("readOnly", true);
             }
         }
 
         async function submitCode() {
-            const code = document.getElementById("codeInput").value.trim();
+            const code = editorCM.getValue().trim();
             if (!code) return;
 
             const btn = document.getElementById("submitBtn");
@@ -442,19 +527,24 @@ The solution PASSED all tests (verified by real execution). Write 2-3 sentences 
                 feedback.innerText = feedbackText;
 
                 if (passed && !storage.isPracticeDone(PROBLEM_KEY)) {
-                    await storage.markPracticeDone(PROBLEM_KEY);
-                    await storage.addXP(10);
-                    const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
-                    const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
-                    let ri = storage.getRankIndex();
-                    let xp = storage.getXP();
-                    if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
-                        xp -= XP_NEEDED[ri]; ri++;
-                        await storage.setXP(xp);
-                        await storage.setRankIndex(ri);
-                        showRankUpAnimation(RANKS[ri]);
+                    try {
+                        await storage.markPracticeDone(PROBLEM_KEY);
+                        await storage.addXP(10);
+                        const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
+                        const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
+                        let ri = storage.getRankIndex();
+                        let xp = storage.getXP();
+                        if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
+                            xp -= XP_NEEDED[ri]; ri++;
+                            await storage.setXP(xp);
+                            await storage.setRankIndex(ri);
+                            showRankUpAnimation(RANKS[ri]);
+                        }
+                        document.getElementById("doneBanner").style.display = "block";
+                        editorCM.setOption("readOnly", true);
+                    } catch (err) {
+                        console.error('XP grant failed:', err);
                     }
-                    document.getElementById("doneBanner").style.display = "block";
                 }
             } catch (err) {
                 loading.style.display = "none";
@@ -478,6 +568,11 @@ The solution PASSED all tests (verified by real execution). Write 2-3 sentences 
             "Practice Problem (Rank D). " + PROBLEM_DESC +
             " Mode: HINT_ONLY — explain concepts and debug their code, but do not write the solution for them.";
     </script>
+
+    <!-- CodeMirror -->
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/display/placeholder.min.js"></script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
