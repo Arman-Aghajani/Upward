@@ -700,11 +700,42 @@
         });
 
         // ─── TAB SWITCH → FORFEIT ───────────────────────────────────────────────
-        document.addEventListener('visibilitychange', () => {
+        document.addEventListener('visibilitychange', async () => {
             if (document.hidden && currentDuelId && !duelOver) {
                 duelOver = true;
                 clearInterval(timerInterval);
-                storage.forfeitDuel(currentDuelId, myPlayer);
+                try {
+                    await storage.forfeitDuel(currentDuelId, myPlayer);
+                } catch (err) {
+                    console.error('forfeitDuel failed:', err);
+                }
+                if (duelUnsubscribe) {
+                    duelUnsubscribe();
+                    duelUnsubscribe = null;
+                }
+            } else if (!document.hidden && currentDuelId && duelOver) {
+                const overlay = document.getElementById('winnerOverlay');
+                if (overlay && !overlay.classList.contains('show')) {
+                    try {
+                        const duelSnap = await firebase.firestore()
+                            .collection('duels').doc(currentDuelId).get();
+                        if (duelSnap.exists) {
+                            const duel = duelSnap.data();
+                            if (duel.status === 'timeout') {
+                                showWinner(null);
+                            } else if (duel.status !== 'active') {
+                                showWinner(duel.winner, duel.status);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Eroare la verificarea stării duelului:', err);
+                    }
+                }
+                // curățăm listener-ul și aici, indiferent pe ce cale am aflat rezultatul
+                if (duelUnsubscribe) {
+                    duelUnsubscribe();
+                    duelUnsubscribe = null;
+                }
             }
         });
 
@@ -713,13 +744,26 @@
             document.getElementById('findMatchBtn').style.display = 'none';
             document.getElementById('searchingBox').style.display = 'block';
 
-            await storage.joinQueue();
-
-            queueUnsubscribe = await storage.listenQueue((duelId, playerNumber) => {
-                currentDuelId = duelId;
-                myPlayer = playerNumber;
-                startDuelScreen();
-            });
+            try {
+                await storage.joinQueue();                       // ← cauza 1, acum prinsă
+                queueUnsubscribe = await storage.listenQueue(
+                    (duelId, playerNumber) => {
+                        currentDuelId = duelId;
+                        myPlayer = playerNumber;
+                        startDuelScreen();
+                    },
+                    (err) => {                                     // ← cauza 2: acum onError e dat efectiv
+                        document.getElementById('findMatchBtn').style.display = 'inline-block';
+                        document.getElementById('searchingBox').style.display = 'none';
+                        alert('Nu s-a putut crea duelul. Încearcă din nou.');
+                    }
+                );
+            } catch (err) {
+                console.error('findMatch failed:', err);
+                document.getElementById('findMatchBtn').style.display = 'inline-block';
+                document.getElementById('searchingBox').style.display = 'none';
+                alert('Eroare la căutarea unui adversar. Încearcă din nou.');
+            }
         }
 
         async function cancelSearch() {
@@ -766,7 +810,10 @@
                 if (!duelOver && duel.status !== 'active') {
                     duelOver = true;
                     clearInterval(timerInterval);
-                    if (duelUnsubscribe) duelUnsubscribe();
+                    if (duelUnsubscribe) {
+                        duelUnsubscribe();
+                        duelUnsubscribe = null;
+                    }
 
                     if (duel.status === 'timeout') {
                         showWinner(null);
@@ -779,6 +826,7 @@
 
         // ─── TIMER ──────────────────────────────────────────────────────────────
         function startTimer(startedAt) {
+            console.log("DEBUG startedAt:", startedAt, "toMillis:", startedAt?.toMillis?.());
             const updateTimer = () => {
                 const now = Date.now();
                 const start = startedAt?.toMillis ? startedAt.toMillis() : Date.now();
@@ -862,10 +910,17 @@
             if (name) {
                 const iWon = (status === 'p1_wins' && myPlayer === 1) ||
                     (status === 'p2_wins' && myPlayer === 2);
-                trophy.innerHTML = '<img src="../logos/trophy.png" alt="TROPHY">';
-                title.innerText = iWon ? 'You Win!' : name + ' Wins!';
-                subtitle.innerText = iWon ? 'Correct solution submitted first' : 'Better luck next time';
-                if (iWon) storage.gainXP(30);
+
+                if (iWon) {
+                    trophy.innerHTML = '<img src="../logos/trophy.png" alt="TROPHY">';
+                    title.innerText = 'You Win!';
+                    subtitle.innerText = 'Correct solution submitted first';
+                    storage.gainXP(30);
+                } else {
+                    trophy.innerHTML = '<img src="../logos/broken_trophy.png" alt="DEFEAT">';
+                    title.innerText = 'You Lose!';
+                    subtitle.innerText = name + ' submitted the correct solution first';
+                }
             } else {
                 trophy.innerHTML = '<img src="../logos/clock.png" alt="CLOCK">';
                 title.innerText = "Time's Up!";
@@ -883,7 +938,10 @@
             currentProblem = null;
             secondsLeft = 300;
             clearInterval(timerInterval);
-            if (duelUnsubscribe) duelUnsubscribe();
+            if (duelUnsubscribe) {
+                duelUnsubscribe();
+                duelUnsubscribe = null;
+            }
 
             duelEditor.setValue('# Write your solution here\n');
             document.getElementById('myFeedback').className = 'feedback-panel';

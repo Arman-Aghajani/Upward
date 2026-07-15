@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
     <script src="../rankup.js"></script>
     <script src="../storage.js"></script>
 
@@ -262,6 +263,8 @@
             flex-direction: column;
             gap: 16px;
             min-height: 500px;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .code-label {
@@ -270,24 +273,93 @@
             color: var(--accent);
         }
 
-        .code-panel textarea {
-            width: 100%;
-            flex: 1;
-            min-height: 220px;
-            background: #111;
+        /* EDITOR CARD — bordered box wrapping CodeMirror (no header/dots) */
+        .editor-card {
+            background: #0b0b1f;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #00ff90;
-            font-family: monospace;
-            font-size: 14px;
-            padding: 14px;
-            resize: vertical;
-            outline: none;
-            line-height: 1.6;
+            border-radius: 10px;
+            overflow: hidden;
+            min-width: 0;
         }
 
-        .code-panel textarea:focus {
-            border-color: var(--accent);
+        #codeEditor {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* CodeMirror — same theme/colors as the lessons (CodeMirror 5) */
+        .CodeMirror {
+            height: 320px !important;
+            max-width: 100%;
+            font-family: monospace !important;
+            font-size: 13px !important;
+            background: #0b0b1f !important;
+            color: #c9d1d9 !important;
+            border-radius: 0 !important;
+            line-height: 1.8 !important;
+        }
+
+        .CodeMirror-scroll {
+            padding: 14px 4px;
+            overflow: auto !important;
+        }
+
+        .CodeMirror-gutters {
+            background: #0b0b1f !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--accent) !important;
+        }
+
+        .CodeMirror-placeholder {
+            color: rgba(255, 255, 255, 0.25) !important;
+            font-style: italic;
+        }
+
+        /* Syntax tokens — identical palette to the lessons */
+        .cm-keyword {
+            color: #ff79c6 !important;
+        }
+
+        .cm-builtin,
+        .cm-def {
+            color: #50fa7b !important;
+        }
+
+        .cm-string,
+        .cm-string-2 {
+            color: #f1fa8c !important;
+        }
+
+        .cm-comment {
+            color: rgba(255, 255, 255, 0.28) !important;
+            font-style: italic !important;
+        }
+
+        .cm-number,
+        .cm-atom {
+            color: #bd93f9 !important;
+        }
+
+        .cm-variable-2,
+        .cm-property {
+            color: #8be9fd !important;
+        }
+
+        .cm-tag,
+        .cm-operator {
+            color: #ff79c6 !important;
+        }
+
+        .cm-attribute,
+        .cm-qualifier {
+            color: #50fa7b !important;
         }
 
         .submit-btn {
@@ -415,6 +487,11 @@
             .streak-banner {
                 grid-column: 1;
             }
+
+            .CodeMirror {
+                font-size: 12px !important;
+                height: 260px !important;
+            }
         }
     </style>
 </head>
@@ -469,7 +546,11 @@
         <div class="code-panel">
             <span class="code-label">Your Solution</span>
             <div class="done-banner" id="doneBanner">✓ Quest completed today — come back tomorrow!</div>
-            <textarea id="codeInput" placeholder="Write your solution here..." spellcheck="false"></textarea>
+
+            <div class="editor-card">
+                <div id="codeEditor"></div>
+            </div>
+
             <p class="loading-text" id="loadingText">Checking your solution...</p>
             <div class="feedback-box" id="feedbackBox"></div>
             <button class="submit-btn" id="submitBtn" onclick="submitCode()">Submit Solution</button>
@@ -481,6 +562,7 @@
 
         const typeIcons = { python: "⚔️", html: "🏗️", css: "🎨" };
         const typeLabels = { python: "PYTHON", html: "HTML", css: "CSS" };
+        const cmModes = { python: "python", html: "htmlmixed", css: "css" };
 
         // Obținem tipul din URL: ?type=python / html / css
         const urlParams = new URLSearchParams(window.location.search);
@@ -493,6 +575,28 @@
 
         let currentProblem = null;
         let todayKey = null;
+        let editorCM = null;
+
+        // Inițializăm CodeMirror după ce conținutul e vizibil (altfel nu poate
+        // calcula dimensiunile). Idempotent — se creează o singură dată.
+        function initEditor() {
+            if (editorCM) {
+                editorCM.refresh();
+                return;
+            }
+            editorCM = CodeMirror(document.getElementById("codeEditor"), {
+                value: "",
+                mode: cmModes[challengeType] || "python",
+                lineNumbers: true,
+                indentUnit: 4,
+                tabSize: 4,
+                indentWithTabs: false,
+                lineWrapping: false,
+                placeholder: "Write your solution here...",
+            });
+            editorCM.setSize("100%", 320);
+            setTimeout(() => editorCM.refresh(), 0);
+        }
 
         function getTodayDoneKey() {
             return `daily_${challengeType}_${getToday()}`;
@@ -548,19 +652,22 @@
             document.getElementById("problemDesc").textContent = problem.description;
             document.getElementById("hintBox").textContent = "💡 " + problem.hint;
 
-            // done banner
-            if (isCompletedToday()) {
-                document.getElementById("doneBanner").style.display = "block";
-                document.getElementById("submitBtn").disabled = true;
-                document.getElementById("codeInput").disabled = true;
-            }
-
             // streak
             renderStreak();
 
             // AI context
             window.LESSON_CONTEXT = `Daily Challenge (${challengeType.toUpperCase()}, Rank ${storage.RANKS[storage.getRankIndex()]})...`
             showContent();
+
+            // editor (după ce page-content e vizibil, ca CodeMirror să se măsoare corect)
+            initEditor();
+
+            // done banner
+            if (isCompletedToday()) {
+                document.getElementById("doneBanner").style.display = "block";
+                document.getElementById("submitBtn").disabled = true;
+                editorCM.setOption("readOnly", true);
+            }
         }
 
         function renderStreak() {
@@ -632,7 +739,7 @@
 
         async function submitCode() {
             if (!currentProblem) return;
-            const code = document.getElementById("codeInput").value.trim();
+            const code = editorCM.getValue().trim();
             if (!code) return;
 
             const btn = document.getElementById("submitBtn");
@@ -708,7 +815,7 @@ Reply in EXACTLY this format:
                     const newRank = await storage.gainXP(20);
                     if (newRank) showRankUpAnimation(newRank);
                     document.getElementById("doneBanner").style.display = "block";
-                    document.getElementById("codeInput").disabled = true;
+                    editorCM.setOption("readOnly", true);
                     renderStreak();
                 }
 
@@ -728,6 +835,15 @@ Reply in EXACTLY this format:
             hideLoadingScreen();
         });
     </script>
+
+    <!-- CodeMirror -->
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/display/placeholder.min.js"></script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>

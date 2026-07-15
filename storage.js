@@ -132,7 +132,7 @@ const storage = {
         return new Promise((resolve, reject) => {
             // Așteptăm ca Firebase să fie disponibil (firebase-init.js se încarcă după)
             const waitForFirebase = setInterval(() => {
-                if (typeof firebase === 'undefined' || !firebase.auth) return;
+                if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) return;
                 clearInterval(waitForFirebase);
 
                 this._db = firebase.firestore();
@@ -270,18 +270,6 @@ const storage = {
         });
     },
 
-    // ─── RANKUP CENTRALIZAT ──────────────────────────────────────────────────────
-    // SINGURA sursă de adevăr pentru XP + rankup. Lecțiile, boss-urile, practice și
-    // daily challenge cheamă DOAR asta când acordă XP — nu mai face nimeni calcul manual.
-    //
-    // Folosire:
-    //   const newRank = await storage.gainXP(10);
-    //   if (newRank) showRankUpAnimation(newRank);
-    //
-    // Întoarce numele noului rank (string) dacă userul a urcat, altfel null.
-    // while = procesează corect și salturile peste mai multe praguri deodată.
-    // Carry-over: surplusul de XP peste prag se reportează la noul rank.
-
     async gainXP(amount) {
         let xp = (this._data?.xp ?? 0) + Number(amount);
         let ri = this._data?.rankIndex ?? 0;
@@ -293,11 +281,9 @@ const storage = {
             rankedUp = this.RANKS[ri];
         }
 
-        // SCRIERE ATOMICĂ: xp și rankIndex într-un SINGUR update.
-        // Esențial pentru Security Rules — regula trebuie să vadă scăderea de xp
-        // și creșterea de rankIndex în aceeași operație, altfel respinge carry-over-ul.
         this._data.xp = xp;
         this._data.rankIndex = ri;
+
         if (this._uid && this._db) {
             try {
                 await this._db.collection('users').doc(this._uid).update({
@@ -307,12 +293,17 @@ const storage = {
             } catch (err) {
                 console.error('storage.gainXP save error:', err, { xp, ri });
             }
+
+            try {
+                await this._db.collection('leaderboard').doc(this._uid).set({
+                    name: this._data.name,
+                    xp: xp,
+                    rankIndex: ri
+                });
+            } catch (err) {
+                console.error('storage.gainXP leaderboard sync error:', err);
+            }
         }
-        await this._db.collection('leaderboard').doc(this._uid).set({
-            name: this._data.name,
-            xp: xp,
-            rankIndex: ri
-        });
 
         return rankedUp;
     },
@@ -405,14 +396,15 @@ const storage = {
         });
     },
 
-    async listenQueue(onMatched) {
+    async listenQueue(onMatched, onError) {
         if (!this._uid || !this._db) return;
         let matched = false;
+        let creating = false;
 
         const unsubscribe = this._db.collection('queue')
             .orderBy('joinedAt')
             .onSnapshot(async (snap) => {
-                if (matched) return;
+                if (matched || creating) return;
 
                 const myDoc = snap.docs.find(d => d.id === this._uid);
                 const others = snap.docs.filter(d => d.id !== this._uid);
@@ -422,6 +414,7 @@ const storage = {
                     const duelSnap = await this._db.collection('duels')
                         .where('p2.uid', '==', this._uid)
                         .where('status', '==', 'active')
+                        .orderBy('startedAt', 'desc')
                         .limit(1)
                         .get();
 
@@ -439,26 +432,53 @@ const storage = {
                 const opponent = others[0].data();
                 if (this._uid > opponent.uid) return;
 
+                creating = true;
+
+                const MAX_OUTER_ATTEMPTS = 3;
+                let duelRef = null;
+                let lastErr = null;
+
+                for (let attempt = 0; attempt < MAX_OUTER_ATTEMPTS; attempt++) {
+                    try {
+                        const problemRank = Math.min(this._data.rankIndex, opponent.rankIndex);
+                        const problem = await this.generateDuelProblem(problemRank);
+
+                        duelRef = await this._db.collection('duels').add({
+                            p1: { uid: this._uid, name: this._data.name },
+                            p2: { uid: opponent.uid, name: opponent.name },
+                            problem: problem,
+                            status: 'active',
+                            startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            winner: null,
+                            p1Code: '',
+                            p2Code: '',
+                            p1Submitted: false,
+                            p2Submitted: false
+                        });
+
+                        lastErr = null;
+                        break; // succes — ieșim din loop
+
+                    } catch (err) {
+                        lastErr = err;
+                        console.warn(`listenQueue: duel creation attempt ${attempt + 1} failed:`, err);
+                        // mic delay înainte de următoarea încercare
+                        if (attempt < MAX_OUTER_ATTEMPTS - 1) {
+                            await new Promise(r => setTimeout(r, 800));
+                        }
+                    }
+                }
+
+                try {
+                    await this._db.collection('queue').doc(this._uid).delete();
+                    await this._db.collection('queue').doc(opponent.uid).delete();
+                } catch (err) {
+                    console.error('listenQueue: queue cleanup failed:', err);
+                    // documentele din queue pot rămâne "orfane" temporar, dar nu e critic —
+                    // duelul deja există, prioritatea e ca playerii să ajungă la el
+                }
+
                 matched = true;
-                const problemRank = Math.min(this._data.rankIndex, opponent.rankIndex);
-                const problem = await this.generateDuelProblem(problemRank);
-
-                const duelRef = await this._db.collection('duels').add({
-                    p1: { uid: this._uid, name: this._data.name },
-                    p2: { uid: opponent.uid, name: opponent.name },
-                    problem: problem,
-                    status: 'active',
-                    startedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    winner: null,
-                    p1Code: '',
-                    p2Code: '',
-                    p1Submitted: false,
-                    p2Submitted: false
-                });
-
-                await this._db.collection('queue').doc(this._uid).delete();
-                await this._db.collection('queue').doc(opponent.uid).delete();
-
                 unsubscribe();
                 onMatched(duelRef.id, 1);
             });
@@ -497,13 +517,18 @@ const storage = {
 
     async forfeitDuel(duelId, player) {
         if (!this._uid || !this._db) return;
-        const duelSnap = await this._db.collection('duels').doc(duelId).get();
-        const duel = duelSnap.data();
-        const winnerName = player === 1 ? duel.p2.name : duel.p1.name;
-        await this._db.collection('duels').doc(duelId).update({
-            status: player === 1 ? 'p2_wins' : 'p1_wins',
-            winner: winnerName
-        });
+        try {
+            const duelSnap = await this._db.collection('duels').doc(duelId).get();
+            if (!duelSnap.exists) return;
+            const duel = duelSnap.data();
+            const winnerName = player === 1 ? duel.p2?.name : duel.p1?.name;
+            await this._db.collection('duels').doc(duelId).update({
+                status: player === 1 ? 'p2_wins' : 'p1_wins',
+                winner: winnerName
+            });
+        } catch (err) {
+            console.error('forfeitDuel error:', err);
+        }
     },
 
     async generateDuelProblem(rankIndex) {

@@ -8,8 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
     <script src="../rankup.js"></script>
     <script src="../storage.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/display/placeholder.min.js"></script>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
@@ -377,6 +381,38 @@
             margin-bottom: 16px;
         }
 
+        .io-grid {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .io-box {
+            flex: 1;
+            min-width: 180px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid var(--accent);
+            border-radius: 4px;
+            padding: 12px 16px;
+        }
+
+        .io-box .io-label {
+            font-family: 'Press Start 2P';
+            font-size: 7px;
+            opacity: 0.5;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .io-box pre {
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--green);
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
         .example-box {
             background: rgba(0, 0, 0, 0.3);
             border-left: 2px solid var(--accent);
@@ -413,6 +449,99 @@
 
         textarea::placeholder {
             color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ===== CodeMirror — keeps the exact textarea look (green on dark) ===== */
+        .cm-box {
+            border: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            min-width: 0;
+            transition: border-color .2s;
+        }
+
+        .cm-box.focused {
+            border-color: rgba(255, 77, 77, 0.4);
+        }
+
+        .cm-box>div {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .CodeMirror {
+            height: 200px !important;
+            max-width: 100%;
+            background: rgba(0, 0, 0, 0.3) !important;
+            color: #c9d1d9 !important;
+            font-family: monospace !important;
+            font-size: 14px !important;
+            line-height: 1.7 !important;
+            border-radius: 10px !important;
+        }
+
+        .CodeMirror-scroll {
+            padding: 12px 4px;
+            overflow: auto !important;
+        }
+
+        .CodeMirror-gutters {
+            background: transparent !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: rgba(255, 255, 255, 0.22) !important;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--accent) !important;
+        }
+
+        .CodeMirror-placeholder {
+            color: rgba(255, 255, 255, 0.15) !important;
+            font-style: italic;
+        }
+
+        /* Syntax tokens — same colored palette as the lessons / other pages */
+        .CodeMirror .cm-keyword {
+            color: #ff79c6 !important;
+        }
+
+        .CodeMirror .cm-builtin,
+        .CodeMirror .cm-def {
+            color: #50fa7b !important;
+        }
+
+        .CodeMirror .cm-string,
+        .CodeMirror .cm-string-2 {
+            color: #f1fa8c !important;
+        }
+
+        .CodeMirror .cm-comment {
+            color: rgba(255, 255, 255, 0.28) !important;
+            font-style: italic !important;
+        }
+
+        .CodeMirror .cm-number,
+        .CodeMirror .cm-atom {
+            color: #bd93f9 !important;
+        }
+
+        .CodeMirror .cm-variable-2,
+        .CodeMirror .cm-property {
+            color: #8be9fd !important;
+        }
+
+        .CodeMirror .cm-operator,
+        .CodeMirror .cm-tag {
+            color: #ff79c6 !important;
+        }
+
+        .CodeMirror .cm-attribute,
+        .CodeMirror .cm-qualifier {
+            color: #50fa7b !important;
         }
 
         .answers {
@@ -520,6 +649,55 @@
             transform: none;
         }
 
+        /* Per-test results list shown after a Piston run */
+        .test-results {
+            margin-top: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .test-results.show {
+            display: flex;
+        }
+
+        .test-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border: var(--border);
+        }
+
+        .test-row .test-dot {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            flex-shrink: 0;
+        }
+
+        .test-row.pass .test-dot {
+            color: var(--green);
+        }
+
+        .test-row.fail .test-dot {
+            color: var(--red);
+        }
+
+        .test-row .test-name {
+            opacity: 0.7;
+        }
+
+        .test-row .test-detail {
+            margin-left: auto;
+            opacity: 0.45;
+            font-family: monospace;
+            font-size: 11px;
+            text-align: right;
+        }
+
         .feedback-box {
             padding: 14px 18px;
             border-radius: 8px;
@@ -540,6 +718,13 @@
             background: rgba(255, 77, 77, 0.08);
             border: 1px solid var(--red);
             color: #ff8080;
+            display: block;
+        }
+
+        .feedback-box.warn {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid var(--accent);
+            color: var(--accent);
             display: block;
         }
 
@@ -765,6 +950,15 @@
                 line-height: 1.6;
             }
 
+            .io-grid {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .io-box {
+                min-width: 0;
+            }
+
             .example-box {
                 font-size: 12px;
                 padding: 10px 12px;
@@ -778,6 +972,11 @@
                 padding: 12px;
             }
 
+            .CodeMirror {
+                font-size: 13px !important;
+                height: 170px !important;
+            }
+
             .answer-btn {
                 font-size: 13px;
                 padding: 12px 14px;
@@ -787,6 +986,10 @@
                 width: 100%;
                 font-size: 8px;
                 padding: 12px 20px;
+            }
+
+            .test-row {
+                font-size: 11px;
             }
 
             .feedback-box {
@@ -836,7 +1039,7 @@
 
     <div class="boss-header">
         <div class="boss-portrait">
-            <img src="../logos/bosses/A.png" alt="The Overlord">
+            <img src="../logos/bosses/A.png" alt="The Sage">
         </div>
         <div class="boss-info">
             <div class="boss-rank-label">Rank A Guardian</div>
@@ -872,11 +1075,33 @@
                 <span class="damage-tag">⚔ 35 HP damage</span>
             </div>
             <h3 class="problem-title">Prime Numbers</h3>
-            <p class="problem-desc">Write a function called <strong>primes_up_to</strong> that takes an integer n and
-                returns a list of all prime numbers from 2 up to and including n.</p>
-            <div class="example-box">primes_up_to(10) → [2, 3, 5, 7]<br>primes_up_to(20) → [2, 3, 5, 7, 11, 13, 17,
-                19]<br>primes_up_to(2) → [2]</div>
-            <textarea id="code1" placeholder="Write your Python solution here..." spellcheck="false"></textarea>
+            <p class="problem-desc">Read an integer <strong>n</strong> from the input. Print all prime numbers from 2 up
+                to and including n, separated by a single space, on one line. If there are no primes, print nothing
+                (an empty line).</p>
+            <div class="io-grid">
+                <div class="io-box">
+                    <span class="io-label">Input</span>
+                    <pre>10</pre>
+                </div>
+                <div class="io-box">
+                    <span class="io-label">Output</span>
+                    <pre>2 3 5 7</pre>
+                </div>
+            </div>
+            <div class="io-grid">
+                <div class="io-box">
+                    <span class="io-label">Input</span>
+                    <pre>2</pre>
+                </div>
+                <div class="io-box">
+                    <span class="io-label">Output</span>
+                    <pre>2</pre>
+                </div>
+            </div>
+            <div class="cm-box">
+                <div id="code1Editor"></div>
+            </div>
+            <div class="test-results" id="results1"></div>
             <div class="feedback-box" id="feedback1"></div>
             <button class="submit-btn" id="submitBtn1" onclick="submitCoding(1)">Strike! ⚔</button>
         </div>
@@ -889,12 +1114,33 @@
                 <span class="damage-tag">⚔ 35 HP damage</span>
             </div>
             <h3 class="problem-title">Most Frequent Character</h3>
-            <p class="problem-desc">Write a function called <strong>most_frequent</strong> that takes a string and
-                returns the character that appears most often. If multiple characters tie for the most occurrences,
-                return the one that appears <strong>first</strong> in the string.</p>
-            <div class="example-box">most_frequent("hello") → "l"<br>most_frequent("aabbb") →
-                "b"<br>most_frequent("abc") → "a"<br>most_frequent("mississippi") → "i"</div>
-            <textarea id="code2" placeholder="Write your Python solution here..." spellcheck="false"></textarea>
+            <p class="problem-desc">Read a single line containing a string. Print the character that appears most often.
+                If several characters tie for the most occurrences, print the one that appears <strong>first</strong> in
+                the string.</p>
+            <div class="io-grid">
+                <div class="io-box">
+                    <span class="io-label">Input</span>
+                    <pre>hello</pre>
+                </div>
+                <div class="io-box">
+                    <span class="io-label">Output</span>
+                    <pre>l</pre>
+                </div>
+            </div>
+            <div class="io-grid">
+                <div class="io-box">
+                    <span class="io-label">Input</span>
+                    <pre>mississippi</pre>
+                </div>
+                <div class="io-box">
+                    <span class="io-label">Output</span>
+                    <pre>i</pre>
+                </div>
+            </div>
+            <div class="cm-box">
+                <div id="code2Editor"></div>
+            </div>
+            <div class="test-results" id="results2"></div>
             <div class="feedback-box" id="feedback2"></div>
             <button class="submit-btn" id="submitBtn2" onclick="submitCoding(2)">Strike! ⚔</button>
         </div>
@@ -908,8 +1154,7 @@
             </div>
             <h3 class="problem-title">Dictionary Comprehension</h3>
             <p class="problem-desc">What does this code print?</p>
-            <div class="example-box">words = ["hi", "hello", "hey"]<br>result = {w: len(w) for w in
-                words}<br>print(result["hello"])</div>
+            <div class="example-box">words = ["hi", "hello", "hey"]<br>result = {w: len(w) for w in words}<br>print(result["hello"])</div>
             <div class="answers">
                 <button class="answer-btn" data-option="a" onclick="selectAnswer(this)">A. &nbsp; "hello"</button>
                 <button class="answer-btn" data-option="b" onclick="selectAnswer(this)">B. &nbsp; 3</button>
@@ -943,6 +1188,58 @@
         let hp = 100, timeLeft = TOTAL_TIME, timerInterval = null;
         let solved = [false, false, false], selectedAnswer = null, bossDefeated = false;
 
+        // ─── Test cases per coding problem (sent to Piston via runCode) ──────────
+        // Hidden tests are not shown in the UI but ARE used for the verdict.
+        // They are designed to catch the classic algorithmic mistakes.
+        const TESTS = {
+            1: [
+                { name: "n = 10", stdin: "10", expected: "2 3 5 7" },
+                { name: "n = 2", stdin: "2", expected: "2" },
+                { name: "n = 1 (no primes)", stdin: "1", expected: "" },        // edge: empty output
+                { name: "n = 20", stdin: "20", expected: "2 3 5 7 11 13 17 19" },
+                { name: "n = 30", stdin: "30", expected: "2 3 5 7 11 13 17 19 23 29" },
+                { name: "n = 0 (no primes)", stdin: "0", expected: "" },        // edge: empty output
+            ],
+            2: [
+                { name: "hello", stdin: "hello", expected: "l" },
+                { name: "mississippi", stdin: "mississippi", expected: "i" },   // tie-break sensitive
+                { name: "aabbb", stdin: "aabbb", expected: "b" },
+                { name: "abc (all tie)", stdin: "abc", expected: "a" },         // tie-break -> first
+                { name: "abab (a,b tie)", stdin: "abab", expected: "a" },       // tie-break -> first
+                { name: "zzxy", stdin: "zzxy", expected: "z" },
+            ],
+        };
+
+        // ALGO check prompts — only used AFTER Piston passes all tests.
+        // The AI must judge the METHOD, not the output (Piston already proved output).
+        const ALGO_PROMPTS = {
+            1: "The problem: read integer n, print all primes from 2 to n inclusive, space-separated on one line. The student code already produces correct output on all hidden tests. Your ONLY job is to detect cheating or a fundamentally wrong METHOD. FAIL if: the code hardcodes specific outputs / answers for specific inputs (e.g. if n==10: print('2 3 5 7')), uses a lookup table of precomputed primes instead of actually testing primality, or otherwise does not genuinely compute primality. PASS a genuine primality approach (trial division, sieve, etc.) even if not optimal.",
+            2: "The problem: read a string, print the character that appears most often; on ties print the one that appears FIRST in the string. The student code already produces correct output on all hidden tests. Your ONLY job is to detect cheating or a fundamentally wrong METHOD. FAIL if: the code hardcodes outputs for specific inputs, or does not genuinely count character frequencies. PASS a genuine counting approach (dict/Counter/manual count) even if not optimal.",
+        };
+
+        // CodeMirror editors for the two coding problems
+        const editors = {};
+        function initEditors() {
+            [1, 2].forEach(n => {
+                editors[n] = CodeMirror(document.getElementById('code' + n + 'Editor'), {
+                    value: '',
+                    mode: 'python',
+                    lineNumbers: true,
+                    indentUnit: 4,
+                    tabSize: 4,
+                    indentWithTabs: false,
+                    lineWrapping: false,
+                    placeholder: 'Read input with input(), print the answer...',
+                });
+                editors[n].setSize('100%', 200);
+                const box = document.getElementById('code' + n + 'Editor').closest('.cm-box');
+                editors[n].on('focus', () => box.classList.add('focused'));
+                editors[n].on('blur', () => box.classList.remove('focused'));
+            });
+            setTimeout(() => editors[1].refresh(), 0);
+        }
+        window.addEventListener('load', initEditors);
+
         function startTimer() {
             timerInterval = setInterval(() => {
                 timeLeft--;
@@ -962,6 +1259,7 @@
             document.querySelectorAll('.problem-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('problem' + n).classList.add('active');
             document.getElementById('tab' + n).classList.add('active');
+            if (editors[n]) setTimeout(() => editors[n].refresh(), 0);
         }
 
         async function dealDamage(amount, problemIndex) {
@@ -982,17 +1280,7 @@
                 clearInterval(timerInterval);
                 bossDefeated = true;
                 if (!storage.isBossDone('a')) {
-                    await storage.addXP(50);
-                    const RANKS = ["E", "D", "C", "B", "A", "S", "National", "MAX RANK"];
-                    const XP_NEEDED = [100, 150, 200, 250, 300, 400, Infinity];
-                    let ri = storage.getRankIndex();
-                    let xp = storage.getXP();
-                    if (ri < RANKS.length - 1 && xp >= XP_NEEDED[ri]) {
-                        xp -= XP_NEEDED[ri]; ri++;
-                        await storage.setXP(xp);
-                        await storage.setRankIndex(ri);
-                        showRankUpAnimation(RANKS[ri]);
-                    }
+                    await storage.gainXP(50);
                     await storage.markBossDone('a');
                 }
                 setTimeout(() => {
@@ -1003,53 +1291,115 @@
             }
         }
 
-        const prompts = {
-            1: "Write a function called primes_up_to that returns all prime numbers from 2 up to n inclusive. Test: primes_up_to(10)=[2,3,5,7], primes_up_to(2)=[2]",
-            2: "Write a function called most_frequent that takes a string and returns the character that appears most often. On ties, return the one appearing first in the string. Test: most_frequent('hello')='l', most_frequent('aabbb')='b', most_frequent('abc')='a', most_frequent('mississippi')='i'"
-        };
+        // Render the per-test pass/fail list under the editor
+        function renderTestResults(problemNum, results) {
+            const tests = TESTS[problemNum];
+            const box = document.getElementById('results' + problemNum);
+            box.innerHTML = '';
+            results.forEach((r, i) => {
+                const name = (tests[i] && tests[i].name) || ('Test ' + (i + 1));
+                const row = document.createElement('div');
+                row.className = 'test-row ' + (r.passed ? 'pass' : 'fail');
+                let detail = '';
+                if (!r.passed) {
+                    detail = r.runtimeError
+                        ? 'runtime error'
+                        : 'got "' + (r.actual === '' ? '∅' : r.actual) + '"';
+                }
+                row.innerHTML =
+                    '<span class="test-dot">' + (r.passed ? '✓' : '✗') + '</span>' +
+                    '<span class="test-name">' + name + '</span>' +
+                    '<span class="test-detail">' + detail + '</span>';
+                box.appendChild(row);
+            });
+            box.classList.add('show');
+        }
 
         async function submitCoding(problemNum) {
-            const code = document.getElementById('code' + problemNum).value.trim();
+            const code = editors[problemNum].getValue().trim();
             if (!code) return;
 
             const btn = document.getElementById('submitBtn' + problemNum);
             const feedback = document.getElementById('feedback' + problemNum);
+            const resultsBox = document.getElementById('results' + problemNum);
 
             btn.disabled = true;
+            resultsBox.classList.remove('show');
             feedback.className = 'feedback-box loading';
-            feedback.innerText = 'The Sage evaluates your attack...';
+            feedback.innerText = 'The Sage runs your code against the trials...';
 
+            // ── STEP 1: run on Piston against all test cases ────────────────────
+            let runRes;
             try {
-                const callApi = firebase.functions().httpsCallable('api');
-                const result = await callApi({
-                    model: 'claude-haiku-4-5-20251001',
-                    max_tokens: 500,
-                    messages: [{
-                        role: 'user',
-                        content: `You are evaluating a Python solution for a boss battle.\n\nPROBLEM: ${prompts[problemNum]}\n\nSTUDENT CODE:\n${code}\n\nBe strict but fair.\n\nRespond in this exact format:\nRESULT: PASS or FAIL\nFEEDBACK: (one encouraging sentence)`
-                    }]
+                const runCode = firebase.functions().httpsCallable('runCode');
+                const res = await runCode({
+                    code: code,
+                    testCases: TESTS[problemNum].map(t => ({ stdin: t.stdin, expected: t.expected })),
                 });
-
-                const text = result.data.content[0].text;
-                const passed = text.includes('RESULT: PASS');
-                const feedbackText = text.split('FEEDBACK:')[1]?.trim() || '';
-
-                if (passed) {
-                    feedback.className = 'feedback-box success';
-                    feedback.innerText = '⚔ Hit! ' + feedbackText;
-                    btn.disabled = true;
-                    dealDamage(35, problemNum);
-                } else {
-                    feedback.className = 'feedback-box error';
-                    feedback.innerText = '✗ Missed! ' + feedbackText;
-                    btn.disabled = false;
-                }
+                runRes = res.data;
             } catch (err) {
                 feedback.className = 'feedback-box error';
                 feedback.innerText = 'Error: ' + err.message;
                 console.error(err);
                 btn.disabled = false;
+                return;
             }
+
+            renderTestResults(problemNum, runRes.results || []);
+
+            if (!runRes.passed) {
+                const failed = (runRes.results || []).filter(r => !r.passed).length;
+                const total = (runRes.results || []).length;
+                feedback.className = 'feedback-box error';
+                feedback.innerText = '✗ Missed! ' + failed + '/' + total +
+                    ' trials failed. Fix the cases marked ✗ and strike again.';
+                btn.disabled = false;
+                return;
+            }
+
+            // ── STEP 2: all tests passed → ALGO check (method validation) ───────
+            feedback.className = 'feedback-box loading';
+            feedback.innerText = 'All trials passed. The Sage inspects your method...';
+
+            let algoVerdict = 'PASS', algoReason = '';
+            try {
+                const callApi = firebase.functions().httpsCallable('api');
+                const result = await callApi({
+                    model: 'claude-haiku-4-5-20251001',
+                    max_tokens: 300,
+                    messages: [{
+                        role: 'user',
+                        content: ALGO_PROMPTS[problemNum] +
+                            "\n\nSTUDENT CODE:\n" + code +
+                            "\n\nRespond in this EXACT format and nothing else:\n" +
+                            "RESULT: PASS or FAIL\n" +
+                            "REASON: (one short sentence)"
+                    }]
+                });
+                const text = result.data.content[0].text;
+                algoVerdict = text.includes('RESULT: FAIL') ? 'FAIL' : 'PASS';
+                algoReason = (text.split('REASON:')[1] || '').trim();
+            } catch (err) {
+                // If the ALGO check itself errors, don't punish the student — Piston already passed.
+                console.warn('ALGO check failed to run, granting hit:', err);
+                algoVerdict = 'PASS';
+            }
+
+            if (algoVerdict === 'FAIL') {
+                feedback.className = 'feedback-box warn';
+                feedback.innerText = '⚠ Trials passed, but The Sage rejects your method: ' +
+                    (algoReason || 'the solution does not genuinely solve the problem.') +
+                    ' Rewrite it with a real algorithm and strike again.';
+                btn.disabled = false;
+                return;
+            }
+
+            // ── Genuine solution → land the hit ─────────────────────────────────
+            feedback.className = 'feedback-box success';
+            feedback.innerText = '⚔ Hit! Your method is sound — all trials passed.';
+            btn.disabled = true;
+            editors[problemNum].setOption('readOnly', true);
+            dealDamage(35, problemNum);
         }
 
         function selectAnswer(btn) {
