@@ -50,9 +50,9 @@ Platforma se adresează elevilor de gimnaziu și liceu fără experiență anter
 | S | The Master Sentinel | 12 min | Memoized Fibonacci, Sum of Digits, Accumulator Trace |
 | National | The Architect | 15 min | Find First Negative, Count Common Characters, Recursive Trace |
 
-- Fiecare luptă are 2 probleme de cod (executate prin Piston, apoi validate algoritmic de AI) și o întrebare grilă de tip „ce afișează acest cod?”
-- Fiecare lovitură reușită scade HP-ul Gardianului (35 / 35 / 30); la 0 HP, Gardianul e învins, elevul primește **+50 XP** și boss-ul e marcat definitiv ca finalizat
-- Dacă timpul expiră înainte de înfrângerea Gardianului, elevul pierde lupta și trebuie să reîncerce
+- Fiecare provocare are 2 probleme de cod (executate prin Piston, apoi validate algoritmic de AI) și o întrebare grilă de tip „ce afișează acest cod?”
+- Fiecare soluție reușită scade HP-ul Gardianului (35 / 35 / 30); la 0 HP, Gardianul e învins, elevul primește **+50 XP** și boss-ul e marcat definitiv ca finalizat
+- Dacă timpul expiră înainte de înfrângerea Gardianului, elevul pierde provocarea și trebuie să reîncerce
 
 ### 2.5. Practice Problems — evaluare duală
 - Probleme de antrenament libere, independente de Guardian Trials, câte 3 pentru fiecare rang (2 probleme de cod + 1 grilă)
