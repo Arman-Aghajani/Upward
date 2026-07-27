@@ -333,7 +333,7 @@ Respond ONLY with valid JSON, no markdown, no backticks:
 }`;
     }
 
-    const MAX_ATTEMPTS = 3;
+    const MAX_ATTEMPTS = 8;
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       try {
@@ -526,7 +526,7 @@ Respond ONLY with valid JSON, no markdown, no backticks:
   ]
 }`;
 
-    const MAX_ATTEMPTS = 3;
+    const MAX_ATTEMPTS = 8;
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       try {
